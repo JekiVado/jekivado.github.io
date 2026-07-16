@@ -14,6 +14,9 @@ assert.match(html, /--surface:\s*#171a1f/);
 assert.match(html, /class="card-grid"/);
 assert.match(html, /box-shadow:\s*0 14px 30px/);
 assert.doesNotMatch(html, /feTurbulence/);
+assert.match(html, /--muted:\s*#b5c0ce/);
+assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
+assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
 
 for (const route of [
   '../escape01/',
