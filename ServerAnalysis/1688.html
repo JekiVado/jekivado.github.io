@@ -93,15 +93,15 @@
       <div class="kpi"><div class="kpi-label">TENCENT CVM</div><div class="kpi-value">23</div><div class="kpi-note">22 台截图已录入 · 1 台待补全</div></div>
       <div class="kpi"><div class="kpi-label">CAPTURED COMPUTE</div><div class="kpi-value" id="cpuCount">128</div><div class="kpi-note"><span id="memoryCount">366</span> GiB / 22 台已录入</div></div>
       <div class="kpi"><div class="kpi-label">MYSQL INSTANCES</div><div class="kpi-value">9</div><div class="kpi-note">均为双节点本地盘 · 包年包月</div></div>
-      <div class="kpi"><div class="kpi-label">SECURITY EVENTS</div><div class="kpi-value">2K</div><div class="kpi-note">待处理主机安全事件 · 需拆分等级</div></div>
+      <div class="kpi"><div class="kpi-label">HEALTH / 24H</div><div class="kpi-value">1 / 1</div><div class="kpi-note">告警 1 · 提醒 1 · 均需处置</div></div>
     </section>
 
     <section class="layout">
       <section class="panel">
         <div class="panel-head"><div><h2>实例核对清单</h2><span>16:9 投屏模式 · 每页 8 台；已录入 22 / 23 台，缺 1 台名称与规格</span></div><div class="table-tools"><span id="rowCount">22 INSTANCES</span><div class="pager" id="pager"></div></div></div>
         <div class="filters" id="filters"><button class="filter active" data-filter="all">已录入 22</button><button class="filter" data-filter="prod">生产 10</button><button class="filter" data-filter="stage">测试 / 开发 4</button><button class="filter" data-filter="ops">运维 / 遗留 8</button></div>
-        <div class="table-wrap"><table class="instances"><thead><tr><th>实例</th><th>角色（由名称推断）</th><th>规格 / 可用区</th><th>网络 / 监控</th><th>到期 / 计费</th><th>核对焦点</th></tr></thead><tbody id="instanceRows"></tbody></table></div>
-        <details><summary>数据口径与暂未录入项</summary><div class="details-copy">CVM 配置、状态、计费方式和到期日来自腾讯云截图。资源概览显示 23 台 CVM，但两张实例截图中仅可完整核对 22 台，尚缺 1 台实例名称、规格与到期日；页面不将该缺口当作已核实数据。截图未提供 CPU、内存、磁盘和流量趋势，不能据此直接提出降配建议。</div></details>
+        <div class="table-wrap"><table class="instances"><thead><tr><th>实例</th><th>角色（由名称推断）</th><th>规格 / 可用区</th><th>当前利用率快照</th><th>到期 / 计费</th><th>核对焦点</th></tr></thead><tbody id="instanceRows"></tbody></table></div>
+        <details><summary>数据口径与暂未录入项</summary><div class="details-copy">CVM 配置、状态、计费方式、到期日与性能快照来自腾讯云截图。性能数值是当前时点，并非峰值或长期趋势；22 台中 20 台运行中并返回性能数据，2 台已关机。资源概览显示共 23 台 CVM，尚缺 1 台实例名称、规格与到期日；页面不将该缺口当作已核实数据。请补充 7/30 天 CPU、内存、磁盘与流量趋势后再评估降配。</div></details>
       </section>
 
       <aside class="side-stack">
@@ -123,37 +123,37 @@
 
   <script>
     const instances = [
-      {n:'sm-sh-tkg-reserved-12',id:'ins-quximkel',c:4,m:32,b:0,role:'预留内存节点',e:'ops',pri:'172.17.16.10',expires:'2026-08-16',focus:'预留用途',r:'medium'},
-      {n:'sm-sh-game-ios-1',id:'ins-6afbhvwl',c:2,m:2,b:100,role:'游戏 iOS 节点',e:'prod',pri:'172.17.0.111',expires:'2026-08-16',focus:'续费价格',r:'medium'},
-      {n:'sm-sh-tkg-reserved-11',id:'ins-3ngyv0yp',c:4,m:32,b:0,role:'预留内存节点',e:'ops',pri:'172.17.16.3',expires:'2026-08-16',focus:'预留用途',r:'medium'},
-      {n:'sm-sh-tkg-data-1',id:'ins-rmy7or2l',c:16,m:64,b:100,role:'数据服务节点',e:'prod',pri:'172.17.16.8',expires:'2026-08-12',focus:'业务依赖',r:'medium'},
-      {n:'sm-sh-oper-be-1',id:'ins-irehte9x',c:2,m:8,b:100,role:'运维后端节点',e:'ops',pri:'172.17.0.103',expires:'2026-08-12',focus:'运维职责',r:'low'},
-      {n:'sm-sh-game-test-1',id:'ins-o1082vnl',c:8,m:16,b:100,role:'游戏测试节点',e:'stage',pri:'172.17.0.73',expires:'2026-08-12',focus:'测试排期',r:'medium'},
-      {n:'sm-sh-game-dl-1',id:'ins-fd2tynvl',c:2,m:2,b:100,role:'游戏下载节点',e:'prod',pri:'172.17.0.60',expires:'2026-08-12',focus:'流量趋势',r:'medium'},
-      {n:'sm-sh-core-loki-1',id:'ins-md36wh4z',c:8,m:16,b:100,role:'日志 Loki 节点',e:'ops',pri:'172.17.0.126',expires:'4 天后自动续费',focus:'自动续费',r:'high'},
-      {n:'SVN-2',id:'ins-4e73o297',c:2,m:2,b:200,role:'代码版本库',e:'ops',pri:'172.17.0.105',expires:'2026-11-20',focus:'备份与迁移',r:'low'},
-      {n:'16-dev环境',id:'ins-as7thumd',c:8,m:16,b:200,role:'开发环境',e:'stage',pri:'172.17.0.35',expires:'2026-11-26',focus:'开发排期',r:'medium'},
-      {n:'16-cicd服务器',id:'ins-2r6e5wxt',c:8,m:16,b:200,role:'CI/CD 节点',e:'ops',pri:'172.17.0.31',expires:'2026-11-17',focus:'任务利用率',r:'medium'},
-      {n:'16-test-中间件服务器',id:'ins-70u88hvx',c:8,m:32,b:100,role:'测试中间件',e:'stage',pri:'172.17.0.34',expires:'2026-11-21',focus:'测试排期',r:'medium'},
-      {n:'SVN',id:'ins-dqcyc0pv',c:2,m:4,b:200,role:'代码版本库',e:'ops',pri:'172.17.0.36',expires:'2026-11-29',focus:'备份与迁移',r:'low'},
-      {n:'1688后台-数据后台',id:'ins-bar6skqz',c:4,m:8,b:200,role:'1688 后台数据',e:'prod',pri:'172.17.0.4',expires:'2026-11-30',focus:'业务依赖',r:'medium'},
-      {n:'1688后台-公共服务',id:'ins-ox0ww4fh',c:4,m:8,b:200,role:'1688 公共服务',e:'prod',pri:'172.17.0.45',expires:'2026-11-30',focus:'业务依赖',r:'medium'},
-      {n:'1688后台-数据打点',id:'ins-28phda99',c:4,m:8,b:200,role:'1688 数据打点',e:'prod',pri:'172.17.0.37',expires:'2026-11-30',focus:'流量与日志',r:'medium'},
-      {n:'1688业务-dev-开发机',id:'ins-bbp9d7y9',c:2,m:4,b:200,role:'1688 开发机',e:'stage',pri:'172.17.0.15',expires:'2026-11-30',focus:'已关机',r:'high',status:'已关机'},
-      {n:'1688发行为-打包机',id:'ins-231r8ei1',c:8,m:16,b:100,role:'构建 / 打包节点',e:'ops',pri:'172.17.0.14',expires:'2026-11-07',focus:'已关机',r:'high',status:'已关机'},
-      {n:'1688发行为-WEB-出队列',id:'ins-0q4vf747',c:8,m:16,b:100,role:'发布 Web 出队列',e:'prod',pri:'172.17.0.17',expires:'2026-11-07',focus:'业务依赖',r:'medium'},
-      {n:'1688发行为-WEB-API2',id:'ins-j3ze702r',c:8,m:16,b:100,role:'发布 Web API',e:'prod',pri:'172.17.0.12',expires:'2026-11-07',focus:'业务依赖',r:'medium'},
-      {n:'1688发行为-WEB-API1',id:'ins-lumevzan',c:8,m:16,b:100,role:'发布 Web API',e:'prod',pri:'172.17.0.3',expires:'2026-11-07',focus:'业务依赖',r:'medium'},
-      {n:'1688发行为-WEB-发布',id:'ins-r0a1tu2v',c:8,m:32,b:100,role:'发布 Web 节点',e:'prod',pri:'172.17.0.7',expires:'2026-11-07',focus:'业务依赖',r:'medium'}
+      {n:'sm-sh-tkg-reserved-12',id:'ins-quximkel',c:4,m:32,b:0,role:'预留内存节点',e:'ops',pri:'172.17.16.10',u:[1.98,6.16,11.49],out:'—',expires:'2026-08-16',focus:'预留用途',r:'medium'},
+      {n:'sm-sh-game-ios-1',id:'ins-6afbhvwl',c:2,m:2,b:100,role:'游戏 iOS 节点',e:'prod',pri:'172.17.0.111',u:[1.18,33.38,18.50],out:'0.00',expires:'2026-08-16',focus:'续费价格',r:'medium'},
+      {n:'sm-sh-tkg-reserved-11',id:'ins-3ngyv0yp',c:4,m:32,b:0,role:'预留内存节点',e:'ops',pri:'172.17.16.3',u:[3.37,9.10,11.18],out:'0.06',expires:'2026-08-16',focus:'预留用途',r:'medium'},
+      {n:'sm-sh-tkg-data-1',id:'ins-rmy7or2l',c:16,m:64,b:100,role:'数据服务节点',e:'prod',pri:'172.17.16.8',u:[2.97,81.25,17.70],out:'0.00',expires:'2026-08-12',focus:'内存趋势',r:'medium'},
+      {n:'sm-sh-oper-be-1',id:'ins-irehte9x',c:2,m:8,b:100,role:'运维后端节点',e:'ops',pri:'172.17.0.103',u:[0.87,15.58,22.70],out:'0.01',expires:'2026-08-12',focus:'运维职责',r:'low'},
+      {n:'sm-sh-game-test-1',id:'ins-o1082vnl',c:8,m:16,b:100,role:'游戏测试节点',e:'stage',pri:'172.17.0.73',u:[0.20,6.66,20.13],out:'0.01',expires:'2026-08-12',focus:'测试排期',r:'medium'},
+      {n:'sm-sh-game-dl-1',id:'ins-fd2tynvl',c:2,m:2,b:100,role:'游戏下载节点',e:'prod',pri:'172.17.0.60',u:[1.02,27.97,18.71],out:'0.00',expires:'2026-08-12',focus:'流量趋势',r:'medium'},
+      {n:'sm-sh-core-loki-1',id:'ins-md36wh4z',c:8,m:16,b:100,role:'日志 Loki 节点',e:'ops',pri:'172.17.0.126',u:[0.32,12.37,17.17],out:'0.02',expires:'4 天后自动续费',focus:'自动续费',r:'high'},
+      {n:'SVN-2',id:'ins-4e73o297',c:2,m:2,b:200,role:'代码版本库',e:'ops',pri:'172.17.0.105',u:[1.85,82.50,21.02],out:'0.02',expires:'2026-11-20',focus:'内存趋势',r:'medium'},
+      {n:'16-dev环境',id:'ins-as7thumd',c:8,m:16,b:200,role:'开发环境',e:'stage',pri:'172.17.0.35',u:[5.67,26.52,90.94],out:'1.04',expires:'2026-11-26',focus:'磁盘 90.94%',r:'high'},
+      {n:'16-cicd服务器',id:'ins-2r6e5wxt',c:8,m:16,b:200,role:'CI/CD 节点',e:'ops',pri:'172.17.0.31',u:[1.80,78.36,97.75],out:'0.01',expires:'2026-11-17',focus:'磁盘告警',r:'high'},
+      {n:'16-test-中间件服务器',id:'ins-70u88hvx',c:8,m:32,b:100,role:'测试中间件',e:'stage',pri:'172.17.0.34',u:[1.67,17.99,34.04],out:'0.52',expires:'2026-11-21',focus:'测试排期',r:'medium'},
+      {n:'SVN',id:'ins-dqcyc0pv',c:2,m:4,b:200,role:'代码版本库',e:'ops',pri:'172.17.0.36',u:[1.91,67.00,50.11],out:'0.05',expires:'2026-11-29',focus:'健康提醒',r:'medium'},
+      {n:'1688后台-数据后台',id:'ins-bar6skqz',c:4,m:8,b:200,role:'1688 后台数据',e:'prod',pri:'172.17.0.4',u:[0.65,15.86,23.74],out:'0.02',expires:'2026-11-30',focus:'业务依赖',r:'medium'},
+      {n:'1688后台-公共服务',id:'ins-ox0ww4fh',c:4,m:8,b:200,role:'1688 公共服务',e:'prod',pri:'172.17.0.45',u:[0.78,16.10,23.87],out:'0.01',expires:'2026-11-30',focus:'业务依赖',r:'medium'},
+      {n:'1688后台-数据打点',id:'ins-28phda99',c:4,m:8,b:200,role:'1688 数据打点',e:'prod',pri:'172.17.0.37',u:[0.80,25.43,23.86],out:'0.01',expires:'2026-11-30',focus:'流量与日志',r:'medium'},
+      {n:'1688业务-dev-开发机',id:'ins-bbp9d7y9',c:2,m:4,b:200,role:'1688 开发机',e:'stage',pri:'172.17.0.15',u:null,out:'0.00',expires:'2026-11-30',focus:'已关机',r:'low',status:'已关机'},
+      {n:'1688发行为-打包机',id:'ins-231r8ei1',c:8,m:16,b:100,role:'构建 / 打包节点',e:'ops',pri:'172.17.0.14',u:null,out:'0.00',expires:'2026-11-07',focus:'已关机',r:'low',status:'已关机'},
+      {n:'1688发行为-WEB-出队列',id:'ins-0q4vf747',c:8,m:16,b:100,role:'发布 Web 出队列',e:'prod',pri:'172.17.0.17',u:[0.42,7.73,30.24],out:'0.07',expires:'2026-11-07',focus:'业务依赖',r:'medium'},
+      {n:'1688发行为-WEB-API2',id:'ins-j3ze702r',c:8,m:16,b:100,role:'发布 Web API',e:'prod',pri:'172.17.0.12',u:[0.52,7.42,30.21],out:'0.03',expires:'2026-11-07',focus:'业务依赖',r:'medium'},
+      {n:'1688发行为-WEB-API1',id:'ins-lumevzan',c:8,m:16,b:100,role:'发布 Web API',e:'prod',pri:'172.17.0.3',u:[0.48,7.35,30.91],out:'0.03',expires:'2026-11-07',focus:'业务依赖',r:'medium'},
+      {n:'1688发行为-WEB-发布',id:'ins-r0a1tu2v',c:8,m:32,b:100,role:'发布 Web 节点',e:'prod',pri:'172.17.0.7',u:[2.03,35.39,42.87],out:'0.01',expires:'2026-11-07',focus:'业务依赖',r:'medium'}
     ];
     const assets = [
-      ['MySQL','9 个双节点本地盘实例 · 含 200GB–1000GB 存储'],['负载均衡 CLB','10 条 · 截图确认部分为容器与公网入口'],['容器服务','1 个集群'],['Redis / 缓存','5 个分布式缓存数据库'],['私有网络 VPC','5 个'],['对象存储 COS','约 17 GB'],['内容分发网络 CDN','昨日使用 155 KB'],['域名与备案','5 域名 · 已完成备案 4 个']
+      ['MySQL','9 个双节点本地盘实例 · 含 200GB–1000GB 存储'],['负载均衡 CLB','10 条 · 截图确认部分为容器与公网入口'],['容器服务','1 个集群'],['Redis / 缓存','5 个分布式缓存数据库'],['私有网络 VPC','5 个'],['对象存储 COS','约 17 GB'],['内容分发网络 CDN','昨日使用 155 KB'],['主机安全','约 2K 待处理事件 · 与 24h 告警分开核验'],['域名与备案','5 域名 · 已完成备案 4 个']
     ];
     const decisions = [
-      {kind:'urgent',label:'费用归因 · P1',title:'2025-11 集中支出需核对包年明细',text:'当月云服务器费 ¥132,106，占 2025 年费用 80.7%。截图中多数资源在 2026 年 8 月或 11 月到期，存在集中包年续费可能，但须由费用明细确认。',metric:'2025-11 · ¥132,106'},
-      {kind:'urgent',label:'费用归因 · P1',title:'2026-06 云服务器费突然升至 ¥17,297',text:'6 月 A 类云服务器费占当月总成本 94.8%，较 5 月的 ¥0 大幅变化。应导出 CVM、MySQL、CLB 与预付抵扣明细，识别续费或资源变更。',metric:'2026-06 · A 类 94.8%'},
-      {kind:'watch',label:'续费窗口 · P2',title:'8 月与 11 月存在两批续费窗口',text:'截图中 8 台左右 CVM 在 2026-08 到期，其余多集中在 2026-11；MySQL 也集中在 8 月和 11 月。应按业务域建立续费清单。',metric:'2026-08 / 2026-11'},
-      {kind:'watch',label:'资源核对 · P2',title:'23 台 CVM 中仍缺 1 台完整信息',text:'已根据截图录入 22 台 CVM（128 vCPU / 366 GiB）。资源概览显示总数为 23 台，缺失项应补齐名称、规格、状态和到期日后再做全量汇总。',metric:'已录入 22 / 23'},
+      {kind:'urgent',label:'容量告警 · P1',title:'16-cicd服务器磁盘 97.75%，当前告警中',text:'CPU 1.80%、内存 78.36%、磁盘 97.75%。先清理构建缓存、制品、日志和旧工作目录，检查磁盘增长来源；处理后再决定扩容或保留。',metric:'DISK 97.75% · ALERT 1'},
+      {kind:'urgent',label:'容量风险 · P1',title:'16-dev环境磁盘 90.94%',text:'开发环境 CPU 5.67%、内存 26.52%，但磁盘 90.94%、外网出带宽 1.04 Mbps。先确认构建产物与日志保留策略，避免步入告警。',metric:'DISK 90.94%'},
+      {kind:'watch',label:'性能提醒 · P2',title:'SVN 收到提醒，内存快照 67.00%',text:'SVN CPU 1.91%、内存 67.00%、磁盘 50.11%，健康状态为“提醒”。需查看具体告警策略和 7/30 天峰值，不能只凭当前 CPU 做降配判断。',metric:'SVN · REMINDER 1'},
+      {kind:'urgent',label:'费用归因 · P1',title:'2025-11 与 2026-06 集中支出待核对',text:'2025-11 云服务器费 ¥132,106；2026-06 A 类云服务器费 ¥17,297。需导出 CVM、MySQL、CLB 与预付抵扣明细，再判断续费与新增资源。',metric:'¥132,106 / ¥17,297'},
       {kind:'urgent',label:'安全治理 · P1',title:'主机安全待处理事件约 2K',text:'资源概览仅提供事件总量，未包含高危比例、受影响实例和处置状态。请先导出分级清单，避免将历史噪声与真实风险混在一起。',metric:'待处理约 2K'}
     ];
     const costHistory = [
@@ -168,7 +168,7 @@
     function render(filter=activeFilter, targetPage=currentPage) {
       activeFilter = filter; const allRows = visible(activeFilter); const pageCount = Math.max(1, Math.ceil(allRows.length / pageSize)); currentPage = Math.max(0, Math.min(targetPage, pageCount - 1)); const rows = allRows.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
       document.querySelector('#rowCount').textContent = `${allRows.length} INSTANCES`;
-      document.querySelector('#instanceRows').innerHTML = rows.map(x => `<tr><td><span class="instance-name">${x.n}</span><span class="instance-meta">${x.id} · 上海</span></td><td class="role">${x.role}<br><span class="status" style="margin-top:7px"><i>•</i>${x.status || '运行中'}</span></td><td class="spec">${x.b === 0 ? '内存型 M9' : '标准型 SA3'}<br>${x.c}C / ${x.m}G / ${x.b} Mbps</td><td class="network">私网 ${x.pri}<br>Default-VPC<br><span class="instance-meta">性能趋势未提供</span></td><td class="billing"><strong>包年包月</strong><br>${x.expires}<br>${x.b ? '按流量计费' : '无公网带宽'}</td><td><span class="tag ${review[x.r][1]}">${review[x.r][0]}</span></td></tr>`).join('');
+      document.querySelector('#instanceRows').innerHTML = rows.map(x => `<tr><td><span class="instance-name">${x.n}</span><span class="instance-meta">${x.id} · 上海</span></td><td class="role">${x.role}<br><span class="status" style="margin-top:7px;color:${x.status ? '#8491a4' : 'var(--mint)'}"><i>•</i>${x.status || '运行中'}</span></td><td class="spec">${x.b === 0 ? '内存型 M9' : '标准型 SA3'}<br>${x.c}C / ${x.m}G / ${x.b} Mbps</td><td>${x.u ? `<div class="bars">${usageBar('CPU',x.u[0])}${usageBar('MEM',x.u[1])}${usageBar('DISK',x.u[2])}</div><span class="instance-meta">外网出 ${x.out} Mbps</span>` : `<div class="no-metrics">已关机，无性能指标<br><span class="instance-meta">外网出 ${x.out} Mbps</span></div>`}</td><td class="billing"><strong>包年包月</strong><br>${x.expires}<br>${x.b ? '按流量计费' : '无公网带宽'}</td><td><span class="tag ${review[x.r][1]}">${review[x.r][0]}</span></td></tr>`).join('');
       document.querySelectorAll('.filter').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
       document.querySelector('#pager').innerHTML = `<button class="page-btn" data-page="prev" ${currentPage === 0 ? 'disabled' : ''} aria-label="上一页">‹</button><span class="page-no">${currentPage + 1} / ${pageCount}</span><button class="page-btn" data-page="next" ${currentPage === pageCount - 1 ? 'disabled' : ''} aria-label="下一页">›</button>`;
     }
@@ -182,9 +182,8 @@
     document.querySelector('#pager').addEventListener('click', event => { const action = event.target.dataset.page; if (action === 'prev') render(activeFilter, currentPage - 1); if (action === 'next') render(activeFilter, currentPage + 1); });
     document.addEventListener('keydown', event => { if (event.key === 'ArrowLeft') render(activeFilter, currentPage - 1); if (event.key === 'ArrowRight') render(activeFilter, currentPage + 1); });
     document.querySelector('#print').addEventListener('click', () => window.print());
-    document.querySelector('#copy').addEventListener('click', async () => { const text='1688 腾讯云：资源概览为 23 台 CVM、9 个 MySQL、10 个 CLB、1 个容器集群与 5 个缓存实例；本次已按截图录入 22 台 CVM（128 vCPU / 366 GiB），仍缺 1 台完整信息。2025 年实际支出 ¥163,740（含 11 月 ¥132,106 集中支出），2026 H1 实际支出 ¥30,865，月均 ¥5,144。优先核对 2025-11 与 2026-06 ¥17,297 的账单明细、8月与11月续费窗口，以及约 2K 主机安全待处理事件。'; try { await navigator.clipboard.writeText(text); document.querySelector('#copy').textContent='已复制'; setTimeout(()=>document.querySelector('#copy').textContent='复制会议结论',1500); } catch { prompt('复制会议结论：',text); } });
+    document.querySelector('#copy').addEventListener('click', async () => { const text='1688 腾讯云：22 台已录入 CVM 的近 24 小时快照显示告警 1、提醒 1。16-cicd服务器磁盘 97.75% 且处于告警中，16-dev环境磁盘 90.94%，应先清理构建产物和日志；SVN 有提醒，内存快照 67%。其余低 CPU 快照需结合 7/30 天趋势后再评估降配。成本侧优先核对 2025-11 ¥132,106 与 2026-06 云服务器费 ¥17,297 的账单明细，并处理约 2K 主机安全待处理事件。'; try { await navigator.clipboard.writeText(text); document.querySelector('#copy').textContent='已复制'; setTimeout(()=>document.querySelector('#copy').textContent='复制会议结论',1500); } catch { prompt('复制会议结论：',text); } });
     render();
   </script>
 </body>
 </html>
-
