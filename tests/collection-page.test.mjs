@@ -7,11 +7,12 @@ assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
 const html = readFileSync(pagePath, 'utf8');
 
-assert.match(html, /个人集合/);
+assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
 assert.match(html, /data-category="analysis"/);
-assert.match(html, /grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/);
-assert.match(html, /min-height:\s*142px/);
+assert.match(html, /#f8f7f2/);
+assert.match(html, /class="entry-list"/);
+assert.doesNotMatch(html, /radial-gradient/);
 
 for (const route of [
   '../escape01/',

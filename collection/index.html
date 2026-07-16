@@ -4,152 +4,124 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#151817" />
-    <title>个人集合 · JekiVado</title>
+    <meta name="theme-color" content="#f8f7f2" />
+    <title>集合 · JekiVado</title>
     <style>
       :root {
-        --ink: #e9e3d5;
-        --muted: #a49d8e;
-        --paper: #151817;
-        --panel: #1d211f;
-        --line: #3a403a;
-        --moss: #9fb489;
-        --orange: #e99e63;
-        --blue: #99c5c8;
+        --paper: #f8f7f2;
+        --ink: #1c1c1a;
+        --muted: #77756d;
+        --rule: #dedbd2;
+        --accent: #c8472e;
       }
 
       * { box-sizing: border-box; }
-      html { min-width: 320px; background: var(--paper); }
-      body {
-        margin: 0;
-        color: var(--ink);
-        background:
-          radial-gradient(circle at 12% -10%, rgba(159, 180, 137, .16), transparent 32rem),
-          radial-gradient(circle at 92% 10%, rgba(233, 158, 99, .12), transparent 25rem),
-          var(--paper);
-        font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
-      }
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        opacity: .2;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
-      }
+      html { background: var(--paper); }
+      body { margin: 0; color: var(--ink); background: var(--paper); font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif; }
       a { color: inherit; }
-      main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 32px 0 48px; }
-      .masthead { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
-      .kicker { margin: 0 0 9px; font: 700 11px/1.2 "SFMono-Regular", Consolas, monospace; color: var(--moss); letter-spacing: .17em; }
-      h1 { margin: 0; font-family: Iowan Old Style, Baskerville, Georgia, "Songti SC", serif; font-size: clamp(40px, 6vw, 72px); font-weight: 400; letter-spacing: -.06em; line-height: .88; }
-      .intro { max-width: 510px; margin: 13px 0 0; color: var(--muted); line-height: 1.65; font-size: 14px; }
-      .counter { font-family: Iowan Old Style, Baskerville, Georgia, serif; font-size: 38px; line-height: .8; text-align: right; color: var(--orange); }
-      .counter small { display: block; margin-top: 10px; font: 700 10px/1.2 "SFMono-Regular", Consolas, monospace; letter-spacing: .12em; color: var(--muted); }
-      .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0 14px; }
-      .toolbar p { margin: 0; color: var(--muted); font: 11px/1.5 "SFMono-Regular", Consolas, monospace; letter-spacing: .05em; }
-      .filters { display: flex; flex-wrap: wrap; gap: 8px; }
-      .filter { appearance: none; padding: 8px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: transparent; font: 700 11px/1 "SFMono-Regular", Consolas, monospace; cursor: pointer; transition: .2s ease; }
-      .filter:hover, .filter[aria-pressed="true"] { color: var(--paper); border-color: var(--moss); background: var(--moss); }
-      .sections { display: grid; gap: 22px; }
-      .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 9px; }
-      h2 { margin: 0; font-family: Iowan Old Style, Baskerville, Georgia, "Songti SC", serif; font-weight: 400; font-size: 21px; letter-spacing: -.03em; }
-      .section-head span { color: var(--muted); font: 11px/1 "SFMono-Regular", Consolas, monospace; }
-      .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-      .card { min-height: 142px; position: relative; display: flex; flex-direction: column; padding: 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(29, 33, 31, .42); text-decoration: none; overflow: hidden; transition: transform .2s ease, background .2s ease; }
-      .card::after { content: "↗"; position: absolute; top: 12px; right: 14px; color: var(--muted); font-family: Georgia, serif; font-size: 16px; transition: transform .2s ease, color .2s ease; }
-      .card:hover { transform: translateY(-2px); background: #252a27; }
-      .card:hover::after { transform: translate(2px, -2px); color: var(--orange); }
-      .card[hidden] { display: none; }
-      .tag { display: inline-flex; width: fit-content; padding: 4px 6px; border-radius: 3px; color: var(--blue); background: rgba(153, 197, 200, .12); font: 700 9px/1 "SFMono-Regular", Consolas, monospace; letter-spacing: .08em; }
-      .tag.prototype { color: var(--orange); background: rgba(233, 158, 99, .12); }
-      .card h3 { max-width: 88%; margin: auto 0 3px; font-family: Iowan Old Style, Baskerville, Georgia, "Songti SC", serif; font-size: 24px; font-weight: 400; letter-spacing: -.04em; }
-      .card p { max-width: 37rem; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
-      .path { margin-top: 9px; color: #777f75; font: 10px/1.3 "SFMono-Regular", Consolas, monospace; }
-      .footnote { display: flex; justify-content: space-between; gap: 24px; margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.6; }
-      .footnote strong { color: var(--ink); font-weight: 600; }
-      @media (max-width: 650px) {
-        main { width: min(100% - 28px, 1120px); padding-top: 24px; }
-        .masthead { grid-template-columns: 1fr; }
-        .counter { display: none; }
-        .toolbar { align-items: flex-start; flex-direction: column; }
-        .grid { grid-template-columns: 1fr; }
-        .card { min-height: 154px; }
-        .footnote { flex-direction: column; }
+      main { width: min(880px, calc(100% - 40px)); margin: 0 auto; padding: 58px 0 48px; }
+      header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding-bottom: 25px; border-bottom: 2px solid var(--ink); }
+      h1 { margin: 0; font: 400 clamp(30px, 5vw, 42px)/1 Iowan Old Style, Baskerville, Georgia, "Songti SC", serif; letter-spacing: -.045em; }
+      .count { margin: 0; color: var(--muted); font: 11px/1.4 "SFMono-Regular", Menlo, monospace; white-space: nowrap; }
+      .intro { max-width: 580px; margin: 16px 0 40px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+      .category { margin-top: 28px; }
+      .category-head { display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: baseline; margin-bottom: 8px; }
+      .category-index { color: var(--accent); font: 700 11px/1 "SFMono-Regular", Menlo, monospace; }
+      h2 { margin: 0; font: 600 14px/1.2 "Avenir Next", "PingFang SC", sans-serif; }
+      .entry-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+      .entry-list li { border-bottom: 1px solid var(--rule); }
+      .entry {
+        display: grid;
+        grid-template-columns: 80px minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+        min-height: 70px;
+        padding: 12px 4px 12px 0;
+        text-decoration: none;
+        transition: color .16s ease, padding-left .16s ease;
+      }
+      .entry:hover { padding-left: 8px; color: var(--accent); }
+      .entry-kind { color: var(--muted); font: 10px/1.35 "SFMono-Regular", Menlo, monospace; letter-spacing: .03em; }
+      .entry-title { display: block; font: 400 19px/1.15 Iowan Old Style, Baskerville, Georgia, "Songti SC", serif; letter-spacing: -.025em; }
+      .entry-detail { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+      .entry-path { color: var(--muted); font: 10px/1.4 "SFMono-Regular", Menlo, monospace; text-align: right; white-space: nowrap; }
+      .entry:hover .entry-kind, .entry:hover .entry-detail, .entry:hover .entry-path { color: currentColor; }
+      footer { margin-top: 42px; color: var(--muted); font: 11px/1.6 "SFMono-Regular", Menlo, monospace; }
+      footer strong { color: var(--ink); font-weight: 600; }
+
+      @media (max-width: 620px) {
+        main { width: min(100% - 28px, 880px); padding-top: 36px; }
+        header { align-items: flex-start; flex-direction: column; gap: 8px; }
+        .intro { margin-bottom: 30px; }
+        .category-head, .entry { grid-template-columns: 1fr; gap: 5px; }
+        .category-index { margin-bottom: 1px; }
+        .entry { min-height: auto; padding: 14px 0; }
+        .entry-path { text-align: left; }
       }
     </style>
   </head>
   <body>
     <main>
-      <header class="masthead">
-        <div>
-          <p class="kicker">JEKIVADO.GITHUB.IO / PERSONAL INDEX</p>
-          <h1>个人集合</h1>
-          <p class="intro">一个为自己保留的快捷入口。这里按用途归整已发布的原型与业务复盘，省去在路径之间来回寻找。</p>
-        </div>
-        <div class="counter">05<small>ACTIVE ENTRIES</small></div>
+      <header>
+        <h1>集合</h1>
+        <p class="count">05 LINKS · PERSONAL INDEX</p>
       </header>
+      <p class="intro">已发布内容的快捷入口，按用途整理。页面保持简洁，只保留必要说明与直达路径。</p>
 
-      <nav class="toolbar" aria-label="集合筛选">
-        <p>分类来自页面标题、内容结构与用途分析</p>
-        <div class="filters">
-          <button class="filter" type="button" data-filter="all" aria-pressed="true">全部 <span>05</span></button>
-          <button class="filter" type="button" data-filter="prototype" aria-pressed="false">可试玩原型 <span>01</span></button>
-          <button class="filter" type="button" data-filter="analysis" aria-pressed="false">云资源复盘 <span>04</span></button>
+      <section class="category" aria-labelledby="prototype-title">
+        <div class="category-head">
+          <span class="category-index">01</span>
+          <h2 id="prototype-title">可试玩原型</h2>
         </div>
-      </nav>
+        <ul class="entry-list">
+          <li>
+            <a class="entry" data-category="prototype" href="../escape01/">
+              <span class="entry-kind">PROTOTYPE</span>
+              <span><span class="entry-title">escape01</span><span class="entry-detail">人流接驳主题的可试玩原型</span></span>
+              <span class="entry-path">/escape01/ ↗</span>
+            </a>
+          </li>
+        </ul>
+      </section>
 
-      <div class="sections">
-        <section aria-labelledby="prototype-title" data-section="prototype">
-          <div class="section-head"><h2 id="prototype-title">可试玩原型</h2><span>01 ENTRY</span></div>
-          <div class="grid">
-            <a class="card" data-category="prototype" href="../escape01/">
-              <span class="tag prototype">INTERACTIVE</span>
-              <h3>escape01</h3>
-              <p>人流接驳主题的首个可试玩原型，适合从这里进入体验与迭代检查。</p>
-              <span class="path">/escape01/</span>
+      <section class="category" aria-labelledby="analysis-title">
+        <div class="category-head">
+          <span class="category-index">02</span>
+          <h2 id="analysis-title">云资源复盘</h2>
+        </div>
+        <ul class="entry-list">
+          <li>
+            <a class="entry" data-category="analysis" href="../ServerAnalysis/cloud.html">
+              <span class="entry-kind">TENCENT CLOUD</span>
+              <span><span class="entry-title">cloud</span><span class="entry-detail">5 台实例的资源与成本核对</span></span>
+              <span class="entry-path">/ServerAnalysis/cloud.html ↗</span>
             </a>
-          </div>
-        </section>
+          </li>
+          <li>
+            <a class="entry" data-category="analysis" href="../ServerAnalysis/hh1.html">
+              <span class="entry-kind">ALIBABA CLOUD</span>
+              <span><span class="entry-title">hh1</span><span class="entry-detail">16 台实例的资源复盘</span></span>
+              <span class="entry-path">/ServerAnalysis/hh1.html ↗</span>
+            </a>
+          </li>
+          <li>
+            <a class="entry" data-category="analysis" href="../ServerAnalysis/hh2.html">
+              <span class="entry-kind">TENCENT CLOUD</span>
+              <span><span class="entry-title">hh2</span><span class="entry-detail">9 台实例的资源复盘</span></span>
+              <span class="entry-path">/ServerAnalysis/hh2.html ↗</span>
+            </a>
+          </li>
+          <li>
+            <a class="entry" data-category="analysis" href="../ServerAnalysis/1688.html">
+              <span class="entry-kind">TENCENT CLOUD</span>
+              <span><span class="entry-title">1688</span><span class="entry-detail">计算、数据库与流量成本复盘</span></span>
+              <span class="entry-path">/ServerAnalysis/1688.html ↗</span>
+            </a>
+          </li>
+        </ul>
+      </section>
 
-        <section aria-labelledby="analysis-title" data-section="analysis">
-          <div class="section-head"><h2 id="analysis-title">云资源复盘</h2><span>04 ENTRIES</span></div>
-          <div class="grid">
-            <a class="card" data-category="analysis" href="../ServerAnalysis/cloud.html">
-              <span class="tag">TENCENT CLOUD</span><h3>cloud</h3>
-              <p>5 台实例的资源清单与成本归因核对，面向会议决策。</p><span class="path">/ServerAnalysis/cloud.html</span>
-            </a>
-            <a class="card" data-category="analysis" href="../ServerAnalysis/hh1.html">
-              <span class="tag">ALIBABA CLOUD</span><h3>hh1</h3>
-              <p>16 台实例的云资源复盘，包含生产、测试与运维维度。</p><span class="path">/ServerAnalysis/hh1.html</span>
-            </a>
-            <a class="card" data-category="analysis" href="../ServerAnalysis/hh2.html">
-              <span class="tag">TENCENT CLOUD</span><h3>hh2</h3>
-              <p>9 台实例的复盘页，聚焦生产、测试开发与 CI/CD 配置。</p><span class="path">/ServerAnalysis/hh2.html</span>
-            </a>
-            <a class="card" data-category="analysis" href="../ServerAnalysis/1688.html">
-              <span class="tag">TENCENT CLOUD</span><h3>1688</h3>
-              <p>计算、数据库与流量成本的集中支出和续费排期复盘。</p><span class="path">/ServerAnalysis/1688.html</span>
-            </a>
-          </div>
-        </section>
-      </div>
-
-      <footer class="footnote">
-        <span><strong>提示：</strong>本页设置了不被搜索引擎收录的提示，但 URL 并非权限控制。</span>
-        <span>更新集合时，请同步维护此页的入口。</span>
-      </footer>
+      <footer><strong>提示：</strong>本页带有不收录提示，但链接本身不是访问权限控制。</footer>
     </main>
-    <script>
-      const buttons = document.querySelectorAll('.filter');
-      const cards = document.querySelectorAll('.card');
-      const sections = document.querySelectorAll('[data-section]');
-
-      buttons.forEach((button) => button.addEventListener('click', () => {
-        const filter = button.dataset.filter;
-        buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
-        cards.forEach((card) => { card.hidden = filter !== 'all' && card.dataset.category !== filter; });
-        sections.forEach((section) => { section.hidden = filter !== 'all' && section.dataset.section !== filter; });
-      }));
-    </script>
   </body>
 </html>
