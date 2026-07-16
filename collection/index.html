@@ -9,11 +9,13 @@
     <style>
       :root {
         --canvas: #0d0f12;
+        --module: #12171e;
         --surface: #171a1f;
         --surface-hover: #20262f;
         --ink: #f7f9fc;
         --muted: #b5c0ce;
         --rule: #3a4552;
+        --card-border: #526172;
         --accent: #78dfbd;
         --prototype: #f5aa6e;
       }
@@ -36,8 +38,9 @@
       h1 { margin: 0; font-size: clamp(36px, 5vw, 52px); font-weight: 650; letter-spacing: -.065em; line-height: 1; }
       .count { margin: 0 0 3px; color: var(--muted); font: 11px/1.4 "SFMono-Regular", Menlo, monospace; letter-spacing: .06em; white-space: nowrap; }
       .intro { max-width: 620px; margin: 15px 0 33px; color: var(--muted); font-size: 16px; line-height: 1.65; }
-      .category + .category { margin-top: 30px; }
-      .category-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+      .category { padding: 16px; border: 1px solid var(--rule); border-radius: 16px; background: linear-gradient(135deg, rgba(120, 223, 189, .045), transparent 32%), var(--module); box-shadow: 0 10px 22px rgba(0, 0, 0, .16); }
+      .category + .category { margin-top: 20px; }
+      .category-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
       .category-title { display: flex; align-items: center; gap: 10px; }
       .category-index { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--rule); border-radius: 7px; color: var(--accent); background: rgba(120, 223, 189, .06); font: 700 9px/1 "SFMono-Regular", Menlo, monospace; }
       h2 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.02em; }
@@ -50,9 +53,10 @@
         flex-direction: column;
         padding: 17px;
         overflow: hidden;
-        border: 1px solid var(--rule);
+        border: 1px solid var(--card-border);
         border-radius: 12px;
-        background: var(--surface);
+        background: linear-gradient(145deg, rgba(255, 255, 255, .025), transparent 65%), var(--surface);
+        box-shadow: 0 7px 16px rgba(0, 0, 0, .18);
         text-decoration: none;
         transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
       }
@@ -74,6 +78,7 @@
       @media (max-width: 720px) {
         main { width: min(100% - 28px, 1060px); padding-top: 32px; }
         header { align-items: flex-start; flex-direction: column; gap: 8px; }
+        .category { padding: 13px; }
         .card-grid { grid-template-columns: 1fr; }
         .card { min-height: 154px; }
         footer { align-items: flex-start; flex-direction: column; gap: 7px; }

@@ -17,6 +17,9 @@ assert.doesNotMatch(html, /feTurbulence/);
 assert.match(html, /--muted:\s*#b5c0ce/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
+assert.match(html, /--module:\s*#12171e/);
+assert.match(html, /\.category\s*\{[^}]*padding:\s*16px/);
+assert.match(html, /--card-border:\s*#526172/);
 
 for (const route of [
   '../escape01/',
