@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#12292b" />
     <title>escape01 · 人流接驳原型</title>
-    <script type="module" crossorigin src="./assets/index-BTj-dn9j.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-hdhXixBr.css">
+    <script type="module" crossorigin src="./assets/index-Cu9EZwNb.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-B8coyhFs.css">
   </head>
   <body>
     <main class="prototype-shell">
@@ -27,14 +27,19 @@
       </section>
 
       <section class="playfield" aria-label="人流接驳玩法原型">
-        <div class="dispatch-header">
-          <span>上方接人槽</span>
-          <b>精确补满才离场</b>
-        </div>
-        <div class="order-dock" id="orders" aria-label="等待下班的人群"></div>
-        <canvas id="game-canvas"></canvas>
-        <div class="lift-grid" id="lift-grid" aria-label="3×3 电梯场"></div>
-        <div class="field-key"><i></i>门口层可转移 · <b>16</b> 人满载离场</div>
+        <section class="crowd-stage" id="crowd-stage" aria-label="上方等待下班的人群">
+          <div class="dispatch-header">
+            <span>上方接人槽 · 人群正在入场</span>
+            <b>精确补满才离场</b>
+          </div>
+          <div class="order-dock" id="orders" aria-label="等待下班的人群"></div>
+          <canvas id="crowd-canvas"></canvas>
+        </section>
+        <section class="elevator-stage" id="elevator-stage" aria-label="下方 3×3 电梯间">
+          <div class="elevator-header"><span>电梯间 · 点击一部电梯</span><b>门口层优先</b></div>
+          <canvas id="game-canvas"></canvas>
+          <div class="field-key"><i></i>门口层可转移 · <b>16</b> 人满载离场</div>
+        </section>
       </section>
 
       <section class="control-deck" aria-label="原型控制">
