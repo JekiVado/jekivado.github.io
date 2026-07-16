@@ -10,9 +10,10 @@ const html = readFileSync(pagePath, 'utf8');
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
 assert.match(html, /data-category="analysis"/);
-assert.match(html, /#f8f7f2/);
-assert.match(html, /class="entry-list"/);
-assert.doesNotMatch(html, /radial-gradient/);
+assert.match(html, /--surface:\s*#171a1f/);
+assert.match(html, /class="card-grid"/);
+assert.match(html, /box-shadow:\s*0 14px 30px/);
+assert.doesNotMatch(html, /feTurbulence/);
 
 for (const route of [
   '../escape01/',

@@ -4,124 +4,134 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#f8f7f2" />
+    <meta name="theme-color" content="#0d0f12" />
     <title>集合 · JekiVado</title>
     <style>
       :root {
-        --paper: #f8f7f2;
-        --ink: #1c1c1a;
-        --muted: #77756d;
-        --rule: #dedbd2;
-        --accent: #c8472e;
+        --canvas: #0d0f12;
+        --surface: #171a1f;
+        --surface-hover: #1d2229;
+        --ink: #f1f4f8;
+        --muted: #929ba8;
+        --rule: #2b313a;
+        --accent: #78dfbd;
+        --prototype: #f5aa6e;
       }
 
       * { box-sizing: border-box; }
-      html { background: var(--paper); }
-      body { margin: 0; color: var(--ink); background: var(--paper); font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif; }
-      a { color: inherit; }
-      main { width: min(880px, calc(100% - 40px)); margin: 0 auto; padding: 58px 0 48px; }
-      header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding-bottom: 25px; border-bottom: 2px solid var(--ink); }
-      h1 { margin: 0; font: 400 clamp(30px, 5vw, 42px)/1 Iowan Old Style, Baskerville, Georgia, "Songti SC", serif; letter-spacing: -.045em; }
-      .count { margin: 0; color: var(--muted); font: 11px/1.4 "SFMono-Regular", Menlo, monospace; white-space: nowrap; }
-      .intro { max-width: 580px; margin: 16px 0 40px; color: var(--muted); font-size: 14px; line-height: 1.7; }
-      .category { margin-top: 28px; }
-      .category-head { display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: baseline; margin-bottom: 8px; }
-      .category-index { color: var(--accent); font: 700 11px/1 "SFMono-Regular", Menlo, monospace; }
-      h2 { margin: 0; font: 600 14px/1.2 "Avenir Next", "PingFang SC", sans-serif; }
-      .entry-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
-      .entry-list li { border-bottom: 1px solid var(--rule); }
-      .entry {
-        display: grid;
-        grid-template-columns: 80px minmax(0, 1fr) auto;
-        gap: 16px;
-        align-items: center;
-        min-height: 70px;
-        padding: 12px 4px 12px 0;
-        text-decoration: none;
-        transition: color .16s ease, padding-left .16s ease;
+      html { background: var(--canvas); }
+      body {
+        min-width: 320px;
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse 70% 38rem at 50% -14rem, rgba(72, 151, 130, .18), transparent 70%),
+          var(--canvas);
+        font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
       }
-      .entry:hover { padding-left: 8px; color: var(--accent); }
-      .entry-kind { color: var(--muted); font: 10px/1.35 "SFMono-Regular", Menlo, monospace; letter-spacing: .03em; }
-      .entry-title { display: block; font: 400 19px/1.15 Iowan Old Style, Baskerville, Georgia, "Songti SC", serif; letter-spacing: -.025em; }
-      .entry-detail { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.45; }
-      .entry-path { color: var(--muted); font: 10px/1.4 "SFMono-Regular", Menlo, monospace; text-align: right; white-space: nowrap; }
-      .entry:hover .entry-kind, .entry:hover .entry-detail, .entry:hover .entry-path { color: currentColor; }
-      footer { margin-top: 42px; color: var(--muted); font: 11px/1.6 "SFMono-Regular", Menlo, monospace; }
+      a { color: inherit; }
+      main { width: min(1060px, calc(100% - 40px)); margin: 0 auto; padding: 54px 0 52px; }
+      header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 25px; border-bottom: 1px solid var(--rule); }
+      .eyebrow { margin: 0 0 10px; color: var(--accent); font: 700 10px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .16em; }
+      h1 { margin: 0; font-size: clamp(36px, 5vw, 52px); font-weight: 650; letter-spacing: -.065em; line-height: 1; }
+      .count { margin: 0 0 3px; color: var(--muted); font: 10px/1.4 "SFMono-Regular", Menlo, monospace; letter-spacing: .06em; white-space: nowrap; }
+      .intro { max-width: 560px; margin: 15px 0 33px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+      .category + .category { margin-top: 30px; }
+      .category-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+      .category-title { display: flex; align-items: center; gap: 10px; }
+      .category-index { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--rule); border-radius: 7px; color: var(--accent); background: rgba(120, 223, 189, .06); font: 700 9px/1 "SFMono-Regular", Menlo, monospace; }
+      h2 { margin: 0; font-size: 15px; font-weight: 650; letter-spacing: -.02em; }
+      .category-count { color: var(--muted); font: 10px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .08em; }
+      .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .card {
+        position: relative;
+        display: flex;
+        min-height: 154px;
+        flex-direction: column;
+        padding: 17px;
+        overflow: hidden;
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        background: var(--surface);
+        text-decoration: none;
+        transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+      }
+      .card::before { content: ""; position: absolute; top: 0; left: 0; width: 42px; height: 3px; background: var(--accent); }
+      .card.prototype::before { background: var(--prototype); }
+      .card:hover { transform: translateY(-4px); border-color: rgba(120, 223, 189, .58); background: var(--surface-hover); box-shadow: 0 14px 30px rgba(0, 0, 0, .28); }
+      .card.prototype:hover { border-color: rgba(245, 170, 110, .58); }
+      .card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .kind { display: inline-flex; width: fit-content; padding: 5px 7px; border-radius: 5px; color: var(--accent); background: rgba(120, 223, 189, .10); font: 700 9px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .07em; }
+      .prototype .kind { color: var(--prototype); background: rgba(245, 170, 110, .10); }
+      .arrow { color: var(--muted); font-size: 16px; line-height: 1; transition: color .2s ease, transform .2s ease; }
+      .card:hover .arrow { color: var(--ink); transform: translate(2px, -2px); }
+      .card-name { margin: auto 0 4px; font-size: 22px; font-weight: 650; letter-spacing: -.045em; line-height: 1.1; }
+      .card-detail { min-height: 34px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+      .path { display: block; margin-top: 10px; color: #69737f; font: 9px/1.2 "SFMono-Regular", Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 36px; padding-top: 17px; border-top: 1px solid var(--rule); color: var(--muted); font: 10px/1.5 "SFMono-Regular", Menlo, monospace; }
       footer strong { color: var(--ink); font-weight: 600; }
 
-      @media (max-width: 620px) {
-        main { width: min(100% - 28px, 880px); padding-top: 36px; }
+      @media (max-width: 720px) {
+        main { width: min(100% - 28px, 1060px); padding-top: 32px; }
         header { align-items: flex-start; flex-direction: column; gap: 8px; }
-        .intro { margin-bottom: 30px; }
-        .category-head, .entry { grid-template-columns: 1fr; gap: 5px; }
-        .category-index { margin-bottom: 1px; }
-        .entry { min-height: auto; padding: 14px 0; }
-        .entry-path { text-align: left; }
+        .card-grid { grid-template-columns: 1fr; }
+        .card { min-height: 142px; }
+        footer { align-items: flex-start; flex-direction: column; gap: 7px; }
       }
     </style>
   </head>
   <body>
     <main>
       <header>
-        <h1>集合</h1>
-        <p class="count">05 LINKS · PERSONAL INDEX</p>
+        <div>
+          <p class="eyebrow">JEKIVADO / PERSONAL INDEX</p>
+          <h1>集合</h1>
+        </div>
+        <p class="count">05 ACTIVE LINKS</p>
       </header>
-      <p class="intro">已发布内容的快捷入口，按用途整理。页面保持简洁，只保留必要说明与直达路径。</p>
+      <p class="intro">已发布内容的快捷入口，按用途整理。保留足够信息帮助判断去向，点击即可直达。</p>
 
       <section class="category" aria-labelledby="prototype-title">
         <div class="category-head">
-          <span class="category-index">01</span>
-          <h2 id="prototype-title">可试玩原型</h2>
+          <div class="category-title"><span class="category-index">01</span><h2 id="prototype-title">可试玩原型</h2></div>
+          <span class="category-count">01 ITEM</span>
         </div>
-        <ul class="entry-list">
-          <li>
-            <a class="entry" data-category="prototype" href="../escape01/">
-              <span class="entry-kind">PROTOTYPE</span>
-              <span><span class="entry-title">escape01</span><span class="entry-detail">人流接驳主题的可试玩原型</span></span>
-              <span class="entry-path">/escape01/ ↗</span>
-            </a>
-          </li>
-        </ul>
+        <div class="card-grid">
+          <a class="card prototype" data-category="prototype" href="../escape01/">
+            <span class="card-top"><span class="kind">INTERACTIVE</span><span class="arrow">↗</span></span>
+            <strong class="card-name">escape01</strong>
+            <p class="card-detail">人流接驳主题的可试玩原型</p>
+            <span class="path">/escape01/</span>
+          </a>
+        </div>
       </section>
 
       <section class="category" aria-labelledby="analysis-title">
         <div class="category-head">
-          <span class="category-index">02</span>
-          <h2 id="analysis-title">云资源复盘</h2>
+          <div class="category-title"><span class="category-index">02</span><h2 id="analysis-title">云资源复盘</h2></div>
+          <span class="category-count">04 ITEMS</span>
         </div>
-        <ul class="entry-list">
-          <li>
-            <a class="entry" data-category="analysis" href="../ServerAnalysis/cloud.html">
-              <span class="entry-kind">TENCENT CLOUD</span>
-              <span><span class="entry-title">cloud</span><span class="entry-detail">5 台实例的资源与成本核对</span></span>
-              <span class="entry-path">/ServerAnalysis/cloud.html ↗</span>
-            </a>
-          </li>
-          <li>
-            <a class="entry" data-category="analysis" href="../ServerAnalysis/hh1.html">
-              <span class="entry-kind">ALIBABA CLOUD</span>
-              <span><span class="entry-title">hh1</span><span class="entry-detail">16 台实例的资源复盘</span></span>
-              <span class="entry-path">/ServerAnalysis/hh1.html ↗</span>
-            </a>
-          </li>
-          <li>
-            <a class="entry" data-category="analysis" href="../ServerAnalysis/hh2.html">
-              <span class="entry-kind">TENCENT CLOUD</span>
-              <span><span class="entry-title">hh2</span><span class="entry-detail">9 台实例的资源复盘</span></span>
-              <span class="entry-path">/ServerAnalysis/hh2.html ↗</span>
-            </a>
-          </li>
-          <li>
-            <a class="entry" data-category="analysis" href="../ServerAnalysis/1688.html">
-              <span class="entry-kind">TENCENT CLOUD</span>
-              <span><span class="entry-title">1688</span><span class="entry-detail">计算、数据库与流量成本复盘</span></span>
-              <span class="entry-path">/ServerAnalysis/1688.html ↗</span>
-            </a>
-          </li>
-        </ul>
+        <div class="card-grid">
+          <a class="card" data-category="analysis" href="../ServerAnalysis/cloud.html">
+            <span class="card-top"><span class="kind">TENCENT CLOUD</span><span class="arrow">↗</span></span>
+            <strong class="card-name">cloud</strong><p class="card-detail">5 台实例的资源与成本核对</p><span class="path">/ServerAnalysis/cloud.html</span>
+          </a>
+          <a class="card" data-category="analysis" href="../ServerAnalysis/hh1.html">
+            <span class="card-top"><span class="kind">ALIBABA CLOUD</span><span class="arrow">↗</span></span>
+            <strong class="card-name">hh1</strong><p class="card-detail">16 台实例的资源复盘</p><span class="path">/ServerAnalysis/hh1.html</span>
+          </a>
+          <a class="card" data-category="analysis" href="../ServerAnalysis/hh2.html">
+            <span class="card-top"><span class="kind">TENCENT CLOUD</span><span class="arrow">↗</span></span>
+            <strong class="card-name">hh2</strong><p class="card-detail">9 台实例的资源复盘</p><span class="path">/ServerAnalysis/hh2.html</span>
+          </a>
+          <a class="card" data-category="analysis" href="../ServerAnalysis/1688.html">
+            <span class="card-top"><span class="kind">TENCENT CLOUD</span><span class="arrow">↗</span></span>
+            <strong class="card-name">1688</strong><p class="card-detail">计算、数据库与流量成本复盘</p><span class="path">/ServerAnalysis/1688.html</span>
+          </a>
+        </div>
       </section>
 
-      <footer><strong>提示：</strong>本页带有不收录提示，但链接本身不是访问权限控制。</footer>
+      <footer><span><strong>提示：</strong>本页带有不收录提示，但链接本身不是访问权限控制。</span><span>UPDATED 2026.07</span></footer>
     </main>
   </body>
 </html>
