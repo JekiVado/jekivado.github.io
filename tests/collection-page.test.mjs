@@ -10,6 +10,8 @@ const html = readFileSync(pagePath, 'utf8');
 assert.match(html, /个人集合/);
 assert.match(html, /data-category="prototype"/);
 assert.match(html, /data-category="analysis"/);
+assert.match(html, /grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/);
+assert.match(html, /min-height:\s*142px/);
 
 for (const route of [
   '../escape01/',
