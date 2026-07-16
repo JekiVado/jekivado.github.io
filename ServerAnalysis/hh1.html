@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>hh1 · 云资源复盘</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap');
+    :root { --ink:#192337; --muted:#718096; --line:#e7edf4; --canvas:#f7f9fc; --card:#fff; --blue:#2563eb; --blue-pale:#eff6ff; --mint:#0f9c7a; --mint-pale:#ecfdf5; --amber:#b7791f; --amber-pale:#fffbeb; --red:#d34d58; --red-pale:#fff3f3; --shadow:0 10px 30px rgba(25,35,55,.055); }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--canvas); font-family:'Noto Sans SC','PingFang SC',sans-serif; font-size:16px; }
+    button { font:inherit; cursor:pointer; } button:focus-visible { outline:3px solid #bfdbfe; outline-offset:2px; }
+    .wrap { max-width:1440px; margin:auto; padding:38px 34px 70px; }
+    .topbar { display:flex; justify-content:space-between; align-items:flex-start; gap:24px; margin-bottom:28px; }
+    .eyebrow, .mono { font-family:'DM Mono',monospace; letter-spacing:.035em; }
+    .eyebrow { color:var(--blue); font-size:13px; font-weight:500; }
+    h1 { margin:7px 0 0; font-size:36px; line-height:1.2; letter-spacing:-.045em; }
+    .sub { margin:7px 0 0; color:var(--muted); font-size:15px; }
+    .top-actions { display:flex; align-items:center; gap:10px; padding-top:3px; }
+    .updated { color:var(--muted); font-size:13px; text-align:right; line-height:1.7; }
+    .btn { min-height:42px; padding:0 16px; border:1px solid var(--line); border-radius:8px; background:#fff; color:#4b5a71; font-size:14px; transition:.16s; }
+    .btn:hover { border-color:#b9c8db; background:#fbfcff; } .btn.primary { color:#fff; background:var(--blue); border-color:var(--blue); }
+    .project-bar { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:12px 16px; border:1px solid var(--line); border-radius:11px; background:#fff; box-shadow:var(--shadow); }
+    .project-token { display:flex; align-items:center; gap:9px; font-size:17px; font-weight:700; }
+    .dot { width:9px; height:9px; border-radius:50%; background:var(--mint); box-shadow:0 0 0 4px var(--mint-pale); }
+    .project-token span { color:var(--muted); font-size:14px; font-weight:400; }
+    .coverage { color:var(--muted); font-size:14px; } .coverage strong { color:var(--ink); }
+    .kpis { display:grid; grid-template-columns:1.2fr repeat(4,1fr); gap:12px; margin:18px 0 28px; }
+    .kpi { min-height:124px; padding:17px 18px; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:var(--shadow); }
+    .kpi.cost { background:linear-gradient(135deg,#17243b,#263c60); border:0; color:#fff; }
+    .kpi-label { color:var(--muted); font-size:12px; } .cost .kpi-label { color:#b7c5d9; }
+    .kpi-value { margin:12px 0 5px; font-size:34px; font-weight:800; letter-spacing:-.06em; line-height:1; }
+    .kpi-value.text { font-size:23px; letter-spacing:-.035em; margin-top:16px; }
+    .kpi-note { color:var(--muted); font-size:13px; line-height:1.5; } .cost .kpi-note { color:#b7c5d9; }
+    .section-heading { display:flex; align-items:baseline; justify-content:space-between; gap:18px; margin-bottom:13px; }
+    h2 { margin:0; font-size:22px; letter-spacing:-.035em; } .section-heading p { margin:0; color:var(--muted); font-size:14px; }
+    .decisions { display:grid; grid-template-columns:1.08fr 1.08fr 1fr .94fr; gap:12px; margin-bottom:30px; }
+    .decision { min-height:164px; padding:16px; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:var(--shadow); border-top:3px solid var(--blue); }
+    .decision.urgent { border-top-color:var(--red); } .decision.watch { border-top-color:var(--amber); } .decision.safe { border-top-color:var(--mint); }
+    .badge { display:inline-flex; padding:3px 7px; border-radius:99px; font-size:10px; font-weight:700; background:var(--blue-pale); color:var(--blue); }
+    .urgent .badge { background:var(--red-pale); color:var(--red); } .watch .badge { background:var(--amber-pale); color:var(--amber); } .safe .badge { background:var(--mint-pale); color:var(--mint); }
+    .decision h3 { margin:10px 0 6px; font-size:15px; letter-spacing:-.02em; }.decision p { margin:0; color:#5d6c82; font-size:12px; line-height:1.65; }
+    .decision .metric-line { margin-top:11px; color:var(--ink); font:11px 'DM Mono',monospace; }
+    .layout { display:block; }
+    .panel { overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:var(--shadow); }
+    .panel-head { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:17px 18px 13px; border-bottom:1px solid var(--line); }
+    .panel-head h2 { font-size:21px; }.panel-head span { color:var(--muted); font:12px 'DM Mono',monospace; }
+    .table-tools { display:flex; align-items:center; gap:13px; }.pager { display:flex; align-items:center; gap:5px; }.page-btn { min-width:33px; height:31px; border:1px solid var(--line); border-radius:7px; background:#fff; color:var(--blue); font-size:16px; line-height:1; }.page-btn:disabled { color:#c1cad7; cursor:not-allowed; background:#f8fafc; }.page-no { min-width:40px; color:var(--muted); font:11px 'DM Mono',monospace; text-align:center; }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; padding:14px 18px; border-bottom:1px solid var(--line); background:#fbfcfe; }
+    .filter { border:0; background:transparent; color:var(--muted); border-radius:7px; padding:8px 12px; font-size:14px; }.filter.active { color:var(--blue); background:var(--blue-pale); font-weight:700; }
+    .table-wrap { overflow-x:auto; }.instances { width:100%; min-width:1080px; border-collapse:collapse; table-layout:fixed; }
+    th { padding:13px 18px; color:var(--muted); background:#fbfcfe; text-align:left; font-size:12px; font-weight:600; white-space:nowrap; } th:nth-child(1){width:24%}th:nth-child(2){width:16%}th:nth-child(3){width:17%}th:nth-child(4){width:26%}th:nth-child(5){width:8%}th:nth-child(6){width:9%} td { padding:19px 18px; border-top:1px solid var(--line); vertical-align:middle; }
+    tbody tr { transition:background .16s; } tbody tr:hover { background:#f8fbff; }
+    .instance-name { display:block; font-size:16px; font-weight:700; line-height:1.45; }.instance-meta { display:block; margin-top:5px; color:var(--muted); font:12px 'DM Mono',monospace; }
+    .role { color:#536176; font-size:15px; }.spec { color:#435168; font:13px/1.65 'DM Mono',monospace; white-space:nowrap; }
+    .bars { display:flex; gap:14px; align-items:flex-end; min-width:240px; }.bar-item { width:70px; }.bar-label { display:flex; justify-content:space-between; margin-bottom:6px; color:var(--muted); font:11px 'DM Mono',monospace; }.track { overflow:hidden; height:8px; border-radius:9px; background:#e9eef5; }.fill { height:100%; border-radius:inherit; background:var(--mint); }.fill.mid { background:#e7a133; }.fill.high { background:var(--red); }
+    .status { display:inline-flex; align-items:center; gap:6px; color:var(--mint); font-size:14px; white-space:nowrap; }.status i { display:block; width:7px; height:7px; border-radius:50%; background:currentColor; }.tag { display:inline-block; padding:6px 9px; border-radius:6px; font-size:12px; font-weight:700; white-space:nowrap; }.tag.high { color:var(--red); background:var(--red-pale); }.tag.medium { color:var(--amber); background:var(--amber-pale); }.tag.low { color:var(--mint); background:var(--mint-pale); }
+    .side-stack { display:grid; grid-template-columns:1.3fr .9fr; gap:20px; margin-top:20px; }.side-card { padding:18px; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:var(--shadow); }.side-card h2 { font-size:16px; }.side-card > p { margin:5px 0 14px; color:var(--muted); font-size:12px; line-height:1.6; }
+    .asset { display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-top:1px solid var(--line); }.asset:first-of-type { border-top:0; }.asset strong { font-size:12px; }.asset span { color:var(--muted); max-width:185px; text-align:right; font-size:11px; line-height:1.5; }
+    .callout { padding:13px; border-radius:9px; background:var(--amber-pale); color:#8a6115; font-size:12px; line-height:1.65; }.callout strong { color:#7c5610; }
+    .cost-panel { margin-top:20px; }.cost-history { display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:var(--line); }.cost-cell { min-height:82px; padding:13px 16px; background:#fff; }.cost-cell.prepay { background:var(--amber-pale); }.cost-month { color:var(--muted); font:10px 'DM Mono',monospace; }.cost-value { margin-top:6px; color:var(--ink); font-size:18px; font-weight:800; letter-spacing:-.035em; }.cost-cell.prepay .cost-value { color:var(--amber); }.cost-meta { margin-top:3px; color:var(--muted); font-size:10px; }
+    .year-analysis { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px; }.year-card { padding:20px; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:var(--shadow); }.year-card.current { border-top:3px solid var(--blue); }.year-card.history { border-top:3px solid var(--amber); }.year-kicker { color:var(--muted); font:11px 'DM Mono',monospace; }.year-card h2 { margin:5px 0 0; font-size:22px; }.year-total { margin:14px 0 4px; font-size:31px; font-weight:800; letter-spacing:-.055em; }.year-caption { color:var(--muted); font-size:12px; }.year-rows { margin-top:15px; border-top:1px solid var(--line); }.year-row { display:flex; justify-content:space-between; gap:16px; padding:10px 0; border-bottom:1px solid var(--line); font-size:12px; }.year-row span { color:var(--muted); }.year-row strong { text-align:right; }.compare-note { grid-column:1/-1; padding:15px 18px; border-radius:10px; background:var(--blue-pale); color:#36517f; font-size:13px; line-height:1.65; }.compare-note strong { color:var(--blue); }
+    details { border-top:1px solid var(--line); } summary { padding:13px 18px; color:#526178; cursor:pointer; font-size:12px; } summary:hover { color:var(--blue); }.details-copy { padding:0 18px 16px; color:var(--muted); font-size:11px; line-height:1.75; }
+    footer { margin-top:22px; color:#93a0b1; font:10px 'DM Mono',monospace; text-align:right; }
+    @media (max-width:1150px) { .kpis{grid-template-columns:repeat(3,1fr)}.kpi.cost{grid-column:span 2}.decisions{grid-template-columns:1fr 1fr} }
+    @media (max-width:700px) { .wrap{padding:24px 16px 50px}.topbar{flex-direction:column;margin-bottom:18px}.top-actions{width:100%;justify-content:space-between}.updated{text-align:left}.project-bar{align-items:flex-start;flex-direction:column}.kpis,.decisions,.side-stack,.year-analysis{grid-template-columns:1fr}.kpi.cost{grid-column:auto}.side-card:last-child{grid-column:auto}.coverage{line-height:1.6} }
+    @media (min-width:1200px) and (min-aspect-ratio:15/9) {
+      .wrap { max-width:none; padding:26px 42px 28px; }
+      .topbar { margin-bottom:16px; }.eyebrow { font-size:13px; } h1 { font-size:38px; }.sub { margin-top:5px; font-size:16px; }.updated { font-size:13px; }.btn { min-height:42px; font-size:15px; }
+      .project-bar { padding:13px 18px; }.project-token { font-size:18px; }.project-token span,.coverage { font-size:15px; }
+      .kpis { gap:12px; margin:15px 0 18px; }.kpi { min-height:114px; padding:16px 18px; }.kpi-label { font-size:12px; }.kpi-value { margin:11px 0 5px; font-size:35px; }.kpi-value.text { margin-top:15px; font-size:23px; }.kpi-note { font-size:13px; }
+      .panel-head { padding:16px 24px 13px; }.panel-head h2 { font-size:23px; }.panel-head span { font-size:13px; }.filters { padding:12px 24px; }.filter { padding:8px 13px; font-size:15px; }
+      .instances { min-width:1280px; } th { padding:13px 24px; font-size:14px; } td { padding:21px 24px; }.instances tbody tr { height:112px; }.instance-name { font-size:22px; line-height:1.25; }.instance-meta { margin-top:6px; font-size:14px; }.role { font-size:19px; }.spec { font-size:17px; line-height:1.5; }.bars { gap:16px; min-width:310px; }.bar-item { width:92px; }.bar-label { margin-bottom:7px; font-size:13px; }.track { height:11px; }.status { font-size:17px; }.status i { width:9px; height:9px; }.tag { padding:8px 11px; font-size:14px; }
+      .side-stack { gap:24px; margin-top:24px; }.side-card { padding:25px; }.side-card h2 { font-size:23px; }.side-card > p { margin:8px 0 17px; font-size:16px; line-height:1.65; }.asset { gap:20px; padding:17px 0; }.asset strong { font-size:17px; }.asset span { max-width:62%; font-size:15px; line-height:1.55; }.callout { padding:18px; font-size:16px; line-height:1.8; }
+      details summary { padding:16px 24px; font-size:15px; }.details-copy { padding:0 24px 20px; font-size:14px; line-height:1.8; }.section-heading { margin-bottom:16px; }.section-heading h2 { font-size:25px; }.section-heading p { font-size:16px; }.decision { padding:20px; min-height:170px; }.badge { padding:5px 9px; font-size:13px; }.decision h3 { margin:12px 0 8px; font-size:20px; }.decision p { font-size:15px; line-height:1.7; }.decision .metric-line { margin-top:12px; font-size:13px; } footer { margin-top:28px; font-size:12px; }
+      .cost-panel { margin-top:24px; }.cost-cell { min-height:118px; padding:18px 21px; }.cost-month { font-size:13px; }.cost-value { margin-top:9px; font-size:24px; }.cost-meta { margin-top:5px; font-size:12px; }
+      .year-analysis { gap:24px; margin-top:24px; }.year-card { padding:25px; }.year-kicker { font-size:13px; }.year-card h2 { margin-top:7px; font-size:26px; }.year-total { margin-top:17px; font-size:38px; }.year-caption { font-size:15px; }.year-rows { margin-top:19px; }.year-row { padding:14px 0; font-size:16px; }.compare-note { padding:19px 22px; font-size:17px; line-height:1.75; }
+    }
+    @media print { body{background:#fff}.wrap{padding:15px;max-width:none}.top-actions,.filters{display:none}.kpis{margin-bottom:18px}.panel,.side-card,.decision{box-shadow:none}.layout{grid-template-columns:1fr 300px}.instances{min-width:0;font-size:10px}td,th{padding:8px}.decision{min-height:0} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="topbar">
+      <div><div class="eyebrow">CLOUD ASSET REVIEW · MEETING BRIEF</div><h1>hh1 · 云资源复盘</h1><p class="sub">先对齐决策，再下钻实例。数据来自阿里云控制台与项目月度成本表。</p></div>
+      <div class="top-actions"><div class="updated">最后更新<br><strong id="updated">—</strong></div><button class="btn" id="print">打印 / PDF</button><button class="btn primary" id="copy">复制会议结论</button></div>
+    </header>
+
+    <section class="project-bar"><div class="project-token"><span class="dot">•</span>hh1 <span>阿里云 · 华东1（杭州）</span></div><div class="coverage">本轮已覆盖：<strong>16 台 ECS</strong>、OSS、SLS、VPC、域名与 CDN；最新月成本 <strong>¥ 4,126（2026-06）</strong></div></section>
+
+    <section class="kpis" aria-label="项目概览">
+      <div class="kpi cost"><div class="kpi-label">MONTHLY COST / 2026-06</div><div class="kpi-value">¥ 4,126</div><div class="kpi-note">云服务器 ¥1,866 · 流量 ¥2,202 · 其他 ¥58</div></div>
+      <div class="kpi"><div class="kpi-label">ECS INSTANCES</div><div class="kpi-value" id="serverCount">16</div><div class="kpi-note">全部运行中 · 包年包月</div></div>
+      <div class="kpi"><div class="kpi-label">COMPUTE POOL</div><div class="kpi-value" id="cpuCount">80</div><div class="kpi-note"><span id="memoryCount">298</span> GiB 内存</div></div>
+      <div class="kpi"><div class="kpi-label">AVG MONTHLY / 2026 H1</div><div class="kpi-value">¥ 2,634</div><div class="kpi-note">H1 合计 ¥15,802 · 6 个月</div></div>
+      <div class="kpi"><div class="kpi-label">CAPACITY WATCH</div><div class="kpi-value">2</div><div class="kpi-note">磁盘 / 内存需先处置</div></div>
+    </section>
+
+    <section class="layout">
+      <section class="panel">
+        <div class="panel-head"><div><h2>实例核对清单</h2><span>16:9 投屏模式 · 每页 8 台，分两页核对</span></div><div class="table-tools"><span id="rowCount">16 INSTANCES</span><div class="pager" id="pager"></div></div></div>
+        <div class="filters" id="filters"><button class="filter active" data-filter="all">全部 16</button><button class="filter" data-filter="prod">生产 7</button><button class="filter" data-filter="stage">测试 / 开发 4</button><button class="filter" data-filter="ops">运维 / 公共 5</button></div>
+        <div class="table-wrap"><table class="instances"><thead><tr><th>实例</th><th>角色（由名称推断）</th><th>规格</th><th>当前利用率快照</th><th>状态</th><th>复核</th></tr></thead><tbody id="instanceRows"></tbody></table></div>
+        <details><summary>数据口径与暂未录入项</summary><div class="details-copy">ECS 配置、计费方式、到期日和利用率来自控制台截图。月度成本来自项目成本表，现阶段只能对应到项目总额，尚未拆分到具体实例；操作系统、关联云盘规格、历史峰值与业务调用量也尚未完整呈现。</div></details>
+      </section>
+
+      <aside class="side-stack">
+        <section class="side-card"><h2>非 ECS 资源</h2><p>这些资源可能产生独立费用，应与 ECS 一起进入账单对账。</p><div id="assets"></div></section>
+        <section class="side-card"><h2>下轮补图清单</h2><p>拿到这些信息后，才可以形成“节省金额”和变更排期。</p><div class="callout"><strong>优先级 1：</strong>费用中心按产品 / 实例的月度账单、续费价格。<br><strong>优先级 2：</strong>云盘、快照、带宽、负载均衡、数据库的用量与费用。<br><strong>优先级 3：</strong>候选实例 7/30 天 CPU、内存、磁盘、流量趋势。</div></section>
+      </aside>
+      <section class="panel cost-panel"><div class="panel-head"><div><h2>项目月度服务器成本</h2><span>2025 仅“云服务器费”；2026 为云服务器、流量、其他服务器成本之和</span></div><span>2026 H1 月均 ¥2,634</span></div><div class="cost-history" id="costHistory"></div></section>
+      <section class="year-analysis" aria-label="年度成本分析">
+        <article class="year-card history"><div class="year-kicker">2025 / CASH OUTLAY</div><h2>2025 年费用分析</h2><div class="year-total">¥ 124,563</div><div class="year-caption">全年实际支出，包含 11 月包年续费</div><div class="year-rows"><div class="year-row"><span>全年月均（含包年续费）</span><strong>¥ 10,380</strong></div><div class="year-row"><span>11 月包年续费</span><strong>¥ 87,373 · 70.1%</strong></div><div class="year-row"><span>计算周期</span><strong>¥ 124,563 / 12 个月</strong></div><div class="year-row"><span>费用分类口径</span><strong>仅云服务器费</strong></div></div></article>
+        <article class="year-card current"><div class="year-kicker">2026 H1 / ACTUAL</div><h2>2026 年费用分析</h2><div class="year-total">¥ 15,802</div><div class="year-caption">1–6 月已发生，不年化、不代表全年预测</div><div class="year-rows"><div class="year-row"><span>月均成本</span><strong>¥ 2,634</strong></div><div class="year-row"><span>流量费</span><strong>¥ 9,956 · 63.0%</strong></div><div class="year-row"><span>云服务器费</span><strong>¥ 4,406 · 27.9%</strong></div><div class="year-row"><span>其他服务器成本</span><strong>¥ 1,441 · 9.1%</strong></div></div></article>
+        <div class="compare-note"><strong>现金支出对比：</strong>2026 年 H1 月均 ¥2,634，较 2025 年含包年续费的全年月均 ¥10,380 低 74.6%。这反映实际现金支出下降；由于 2025 仅列“云服务器费”、2026 改为 A/B/C 三类且只覆盖半年，不能将该比例视为严格的同比节省率。</div>
+      </section>
+    </section>
+
+    <div class="section-heading" style="margin-top:30px"><h2>会议需要对齐的动作</h2><p>基于当前截图的瞬时监控值，需用 7/30 天趋势确认后再执行变更。</p></div>
+    <section class="decisions" id="decisions"></section>
+    <footer>HH1 · INTERNAL INFRASTRUCTURE REVIEW</footer>
+  </main>
+
+  <script>
+    const instances = [
+      {n:'yzs-hz-comm-mon-1',id:'i-bp1bn5znk2dvy6sh7zxm',t:'ecs.u1-c1m4.2xlarge',c:8,m:32,b:50,role:'通用监控节点',u:[.94,6.6,26.11],e:'ops',r:'medium'},
+      {n:'B_弹幕pro_new-mongo1',id:'i-bp18xm2a79lkjom5sfod',t:'ecs.e-c1m4.xlarge',c:4,m:16,b:100,role:'生产 MongoDB',u:[1.92,44.3,28.86],e:'prod',r:'low'},
+      {n:'B_弹幕pro_new-mongo2',id:'i-bp18xm2a79lkjom5sfoc',t:'ecs.e-c1m4.xlarge',c:4,m:16,b:100,role:'生产 MongoDB',u:[2.57,48.79,22.41],e:'prod',r:'low'},
+      {n:'A_公共存储_1000GB',id:'i-bp14xn0u5qkzzyqj9k9h',t:'ecs.e-c1m1.large',c:2,m:2,b:100,role:'公共存储服务',u:[3.84,89.18,70.1],e:'ops',r:'low'},
+      {n:'A_Zabbix_Grafena_ELK_Gitlab_4c16g100',id:'i-bp12c2tdr1v9ettm86nc',t:'ecs.e-c1m4.xlarge',c:4,m:16,b:100,role:'监控 / 日志 / GitLab',u:[12.91,43.75,70.17],e:'ops',r:'medium'},
+      {n:'B_弹幕pro_mid_3_4c16g300',id:'i-bp1b2okjf6ka1v1gap4w',t:'ecs.g6.2xlarge',c:8,m:32,b:100,role:'生产中间层',u:[1.14,24.27,70.66],e:'prod',r:'medium'},
+      {n:'B_弹幕pro_业务_2_4c16g100',id:'i-bp19218ujhp1yq57qc18',t:'ecs.g6.xlarge',c:4,m:16,b:100,role:'生产业务节点',u:[4.75,14.52,33.85],e:'prod',r:'high'},
+      {n:'B_弹幕pro_mid_1_4c16g500',id:'i-bp1a7osfwfxzhuk3c6q5',t:'ecs.g6.2xlarge',c:8,m:32,b:100,role:'生产中间层',u:[2.12,16.49,48.95],e:'prod',r:'medium'},
+      {n:'B_弹幕pro_业务_1_4c16g500',id:'i-bp12gyw5w7vsubk4zfcm',t:'ecs.g6.xlarge',c:4,m:16,b:100,role:'生产业务节点',u:[5.1,18.59,17.87],e:'prod',r:'high'},
+      {n:'B_弹幕pro_mid_2_4c16g500',id:'i-bp1adipbdcbmmfxxamyl',t:'ecs.g6.2xlarge',c:8,m:32,b:100,role:'生产中间层',u:[2.43,26.8,68.87],e:'prod',r:'medium'},
+      {n:'A_CICD_8c16g100',id:'i-bp1a7osfwfxxgsfw6tem',t:'ecs.c6.2xlarge',c:8,m:16,b:100,role:'CI/CD 节点',u:[1.49,71.05,73.06],e:'ops',r:'low'},
+      {n:'B_弹幕test_mid_8c32g300',id:'i-bp1a9eb5j2weks0q8nmv',t:'ecs.g6.2xlarge',c:8,m:32,b:100,role:'测试中间层',u:[22.44,84.44,80.5],e:'stage',r:'medium'},
+      {n:'B_弹幕test_RedisC_4c16g300',id:'i-bp1785mhiy57dzx64amw',t:'ecs.g6.xlarge',c:4,m:16,b:50,role:'测试 Redis',u:[.62,7.43,19.2],e:'stage',r:'high'},
+      {n:'B_弹幕dev_业务_2c8g100',id:'i-bp14agnt9boegdntxw3f',t:'ecs.g6.large',c:2,m:8,b:50,role:'开发业务节点',u:[5.37,21.51,78.22],e:'stage',r:'medium'},
+      {n:'B_弹幕test_业务_2c8g100',id:'i-bp1ecejpmgl3k9f3azgb',t:'ecs.g6.large',c:2,m:8,b:50,role:'测试业务节点',u:[22.64,19.8,72.5],e:'stage',r:'medium'},
+      {n:'A_JumpServer_2c4g100',id:'i-bp176bho6w3yj2xjhc67',t:'ecs.g6.large',c:2,m:8,b:100,role:'JumpServer 堡垒机',u:[7.05,49.43,23.63],e:'ops',r:'medium'}
+    ];
+    const assets = [
+      ['OSS','6 Bucket · 可见存储约 14.1 GB'],['SLS','6 日志库 · 4 个 Project'],['网络','2 VPC · 2 交换机 · 2 路由表'],['ECS 配套','31 云盘 · 3 快照 · 16 弹性网卡'],['域名与交付','1 域名 · 1 DNS · 1 CDN 域名'],['权限治理','7 RAM 用户 · 36 角色']
+    ];
+    const decisions = [
+      {kind:'safe',label:'费用口径 · 已确认',title:'2025 年 11 月为一次性包年续费',text:'该笔 ¥87,373 为年度预付，仍纳入 2025 年实际现金支出与全年月均。2025 年全年月均为 ¥10,380。',metric:'2025-11 · 包年续费'},
+      {kind:'urgent',label:'成本候选 · P1',title:'测试 Redis 可优先核验',text:'当前 CPU 0.62%、内存 7.43%、磁盘 19.2%。确认测试排期、缓存容量和峰值后，评估停机、迁移或降配。',metric:'B_弹幕test_RedisC'},
+      {kind:'urgent',label:'成本候选 · P1',title:'两台生产业务机有降配线索',text:'业务_1 / 业务_2 的当前 CPU、内存与磁盘均偏低。先补趋势与 QPS，采用灰度方式验证，不能直接变更。',metric:'CPU 5.10% / 4.75%'},
+      {kind:'watch',label:'容量风险 · 先处置',title:'测试与开发磁盘偏高',text:'测试中间层磁盘 80.5%、内存 84.44%；开发业务机磁盘 78.22%。先查日志、构建产物和保留周期。',metric:'DISK 80.50% / 78.22%'},
+      {kind:'watch',label:'费用驱动 · 2026-06',title:'流量费已成为最大成本项',text:'6 月项目服务器总成本为 ¥4,126，其中流量费 ¥2,202（53.4%），高于云服务器费 ¥1,866。应先核对出口流量、CDN 命中率与带宽计费方式。',metric:'环比 +62.4% · 5 月 ¥2,541'}
+    ];
+    const costHistory = [
+      ['2025-01',7035.88,'云服务器费'],['2025-02',3136.16,'云服务器费'],['2025-03',5809.57,'云服务器费'],['2025-04',1884.23,'云服务器费'],['2025-05',4197.70,'云服务器费'],['2025-06',1566.97,'云服务器费'],
+      ['2025-07',2575.17,'云服务器费'],['2025-08',2563.10,'云服务器费'],['2025-09',2800.96,'云服务器费'],['2025-10',4526.15,'云服务器费'],['2025-11',87373.07,'包年续费'],['2025-12',1093.86,'云服务器费'],
+      ['2026-01',1210.56,'A+B+C'],['2026-02',1865.88,'A+B+C'],['2026-03',2406.80,'A+B+C'],['2026-04',3651.52,'A+B+C'],['2026-05',2541.40,'A+B+C'],['2026-06',4126.33,'A+B+C']
+    ];
+    const usageBar = (label, value) => { const state = value >= 75 ? 'high' : value >= 60 ? 'mid' : ''; return `<div class="bar-item"><div class="bar-label"><span>${label}</span><span>${value}%</span></div><div class="track"><div class="fill ${state}" style="width:${Math.min(value,100)}%"></div></div></div>`; };
+    const review = {high:['高优先','high'],medium:['需核验','medium'],low:['观察','low']};
+    const pageSize = 8; let activeFilter = 'all'; let currentPage = 0;
+    function visible(filter) { if(filter === 'all') return instances; if(filter === 'stage') return instances.filter(x => x.e === 'stage'); return instances.filter(x => x.e === filter); }
+    function render(filter=activeFilter, targetPage=currentPage) {
+      activeFilter = filter; const allRows = visible(activeFilter); const pageCount = Math.max(1, Math.ceil(allRows.length / pageSize)); currentPage = Math.max(0, Math.min(targetPage, pageCount - 1)); const rows = allRows.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+      document.querySelector('#rowCount').textContent = `${allRows.length} INSTANCES`;
+      document.querySelector('#instanceRows').innerHTML = rows.map(x => `<tr><td><span class="instance-name">${x.n}</span><span class="instance-meta">${x.id} · 杭州</span></td><td class="role">${x.role}</td><td class="spec">${x.c}C / ${x.m}G / ${x.b}M<br>${x.t}</td><td><div class="bars">${usageBar('CPU',x.u[0])}${usageBar('MEM',x.u[1])}${usageBar('DISK',x.u[2])}</div></td><td><span class="status"><i>•</i>运行中</span></td><td><span class="tag ${review[x.r][1]}">${review[x.r][0]}</span></td></tr>`).join('');
+      document.querySelectorAll('.filter').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+      document.querySelector('#pager').innerHTML = `<button class="page-btn" data-page="prev" ${currentPage === 0 ? 'disabled' : ''} aria-label="上一页">‹</button><span class="page-no">${currentPage + 1} / ${pageCount}</span><button class="page-btn" data-page="next" ${currentPage === pageCount - 1 ? 'disabled' : ''} aria-label="下一页">›</button>`;
+    }
+    document.querySelector('#decisions').innerHTML = decisions.map(x => `<article class="decision ${x.kind}"><span class="badge">${x.label}</span><h3>${x.title}</h3><p>${x.text}</p><div class="metric-line">${x.metric}</div></article>`).join('');
+    document.querySelector('#assets').innerHTML = assets.map(x => `<div class="asset"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('');
+    document.querySelector('#costHistory').innerHTML = costHistory.map(x => `<div class="cost-cell ${x[0] === '2025-11' ? 'prepay' : ''}"><div class="cost-month">${x[0]}</div><div class="cost-value">¥${x[1].toLocaleString('zh-CN',{maximumFractionDigits:2})}</div><div class="cost-meta">${x[2]}</div></div>`).join('');
+    document.querySelector('#serverCount').textContent = instances.length;
+    document.querySelector('#cpuCount').textContent = instances.reduce((n,x)=>n+x.c,0);
+    document.querySelector('#memoryCount').textContent = instances.reduce((n,x)=>n+x.m,0);
+    document.querySelector('#updated').textContent = new Date().toLocaleString('zh-CN',{hour12:false});
+    document.querySelectorAll('.filter').forEach(b => b.addEventListener('click', () => render(b.dataset.filter, 0)));
+    document.querySelector('#pager').addEventListener('click', event => { const action = event.target.dataset.page; if (action === 'prev') render(activeFilter, currentPage - 1); if (action === 'next') render(activeFilter, currentPage + 1); });
+    document.addEventListener('keydown', event => { if (event.key === 'ArrowLeft') render(activeFilter, currentPage - 1); if (event.key === 'ArrowRight') render(activeFilter, currentPage + 1); });
+    document.querySelector('#print').addEventListener('click', () => window.print());
+    document.querySelector('#copy').addEventListener('click', async () => { const text='hh1 阿里云：16 台 ECS（80 vCPU / 298 GiB），2026 年 H1 月均服务器相关成本 ¥2,634，6 月成本 ¥4,126，其中流量费 ¥2,202（53.4%）。优先核对流量、CDN 与带宽计费，并复核测试 Redis 和两台生产业务机的降配可能性。'; try { await navigator.clipboard.writeText(text); document.querySelector('#copy').textContent='已复制'; setTimeout(()=>document.querySelector('#copy').textContent='复制会议结论',1500); } catch { prompt('复制会议结论：',text); } });
+    render();
+  </script>
+</body>
+</html>
+
