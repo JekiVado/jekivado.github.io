@@ -49,10 +49,10 @@
     .filters { display:flex; gap:8px; flex-wrap:wrap; padding:14px 18px; border-bottom:1px solid var(--line); background:#fbfcfe; }
     .filter { border:0; background:transparent; color:var(--muted); border-radius:7px; padding:8px 12px; font-size:14px; }.filter.active { color:var(--blue); background:var(--blue-pale); font-weight:700; }
     .table-wrap { overflow-x:auto; }.instances { width:100%; min-width:1080px; border-collapse:collapse; table-layout:fixed; }
-    th { padding:13px 18px; color:var(--muted); background:#fbfcfe; text-align:left; font-size:12px; font-weight:600; white-space:nowrap; } th:nth-child(1){width:20%}th:nth-child(2){width:16%}th:nth-child(3){width:20%}th:nth-child(4){width:20%}th:nth-child(5){width:16%}th:nth-child(6){width:8%} td { padding:19px 18px; border-top:1px solid var(--line); vertical-align:middle; }
+    th { padding:13px 18px; color:var(--muted); background:#fbfcfe; text-align:left; font-size:12px; font-weight:600; white-space:nowrap; } th:nth-child(1){width:19%}th:nth-child(2){width:15%}th:nth-child(3){width:18%}th:nth-child(4){width:28%}th:nth-child(5){width:13%}th:nth-child(6){width:7%} td { padding:19px 18px; border-top:1px solid var(--line); vertical-align:middle; }
     tbody tr { transition:background .16s; } tbody tr:hover { background:#f8fbff; }
     .instance-name { display:block; font-size:16px; font-weight:700; line-height:1.45; }.instance-meta { display:block; margin-top:5px; color:var(--muted); font:12px 'DM Mono',monospace; }
-    .role { color:#536176; font-size:15px; }.spec { color:#435168; font:13px/1.65 'DM Mono',monospace; white-space:nowrap; }.network,.billing { color:#536176; font:12px/1.65 'DM Mono',monospace; }.billing strong { color:var(--ink); font-family:'Noto Sans SC','PingFang SC',sans-serif; }
+    .role { color:#536176; font-size:15px; }.spec { color:#435168; font:13px/1.65 'DM Mono',monospace; white-space:nowrap; }.network,.billing { color:#536176; font:12px/1.65 'DM Mono',monospace; }.billing strong { color:var(--ink); font-family:'Noto Sans SC','PingFang SC',sans-serif; }.no-metrics { color:var(--muted); font-size:13px; line-height:1.6; }
     .bars { display:flex; gap:14px; align-items:flex-end; min-width:240px; }.bar-item { width:70px; }.bar-label { display:flex; justify-content:space-between; margin-bottom:6px; color:var(--muted); font:11px 'DM Mono',monospace; }.track { overflow:hidden; height:8px; border-radius:9px; background:#e9eef5; }.fill { height:100%; border-radius:inherit; background:var(--mint); }.fill.mid { background:#e7a133; }.fill.high { background:var(--red); }
     .status { display:inline-flex; align-items:center; gap:6px; color:var(--mint); font-size:14px; white-space:nowrap; }.status i { display:block; width:7px; height:7px; border-radius:50%; background:currentColor; }.tag { display:inline-block; padding:6px 9px; border-radius:6px; font-size:12px; font-weight:700; white-space:nowrap; }.tag.high { color:var(--red); background:var(--red-pale); }.tag.medium { color:var(--amber); background:var(--amber-pale); }.tag.low { color:var(--mint); background:var(--mint-pale); }
     .side-stack { display:grid; grid-template-columns:1.3fr .9fr; gap:20px; margin-top:20px; }.side-card { padding:18px; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:var(--shadow); }.side-card h2 { font-size:16px; }.side-card > p { margin:5px 0 14px; color:var(--muted); font-size:12px; line-height:1.6; }
@@ -93,15 +93,15 @@
       <div class="kpi"><div class="kpi-label">TENCENT CVM</div><div class="kpi-value" id="serverCount">5</div><div class="kpi-note">全部运行中 · 包年包月</div></div>
       <div class="kpi"><div class="kpi-label">COMPUTE POOL</div><div class="kpi-value" id="cpuCount">20</div><div class="kpi-note"><span id="memoryCount">48</span> GiB 内存 · 200 Mbps</div></div>
       <div class="kpi"><div class="kpi-label">AVG MONTHLY / 2026 H1</div><div class="kpi-value">¥ 1,851</div><div class="kpi-note">H1 合计 ¥11,104 · 6 个月</div></div>
-      <div class="kpi"><div class="kpi-label">HOST SECURITY</div><div class="kpi-value">553</div><div class="kpi-note">待处理安全事件 · 需单独核验</div></div>
+      <div class="kpi"><div class="kpi-label">ALERTS / 24H</div><div class="kpi-value">0</div><div class="kpi-note">全部健康正常 · CI/CD 指标缺失</div></div>
     </section>
 
     <section class="layout">
       <section class="panel">
         <div class="panel-head"><div><h2>实例核对清单</h2><span>16:9 投屏模式 · 每页最多 8 台，本项目单页完整展示</span></div><div class="table-tools"><span id="rowCount">5 INSTANCES</span><div class="pager" id="pager"></div></div></div>
         <div class="filters" id="filters"><button class="filter active" data-filter="all">全部 5</button><button class="filter" data-filter="prod">生产 2</button><button class="filter" data-filter="stage">测试 2</button><button class="filter" data-filter="ops">运维 1</button></div>
-        <div class="table-wrap"><table class="instances"><thead><tr><th>实例</th><th>角色（由名称推断）</th><th>规格 / 可用区</th><th>公网 / 私网</th><th>到期 / 计费</th><th>核对焦点</th></tr></thead><tbody id="instanceRows"></tbody></table></div>
-        <details><summary>数据口径与暂未录入项</summary><div class="details-copy">实例规格、网络、计费方式与到期日来自腾讯云控制台截图。月度成本来自项目成本表，当前只能对应项目总额，未拆分到具体 CVM。截图未包含 CPU、内存、磁盘、流量趋势与云盘容量；请补充 7/30 天监控后再评估规格调整。</div></details>
+        <div class="table-wrap"><table class="instances"><thead><tr><th>实例</th><th>角色（由名称推断）</th><th>规格 / 可用区</th><th>当前利用率快照</th><th>到期 / 计费</th><th>核对焦点</th></tr></thead><tbody id="instanceRows"></tbody></table></div>
+        <details><summary>数据口径与暂未录入项</summary><div class="details-copy">实例规格、计费方式、到期日与健康状态来自腾讯云控制台截图。性能数值为当前快照，不代表峰值；4 台已返回 CPU、内存、磁盘与出网指标，CI/CD 未返回性能数值。月度成本来自项目成本表，当前只能对应项目总额，未拆分到具体 CVM；请补充 7/30 天趋势后再评估规格调整。</div></details>
       </section>
 
       <aside class="side-stack">
@@ -123,34 +123,35 @@
 
   <script>
     const instances = [
-      {n:'GC_pro_中间件',id:'ins-4v5mqxjj',c:8,m:16,b:200,role:'生产中间件',e:'prod',pub:'124.222.126.4',pri:'172.17.0.6',expires:'2026-10-04 19:37',focus:'业务依赖',r:'medium'},
-      {n:'GC_pro_业务',id:'ins-b3v7j2gb',c:4,m:8,b:200,role:'生产业务节点',e:'prod',pub:'110.42.226.26',pri:'172.17.0.9',expires:'2026-10-26 19:37',focus:'续费价格',r:'medium'},
-      {n:'GC_test_中间件',id:'ins-9s09gih7',c:2,m:4,b:200,role:'测试中间件',e:'stage',pub:'118.89.82.48',pri:'172.17.0.16',expires:'2026-10-31 14:38',focus:'测试排期',r:'low'},
-      {n:'GC_test_业务',id:'ins-abzfzu8d',c:2,m:4,b:200,role:'测试业务节点',e:'stage',pub:'111.231.51.3',pri:'172.17.0.5',expires:'2026-10-31 14:38',focus:'测试排期',r:'low'},
-      {n:'CI/CD',id:'ins-cuxy46ld',c:4,m:16,b:200,role:'构建与发布节点',e:'ops',pub:'124.223.19.217',pri:'172.17.0.7',expires:'2026-10-31 14:38',focus:'执行任务',r:'medium'}
+      {n:'GC_pro_中间件',id:'ins-4v5mqxjj',c:8,m:16,b:200,role:'生产中间件',e:'prod',pub:'124.222.126.4',pri:'172.17.0.6',u:[6.28,20.22,43.67],out:0,expires:'2026-10-04 19:37',focus:'业务依赖',r:'medium'},
+      {n:'GC_pro_业务',id:'ins-b3v7j2gb',c:4,m:8,b:200,role:'生产业务节点',e:'prod',pub:'110.42.226.26',pri:'172.17.0.9',u:[8.97,31.50,61.56],out:0.61,expires:'2026-10-26 19:37',focus:'续费价格',r:'medium'},
+      {n:'GC_test_中间件',id:'ins-9s09gih7',c:2,m:4,b:200,role:'测试中间件',e:'stage',pub:'118.89.82.48',pri:'172.17.0.16',u:[2.30,41.61,29.44],out:0.49,expires:'2026-10-31 14:38',focus:'测试排期',r:'low'},
+      {n:'GC_test_业务',id:'ins-abzfzu8d',c:2,m:4,b:200,role:'测试业务节点',e:'stage',pub:'111.231.51.3',pri:'172.17.0.5',u:[4.20,49.48,63.74],out:0.32,expires:'2026-10-31 14:38',focus:'磁盘趋势',r:'medium'},
+      {n:'CI/CD',id:'ins-cuxy46ld',c:4,m:16,b:200,role:'构建与发布节点',e:'ops',pub:'124.223.19.217',pri:'172.17.0.7',u:null,out:0.01,expires:'2026-10-31 14:38',focus:'补性能监控',r:'high'}
     ];
     const assets = [
-      ['私有网络 VPC','2 个'],['内容分发网络 CDN','昨日使用 0 B'],['ICP 备案','已完成 2 个'],['域名注册','2 个'],['短信','本月使用约 5K 条'],['主机安全','553 个待处理安全事件']
+      ['私有网络 VPC','2 个'],['内容分发网络 CDN','昨日使用 0 B'],['ICP 备案','已完成 2 个'],['域名注册','2 个'],['短信','本月使用约 5K 条'],['主机安全（历史待处理）','553 个事件 · 与 24h 告警分开核验']
     ];
     const decisions = [
+      {kind:'safe',label:'性能快照 · 健康',title:'近 24 小时无告警与提醒',text:'4 台有性能数据的实例均显示健康正常；CPU 为 2.30%–8.97%，内存为 20.22%–49.48%，磁盘最高 63.74%。当前快照不支持直接降配。',metric:'ALERTS 0 · REMINDERS 0'},
+      {kind:'urgent',label:'监控覆盖 · P1',title:'CI/CD 未返回 CPU、内存、磁盘指标',text:'CI/CD 仅有极低出网快照（0.01），核心资源指标为“-”。应先检查监控 Agent、采集权限与任务执行周期，补齐趋势后再判定容量。',metric:'ins-cuxy46ld · 指标缺失'},
       {kind:'urgent',label:'账务核对 · P1',title:'2026 云服务器费为 0，需先确认归属',text:'成本表的 2026 A 类“云服务器费”合计为 ¥0，但控制台显示 5 台包年包月 CVM 正在运行。需核对是否预付、归入 C 类或计入其他项目。',metric:'5 台 CVM · A 类 ¥0'},
-      {kind:'urgent',label:'费用驱动 · P1',title:'4 月 C 类成本异常抬升',text:'2026-04 其他服务器成本 ¥3,969.90，占当月 ¥4,203.97 的 94.4%。先拆出产品明细、一次性项目与续费项，再讨论优化。',metric:'2026-04 · C 类 94.4%'},
-      {kind:'watch',label:'续费窗口 · P2',title:'5 台实例集中在 10 月到期',text:'最早一台 2026-10-04 到期，其余在 10-26 至 10-31 到期。建议在 8 月前补齐业务依赖、续费报价与预付归属。',metric:'2026-10-04 → 10-31'},
-      {kind:'watch',label:'安全风险 · P2',title:'主机安全有 553 个待处理事件',text:'截图只展示待处理事件总数，尚未区分高危、已忽略与历史告警。应先导出事件等级、受影响实例和处置状态。',metric:'待处理 553 个'},
-      {kind:'safe',label:'网络费用 · 观察',title:'流量费占 H1 成本 16.8%',text:'2026 H1 流量费 ¥1,870；CDN 截图显示昨日使用 0 B，不能据此判断长期流量。需要补按产品、带宽与流量方向的账单。',metric:'H1 流量 ¥1,870'}
+      {kind:'watch',label:'费用驱动 · P2',title:'4 月 C 类成本异常抬升',text:'2026-04 其他服务器成本 ¥3,969.90，占当月 ¥4,203.97 的 94.4%。先拆出产品明细、一次性项目与续费项，再讨论优化。',metric:'2026-04 · C 类 94.4%'},
+      {kind:'watch',label:'续费窗口 · P2',title:'5 台实例集中在 10 月到期',text:'最早一台 2026-10-04 到期，其余在 10-26 至 10-31 到期。建议在 8 月前补齐业务依赖、续费报价与预付归属。',metric:'2026-10-04 → 10-31'}
     ];
     const costHistory = [
       ['2025-01',35.52,'云服务器费'],['2025-02',49.08,'云服务器费'],['2025-03',75.10,'云服务器费'],['2025-04',1135,'云服务器费'],['2025-05',2075.58,'云服务器费'],['2025-06',5801.05,'云服务器费'],
       ['2025-07',5735.18,'云服务器费'],['2025-08',1422.11,'云服务器费'],['2025-09',14687.80,'云服务器费'],['2025-10',356.62,'云服务器费'],['2025-11',950.93,'云服务器费'],['2025-12',1406.62,'云服务器费'],
       ['2026-01',742.89,'A+B+C'],['2026-02',1118.44,'A+B+C'],['2026-03',1202.47,'A+B+C'],['2026-04',4203.97,'A+B+C'],['2026-05',1707.17,'A+B+C'],['2026-06',2128.71,'A+B+C']
     ];
-    const review = {high:['优先核验','high'],medium:['续费核对','medium'],low:['环境核验','low']};
+    const usageBar = (label, value) => { const state = value >= 75 ? 'high' : value >= 60 ? 'mid' : ''; return `<div class="bar-item"><div class="bar-label"><span>${label}</span><span>${value}%</span></div><div class="track"><div class="fill ${state}" style="width:${Math.min(value,100)}%"></div></div></div>`; };
+    const review = {high:['补监控','high'],medium:['需核验','medium'],low:['环境核验','low']};
     const pageSize = 8; let activeFilter = 'all'; let currentPage = 0;
     function visible(filter) { if(filter === 'all') return instances; if(filter === 'stage') return instances.filter(x => x.e === 'stage'); return instances.filter(x => x.e === filter); }
     function render(filter=activeFilter, targetPage=currentPage) {
       activeFilter = filter; const allRows = visible(activeFilter); const pageCount = Math.max(1, Math.ceil(allRows.length / pageSize)); currentPage = Math.max(0, Math.min(targetPage, pageCount - 1)); const rows = allRows.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
       document.querySelector('#rowCount').textContent = `${allRows.length} INSTANCES`;
-      document.querySelector('#instanceRows').innerHTML = rows.map(x => `<tr><td><span class="instance-name">${x.n}</span><span class="instance-meta">${x.id} · 上海小区</span></td><td class="role">${x.role}</td><td class="spec">标准型 SA3<br>${x.c}C / ${x.m}G / ${x.b} Mbps</td><td class="network">公 ${x.pub}<br>内 ${x.pri}<br>Default-VPC</td><td class="billing"><strong>包年包月</strong><br>${x.expires} 到期<br>按流量计费</td><td><span class="tag ${review[x.r][1]}">${review[x.r][0]}</span></td></tr>`).join('');
+      document.querySelector('#instanceRows').innerHTML = rows.map(x => `<tr><td><span class="instance-name">${x.n}</span><span class="instance-meta">${x.id} · 上海小区</span></td><td class="role">${x.role}</td><td class="spec">标准型 SA3<br>${x.c}C / ${x.m}G / ${x.b} Mbps</td><td>${x.u ? `<div class="bars">${usageBar('CPU',x.u[0])}${usageBar('MEM',x.u[1])}${usageBar('DISK',x.u[2])}</div><span class="instance-meta">外网出 ${x.out}</span>` : `<div class="no-metrics">性能指标未返回<br><span class="instance-meta">外网出 ${x.out}</span></div>`}</td><td class="billing"><strong>包年包月</strong><br>${x.expires} 到期<br>按流量计费</td><td><span class="tag ${review[x.r][1]}">${review[x.r][0]}</span></td></tr>`).join('');
       document.querySelectorAll('.filter').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
       document.querySelector('#pager').innerHTML = `<button class="page-btn" data-page="prev" ${currentPage === 0 ? 'disabled' : ''} aria-label="上一页">‹</button><span class="page-no">${currentPage + 1} / ${pageCount}</span><button class="page-btn" data-page="next" ${currentPage === pageCount - 1 ? 'disabled' : ''} aria-label="下一页">›</button>`;
     }
@@ -165,9 +166,8 @@
     document.querySelector('#pager').addEventListener('click', event => { const action = event.target.dataset.page; if (action === 'prev') render(activeFilter, currentPage - 1); if (action === 'next') render(activeFilter, currentPage + 1); });
     document.addEventListener('keydown', event => { if (event.key === 'ArrowLeft') render(activeFilter, currentPage - 1); if (event.key === 'ArrowRight') render(activeFilter, currentPage + 1); });
     document.querySelector('#print').addEventListener('click', () => window.print());
-    document.querySelector('#copy').addEventListener('click', async () => { const text='cloud 腾讯云：5 台包年包月 CVM（20 vCPU / 48 GiB），均在 2026 年 10 月到期。2026 年 H1 已入账服务器相关成本 ¥11,104，月均 ¥1,851，其中其他服务器成本 ¥9,234（83.2%）。优先核对 2026 年云服务器费 A 类为 0 与 CVM 预付归属、4 月 C 类 ¥3,970 的产品明细，以及 553 个主机安全待处理事件。'; try { await navigator.clipboard.writeText(text); document.querySelector('#copy').textContent='已复制'; setTimeout(()=>document.querySelector('#copy').textContent='复制会议结论',1500); } catch { prompt('复制会议结论：',text); } });
+    document.querySelector('#copy').addEventListener('click', async () => { const text='cloud 腾讯云：5 台包年包月 CVM（20 vCPU / 48 GiB），均在 2026 年 10 月到期。近 24 小时 0 告警、0 提醒；4 台已返回性能指标，CPU 2.30%–8.97%、磁盘最高 63.74%，不建议仅据此快照直接降配；CI/CD 缺少 CPU、内存、磁盘指标，应先补监控。2026 年 H1 已入账服务器相关成本 ¥11,104，月均 ¥1,851，优先核对云服务器费 A 类为 0 与 CVM 预付归属、4 月 C 类 ¥3,970 的产品明细。'; try { await navigator.clipboard.writeText(text); document.querySelector('#copy').textContent='已复制'; setTimeout(()=>document.querySelector('#copy').textContent='复制会议结论',1500); } catch { prompt('复制会议结论：',text); } });
     render();
   </script>
 </body>
 </html>
-
