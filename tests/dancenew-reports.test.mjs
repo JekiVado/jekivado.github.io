@@ -20,6 +20,8 @@ assert.match(html, /\.workbuddy\/reports/);
 assert.match(html, /class="archive-list"/);
 assert.match(html, /class="tech-shell"/, 'Expected the archive to use the modern technology layout shell');
 assert.match(html, /class="report-card"/, 'Expected the archive entries to use readable report cards');
+assert.match(html, /class="light-shell"/, 'Expected the modern archive to use the requested light layout');
+assert.doesNotMatch(html, /--canvas:\s*#090d18/, 'Expected the archive to avoid the former dark canvas');
 assert.doesNotMatch(html, /data-filter=/, 'Expected a static archive list without filter controls');
 assert.doesNotMatch(html, /<script\b/i, 'Expected the archive page to work without JavaScript');
 
