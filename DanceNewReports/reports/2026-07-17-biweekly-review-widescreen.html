@@ -302,7 +302,7 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
 
   .producer-table {
     width: 100%;
-    min-width: 920px;
+    min-width: 0 !important;
     border-collapse: collapse;
     table-layout: fixed;
     background: #ffffff;
@@ -330,6 +330,106 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
   .producer-table td:nth-child(1) { width: 8%; }
   .producer-table th:nth-child(2),
   .producer-table td:nth-child(2) { width: 10%; }
+
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  .portable-fallback,
+  .portable-block,
+  .portable-content-card,
+  .portable-chart-summary,
+  .portable-table-scroll,
+  .producer-table-wrap {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .portable-table-scroll,
+  .producer-table-wrap {
+    overflow: visible !important;
+  }
+
+  .portable-table-scroll table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+  }
+
+  .portable-table-scroll th,
+  .portable-table-scroll td,
+  .producer-table th,
+  .producer-table td {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .portable-static-chart,
+  .portable-static-chart-variant,
+  .portable-static-chart-variant > svg {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+@media screen and (max-width: 1180px) {
+  .portable-table-scroll,
+  .producer-table-wrap { overflow: visible !important; }
+
+  .portable-table-scroll table,
+  .producer-table {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: auto !important;
+  }
+
+  .portable-table-scroll thead,
+  .producer-table thead { display: none; }
+
+  .portable-table-scroll tbody,
+  .producer-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .portable-table-scroll tr,
+  .producer-table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 8px 14px;
+    border: 1px solid #cbd7d2;
+    border-radius: 4px;
+    background: #ffffff;
+  }
+
+  .portable-table-scroll td,
+  .producer-table td {
+    display: grid;
+    grid-template-columns: minmax(116px, 32%) minmax(0, 1fr);
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e8e4;
+  }
+
+  .portable-table-scroll td:last-child,
+  .producer-table td:last-child { border-bottom: 0; }
+
+  .portable-table-scroll td::before,
+  .producer-table td::before {
+    content: attr(data-label);
+    color: #536765;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.55;
+  }
 }
 
 @media screen and (max-width: 760px) {
@@ -408,6 +508,17 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
     });
   };
 
+  const annotateResponsiveTableLabels = () => {
+    document.querySelectorAll(".portable-table-scroll table, .producer-table").forEach((table) => {
+      const headers = [...table.querySelectorAll("thead th")].map((cell) => cell.textContent.trim());
+      table.querySelectorAll("tbody tr").forEach((row) => {
+        [...row.querySelectorAll("td")].forEach((cell, index) => {
+          cell.dataset.label = headers[index] || "字段";
+        });
+      });
+    });
+  };
+
   const prepareProducerBrief = () => {
     const fallback = document.querySelector("[data-portable-fallback]");
     if (fallback) {
@@ -420,6 +531,7 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
     if (description) description.textContent = "当前版本复审、首测风险与候选包门槛";
     removeSourceChrome();
     convertRawTables();
+    annotateResponsiveTableLabels();
   };
   document.addEventListener("DOMContentLoaded", prepareProducerBrief, { once: true });
 })();
