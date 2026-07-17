@@ -14,6 +14,9 @@ assert.match(html, /<title>DanceNew 报告档案<\/title>/);
 assert.match(html, /DanceNew 报告档案/);
 assert.match(html, /\.codex/);
 assert.match(html, /\.workbuddy\/reports/);
+assert.match(html, /class="archive-list"/);
+assert.doesNotMatch(html, /data-filter=/, 'Expected a static archive list without filter controls');
+assert.doesNotMatch(html, /<script\b/i, 'Expected the archive page to work without JavaScript');
 
 const links = [...html.matchAll(/<a\s+class="report-link"\s+data-date="([^"]+)"\s+href="([^"]+)"/g)];
 assert.equal(links.length, 9, 'Expected exactly nine report links');

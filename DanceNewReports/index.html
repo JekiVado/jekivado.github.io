@@ -3,24 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#efe9dd" />
+    <meta name="theme-color" content="#ffffff" />
     <meta
       name="description"
-      content="DanceNew 项目静态分析报告档案，收录 .codex 与 .workbuddy/reports 生成的九份报告，按时间倒序整理。"
+      content="DanceNew 项目报告档案：收录 .codex 与 .workbuddy/reports 生成的静态报告，按时间倒序排列。"
     />
     <title>DanceNew 报告档案</title>
     <style>
       :root {
-        color-scheme: light;
-        --paper: #efe9dd;
-        --paper-light: #f8f4eb;
-        --ink: #201f1b;
-        --muted: #6d685f;
-        --rule: rgba(32, 31, 27, 0.2);
-        --accent: #b63b27;
-        --accent-dark: #7f271b;
-        --codex: #173c40;
-        --workbuddy: #78542e;
+        --ink: #1f2933;
+        --muted: #667085;
+        --line: #d9dde3;
+        --blue: #1d4ed8;
+        --blue-dark: #173ea6;
+        --paper: #ffffff;
+        --wash: #f7f8fa;
         --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, Georgia, serif;
         --sans: "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
       }
@@ -29,608 +26,360 @@
         box-sizing: border-box;
       }
 
-      html {
-        scroll-behavior: smooth;
-      }
-
       body {
         min-width: 320px;
         margin: 0;
         color: var(--ink);
-        background:
-          linear-gradient(90deg, transparent 0 49.92%, rgba(32, 31, 27, 0.035) 49.92% 50.08%, transparent 50.08%),
-          radial-gradient(circle at 12% 8%, rgba(182, 59, 39, 0.11), transparent 27rem),
-          var(--paper);
-        font-family: var(--serif);
-      }
-
-      body::before {
-        position: fixed;
-        inset: 0;
-        z-index: -1;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
-        content: "";
-        pointer-events: none;
+        background: var(--paper);
+        font-family: var(--sans);
       }
 
       a {
         color: inherit;
       }
 
-      .shell {
-        width: min(1180px, calc(100% - 40px));
+      .page {
+        width: min(920px, calc(100% - 40px));
         margin: 0 auto;
       }
 
-      .masthead {
-        display: grid;
-        grid-template-columns: minmax(0, 1.65fr) minmax(260px, 0.65fr);
-        gap: clamp(32px, 8vw, 110px);
-        align-items: end;
-        min-height: 72vh;
-        padding: 72px 0 58px;
+      header {
+        padding: 56px 0 28px;
         border-bottom: 1px solid var(--ink);
       }
 
-      .kicker,
-      .source,
-      .tag,
-      .filter-button,
-      .footer,
-      .archive-facts dt,
-      .archive-facts dd {
-        font-family: var(--sans);
-      }
-
-      .kicker {
-        display: flex;
-        gap: 14px;
-        align-items: center;
-        margin: 0 0 30px;
-        color: var(--accent-dark);
-        font-size: 0.76rem;
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--blue);
+        font-size: 0.74rem;
         font-weight: 700;
-        letter-spacing: 0.18em;
+        letter-spacing: 0.09em;
         text-transform: uppercase;
       }
 
-      .kicker::before {
-        width: 44px;
-        height: 2px;
-        background: var(--accent);
-        content: "";
+      h1,
+      h2 {
+        font-family: var(--serif);
       }
 
       h1 {
-        max-width: 8ch;
         margin: 0;
-        font-size: clamp(4.7rem, 13vw, 10.5rem);
+        font-size: clamp(2rem, 5vw, 3.1rem);
         font-weight: 600;
-        letter-spacing: -0.09em;
-        line-height: 0.82;
-      }
-
-      h1 span {
-        display: block;
-        margin-top: 0.18em;
-        color: var(--accent);
-        font-size: 0.52em;
-        font-style: italic;
-        font-weight: 500;
         letter-spacing: -0.04em;
+        line-height: 1.15;
       }
 
-      .intro {
-        margin: 0 0 38px;
-        color: #454139;
-        font-size: clamp(1rem, 1.4vw, 1.2rem);
-        line-height: 1.95;
+      .summary {
+        max-width: 660px;
+        margin: 14px 0 0;
+        color: #475467;
+        font-size: 0.97rem;
+        line-height: 1.8;
       }
 
-      .archive-facts {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        margin: 0;
-        border-top: 1px solid var(--rule);
+      .summary code,
+      .source,
+      time,
+      .kind,
+      footer {
+        font-family: var(--sans);
       }
 
-      .archive-facts div {
-        padding: 18px 14px 0 0;
+      .summary code {
+        padding: 1px 4px;
+        border-radius: 3px;
+        color: #344054;
+        background: var(--wash);
+        font-size: 0.9em;
       }
 
-      .archive-facts dt {
+      .facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px 34px;
+        margin: 24px 0 0;
         color: var(--muted);
-        font-size: 0.66rem;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
+        font-size: 0.78rem;
       }
 
-      .archive-facts dd {
-        margin: 6px 0 0;
-        font-size: 1.5rem;
+      .facts strong {
+        margin-right: 6px;
+        color: var(--ink);
         font-weight: 700;
       }
 
       main {
-        padding: 72px 0 110px;
+        padding: 34px 0 64px;
       }
 
-      .archive-heading {
+      .section-heading {
         display: flex;
-        gap: 28px;
-        align-items: center;
+        gap: 20px;
+        align-items: baseline;
         justify-content: space-between;
-        margin-bottom: 40px;
+        margin-bottom: 12px;
       }
 
-      .archive-heading h2 {
+      .section-heading h2 {
         margin: 0;
-        font-size: clamp(1.8rem, 4vw, 3.3rem);
-        font-weight: 500;
-        letter-spacing: -0.045em;
+        font-size: 1.35rem;
+        font-weight: 600;
       }
 
-      .filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        justify-content: flex-end;
-      }
-
-      .filter-button {
-        padding: 9px 14px;
-        border: 1px solid var(--rule);
-        border-radius: 999px;
+      .section-heading p {
+        margin: 0;
         color: var(--muted);
-        background: transparent;
-        cursor: pointer;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+        font-size: 0.78rem;
       }
 
-      .filter-button:hover,
-      .filter-button:focus-visible {
-        border-color: var(--ink);
-        color: var(--ink);
-        outline: none;
-      }
-
-      .filter-button[aria-pressed="true"] {
-        border-color: var(--ink);
-        color: var(--paper-light);
-        background: var(--ink);
-      }
-
-      .timeline {
+      .archive-list {
         margin: 0;
         padding: 0;
         list-style: none;
-        border-top: 1px solid var(--ink);
+        border-top: 1px solid var(--line);
       }
 
-      .report-row {
+      .report {
         display: grid;
-        grid-template-columns: minmax(190px, 0.58fr) minmax(0, 1.7fr) auto;
-        gap: clamp(24px, 4vw, 64px);
-        align-items: center;
-        min-height: 170px;
-        padding: 30px 0;
-        border-bottom: 1px solid var(--rule);
-        animation: settle 520ms both;
-        animation-delay: calc(var(--row) * 45ms);
-        transition: opacity 180ms ease, transform 180ms ease;
-      }
-
-      .report-row[hidden] {
-        display: none;
-      }
-
-      .report-date {
-        display: grid;
-        grid-template-columns: 44px 1fr;
-        gap: 16px;
-        align-items: center;
-      }
-
-      .ordinal {
-        color: var(--accent);
-        font-family: Georgia, serif;
-        font-size: 0.82rem;
-        font-style: italic;
+        grid-template-columns: 152px minmax(0, 1fr);
+        gap: 30px;
+        padding: 22px 0;
+        border-bottom: 1px solid var(--line);
       }
 
       time {
         display: block;
-        font-size: 0.95rem;
+        color: #344054;
+        font-size: 0.84rem;
+        font-weight: 700;
         font-variant-numeric: tabular-nums;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.02em;
       }
 
       .source {
-        display: inline-block;
-        margin-top: 8px;
+        display: block;
+        margin-top: 6px;
         color: var(--muted);
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
+        font-size: 0.72rem;
+        line-height: 1.45;
       }
 
-      .source-codex {
-        color: var(--codex);
-      }
-
-      .source-workbuddy {
-        color: var(--workbuddy);
-      }
-
-      .report-body h3 {
+      .report h3 {
         margin: 0;
-        font-size: clamp(1.35rem, 2.6vw, 2.35rem);
-        font-weight: 500;
-        letter-spacing: -0.035em;
-        line-height: 1.25;
+        font-family: var(--serif);
+        font-size: 1.14rem;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        line-height: 1.45;
       }
 
       .report-link {
-        text-decoration-color: transparent;
-        text-decoration-thickness: 2px;
+        color: var(--blue-dark);
+        text-decoration-color: #b7c8f7;
+        text-decoration-thickness: 1px;
         text-underline-offset: 0.2em;
-        transition: color 160ms ease, text-decoration-color 160ms ease;
       }
 
       .report-link:hover,
       .report-link:focus-visible {
-        color: var(--accent-dark);
-        text-decoration-color: var(--accent);
+        color: var(--blue);
+        text-decoration-color: currentColor;
         outline: none;
       }
 
-      .report-body p {
-        max-width: 64ch;
-        margin: 12px 0 0;
-        color: var(--muted);
-        font-size: 0.94rem;
-        line-height: 1.75;
+      .report p {
+        margin: 7px 0 0;
+        color: #667085;
+        font-size: 0.9rem;
+        line-height: 1.7;
       }
 
-      .tag {
-        justify-self: end;
-        padding: 7px 10px;
-        border: 1px solid currentColor;
-        color: var(--accent-dark);
-        font-size: 0.62rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        white-space: nowrap;
-      }
-
-      .empty-state {
-        margin: 36px 0 0;
-        color: var(--muted);
-        font-style: italic;
-      }
-
-      .footer {
-        display: flex;
-        gap: 20px;
-        justify-content: space-between;
-        padding: 26px 0 46px;
-        border-top: 1px solid var(--ink);
+      .kind {
+        display: inline-block;
+        margin: 9px 0 0;
         color: var(--muted);
         font-size: 0.72rem;
+      }
+
+      footer {
+        display: flex;
+        gap: 16px;
+        justify-content: space-between;
+        padding: 22px 0 38px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.75rem;
         line-height: 1.6;
       }
 
-      .footer a {
-        color: var(--accent-dark);
+      footer a {
+        color: var(--blue-dark);
         text-underline-offset: 0.2em;
       }
 
-      @keyframes settle {
-        from {
-          opacity: 0;
-          transform: translateY(14px);
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-          scroll-behavior: auto !important;
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          transition-duration: 0.01ms !important;
-        }
-      }
-
-      @media (max-width: 820px) {
-        .masthead {
-          grid-template-columns: 1fr;
-          min-height: auto;
-          padding-top: 48px;
+      @media (max-width: 620px) {
+        .page {
+          width: min(100% - 28px, 920px);
         }
 
-        h1 {
-          font-size: clamp(4rem, 20vw, 7rem);
+        header {
+          padding-top: 36px;
         }
 
-        .archive-heading {
+        .section-heading,
+        footer {
           align-items: flex-start;
           flex-direction: column;
         }
 
-        .filters {
-          justify-content: flex-start;
-        }
-
-        .report-row {
-          grid-template-columns: 1fr auto;
-          gap: 22px;
-        }
-
-        .report-date {
-          grid-column: 1 / -1;
-        }
-
-        .report-body {
-          grid-column: 1;
-        }
-
-        .tag {
-          grid-column: 2;
-        }
-      }
-
-      @media (max-width: 520px) {
-        .shell {
-          width: min(100% - 24px, 1180px);
-        }
-
-        .masthead {
-          padding-bottom: 40px;
-        }
-
-        .archive-facts {
-          grid-template-columns: 1fr 1fr;
-        }
-
-        .archive-facts div:last-child {
-          grid-column: 1 / -1;
-        }
-
-        main {
-          padding-top: 52px;
-        }
-
-        .report-row {
+        .report {
           grid-template-columns: 1fr;
+          gap: 9px;
+          padding: 20px 0;
         }
 
-        .report-body,
-        .tag {
-          grid-column: 1;
-        }
-
-        .tag {
-          justify-self: start;
-        }
-
-        .footer {
-          flex-direction: column;
+        .source {
+          display: inline;
+          margin-left: 8px;
         }
       }
     </style>
   </head>
   <body>
-    <header class="shell masthead">
-      <div>
-        <p class="kicker">Project 1688 · Release intelligence</p>
-        <h1>DanceNew<span>报告档案</span></h1>
-      </div>
-      <div>
-        <p class="intro">
-          从代码全景到版本复盘，一条按生成时间倒序排列的项目观察轨迹。这里整合了
-          <strong>.codex</strong> 与 <strong>.workbuddy/reports</strong> 中已生成的静态报告页面。
-        </p>
-        <dl class="archive-facts">
-          <div>
-            <dt>页面</dt>
-            <dd>09</dd>
-          </div>
-          <div>
-            <dt>跨度</dt>
-            <dd>100 天</dd>
-          </div>
-          <div>
-            <dt>最新归档</dt>
-            <dd>2026.07.17</dd>
-          </div>
-        </dl>
+    <header class="page">
+      <p class="eyebrow">DanceNew / Project 1688</p>
+      <h1>报告档案</h1>
+      <p class="summary">
+        收录 <code>.codex</code> 与 <code>.workbuddy/reports</code> 中已生成的静态报告，按生成时间倒序排列。
+      </p>
+      <div class="facts" aria-label="档案概览">
+        <span><strong>9</strong>份报告</span>
+        <span><strong>2026.04—07</strong>归档跨度</span>
+        <span><strong>2026.07.17</strong>最新更新</span>
       </div>
     </header>
 
-    <main class="shell">
-      <div class="archive-heading">
-        <h2>版本观察时间轴</h2>
-        <div class="filters" aria-label="按来源筛选报告">
-          <button class="filter-button" type="button" data-filter="all" aria-pressed="true">全部 09</button>
-          <button class="filter-button" type="button" data-filter="codex" aria-pressed="false">.codex 03</button>
-          <button class="filter-button" type="button" data-filter="workbuddy" aria-pressed="false">.workbuddy 06</button>
-        </div>
+    <main class="page">
+      <div class="section-heading">
+        <h2>全部报告</h2>
+        <p>按时间倒序</p>
       </div>
 
-      <ol class="timeline" id="report-list">
-        <li class="report-row" data-source="codex" style="--row: 1">
-          <div class="report-date">
-            <span class="ordinal">01</span>
-            <div>
-              <time datetime="2026-07-17T19:37:16+08:00">2026 · 07 · 17</time>
-              <span class="source source-codex">.codex / 19:37</span>
-            </div>
+      <ol class="archive-list">
+        <li class="report">
+          <div>
+            <time datetime="2026-07-17T19:37:16+08:00">2026.07.17</time>
+            <span class="source">.codex · 19:37</span>
           </div>
-          <div class="report-body">
-            <h3><a class="report-link" data-date="2026-07-17T19:37:16+08:00" href="./reports/2026-07-17-biweekly-review-widescreen.html">两周增量复审报告 · 宽屏版</a></h3>
-            <p>聚焦近期增量、编译证据、架构风险与交付建议的宽屏仪表板版本。</p>
+          <div>
+            <h3><a class="report-link" data-date="2026-07-17T19:37:16+08:00" href="./reports/2026-07-17-biweekly-review-widescreen.html">两周增量复审报告（宽屏版）</a></h3>
+            <p>近期增量、编译证据、架构风险与交付建议的宽屏阅读版本。</p>
+            <span class="kind">增量复审</span>
           </div>
-          <span class="tag">Widescreen</span>
         </li>
 
-        <li class="report-row" data-source="codex" style="--row: 2">
-          <div class="report-date">
-            <span class="ordinal">02</span>
-            <div>
-              <time datetime="2026-07-17T18:08:27+08:00">2026 · 07 · 17</time>
-              <span class="source source-codex">.codex / 18:08</span>
-            </div>
+        <li class="report">
+          <div>
+            <time datetime="2026-07-17T18:08:27+08:00">2026.07.17</time>
+            <span class="source">.codex · 18:08</span>
           </div>
-          <div class="report-body">
+          <div>
             <h3><a class="report-link" data-date="2026-07-17T18:08:27+08:00" href="./reports/2026-07-17-biweekly-review.html">两周增量复审报告</a></h3>
-            <p>适配常规阅读宽度的增量复审版本，保留同一轮分析的完整结论与证据。</p>
+            <p>常规阅读宽度版本，保留同一轮分析的结论与证据。</p>
+            <span class="kind">增量复审</span>
           </div>
-          <span class="tag">Review</span>
         </li>
 
-        <li class="report-row" data-source="workbuddy" style="--row: 3">
-          <div class="report-date">
-            <span class="ordinal">03</span>
-            <div>
-              <time datetime="2026-07-05T23:58:44+08:00">2026 · 07 · 05</time>
-              <span class="source source-workbuddy">.workbuddy/reports / CBT5</span>
-            </div>
+        <li class="report">
+          <div>
+            <time datetime="2026-07-05T23:58:44+08:00">2026.07.05</time>
+            <span class="source">.workbuddy/reports · CBT5</span>
           </div>
-          <div class="report-body">
+          <div>
             <h3><a class="report-link" data-date="2026-07-05T23:58:44+08:00" href="./reports/2026-07-05-cbt5-launch-analysis.html">CBT5 启动分析与改进方案</a></h3>
-            <p>承接 CBT4 反馈，梳理 CBT5 启动阶段的重点问题、优先级和改进路径。</p>
+            <p>整理 CBT5 启动阶段的问题、优先级和改进路径。</p>
+            <span class="kind">CBT5</span>
           </div>
-          <span class="tag">CBT5</span>
         </li>
 
-        <li class="report-row" data-source="workbuddy" style="--row: 4">
-          <div class="report-date">
-            <span class="ordinal">04</span>
-            <div>
-              <time datetime="2026-07-05T23:57:21+08:00">2026 · 07 · 05</time>
-              <span class="source source-workbuddy">.workbuddy/reports / CBT4</span>
-            </div>
+        <li class="report">
+          <div>
+            <time datetime="2026-07-05T23:57:21+08:00">2026.07.05</time>
+            <span class="source">.workbuddy/reports · CBT4</span>
           </div>
-          <div class="report-body">
+          <div>
             <h3><a class="report-link" data-date="2026-07-05T23:57:21+08:00" href="./reports/2026-07-05-cbt4-retrospective.html">CBT4 版本回顾</a></h3>
-            <p>总结 CBT4 的版本成果、遗留问题与下一阶段决策输入。</p>
+            <p>总结 CBT4 的版本成果、遗留问题与下一阶段输入。</p>
+            <span class="kind">CBT4</span>
           </div>
-          <span class="tag">CBT4</span>
         </li>
 
-        <li class="report-row" data-source="codex" style="--row: 5">
-          <div class="report-date">
-            <span class="ordinal">05</span>
-            <div>
-              <time datetime="2026-06-29T21:20:04+08:00">2026 · 06 · 29</time>
-              <span class="source source-codex">.codex / 源码总览</span>
-            </div>
+        <li class="report">
+          <div>
+            <time datetime="2026-06-29T21:20:04+08:00">2026.06.29</time>
+            <span class="source">.codex · 源码总览</span>
           </div>
-          <div class="report-body">
+          <div>
             <h3><a class="report-link" data-date="2026-06-29T21:20:04+08:00" href="./reports/2026-06-29-source-analysis-overview.html">项目源码分析总报告</a></h3>
-            <p>覆盖架构、模块完成度、首测准备度、风险台账、资源配置与研发流程的综合入口。</p>
+            <p>架构、模块完成度、首测准备度、风险与资源配置的综合入口。</p>
+            <span class="kind">源码分析</span>
           </div>
-          <span class="tag">Overview</span>
         </li>
 
-        <li class="report-row" data-source="workbuddy" style="--row: 6">
-          <div class="report-date">
-            <span class="ordinal">06</span>
-            <div>
-              <time datetime="2026-06-17T22:25:30+08:00">2026 · 06 · 17</time>
-              <span class="source source-workbuddy">.workbuddy/reports / CBT4</span>
-            </div>
+        <li class="report">
+          <div>
+            <time datetime="2026-06-17T22:25:30+08:00">2026.06.17</time>
+            <span class="source">.workbuddy/reports · CBT4</span>
           </div>
-          <div class="report-body">
+          <div>
             <h3><a class="report-link" data-date="2026-06-17T22:25:30+08:00" href="./reports/2026-06-17-analysis-v4.html">DanceNew 深度分析报告 v4.0</a></h3>
-            <p>面向 6 月中旬版本状态的第四轮工程与产品深度分析。</p>
+            <p>第 4 轮工程与产品状态分析。</p>
+            <span class="kind">版本分析</span>
           </div>
-          <span class="tag">v4.0</span>
         </li>
 
-        <li class="report-row" data-source="workbuddy" style="--row: 7">
-          <div class="report-date">
-            <span class="ordinal">07</span>
-            <div>
-              <time datetime="2026-06-01T13:14:26+08:00">2026 · 06 · 01</time>
-              <span class="source source-workbuddy">.workbuddy/reports / CBT4</span>
-            </div>
+        <li class="report">
+          <div>
+            <time datetime="2026-06-01T13:14:26+08:00">2026.06.01</time>
+            <span class="source">.workbuddy/reports · CBT4</span>
           </div>
-          <div class="report-body">
+          <div>
             <h3><a class="report-link" data-date="2026-06-01T13:14:26+08:00" href="./reports/2026-06-01-analysis-v3.html">DanceNew 深度分析报告 v3.0</a></h3>
-            <p>记录 6 月初阶段的系统结构、质量信号和版本推进判断。</p>
+            <p>记录 6 月初的系统结构、质量信号与版本判断。</p>
+            <span class="kind">版本分析</span>
           </div>
-          <span class="tag">v3.0</span>
         </li>
 
-        <li class="report-row" data-source="workbuddy" style="--row: 8">
-          <div class="report-date">
-            <span class="ordinal">08</span>
-            <div>
-              <time datetime="2026-05-08T16:12:02+08:00">2026 · 05 · 08</time>
-              <span class="source source-workbuddy">.workbuddy/reports / CBT4</span>
-            </div>
+        <li class="report">
+          <div>
+            <time datetime="2026-05-08T16:12:02+08:00">2026.05.08</time>
+            <span class="source">.workbuddy/reports · CBT4</span>
           </div>
-          <div class="report-body">
+          <div>
             <h3><a class="report-link" data-date="2026-05-08T16:12:02+08:00" href="./reports/2026-05-08-analysis-v2.html">DanceNew 深度分析报告 v2.0</a></h3>
-            <p>第二轮项目深度分析，对阶段进展和关键技术问题进行再评估。</p>
+            <p>第二轮项目深度分析与阶段问题评估。</p>
+            <span class="kind">版本分析</span>
           </div>
-          <span class="tag">v2.0</span>
         </li>
 
-        <li class="report-row" data-source="workbuddy" style="--row: 9">
-          <div class="report-date">
-            <span class="ordinal">09</span>
-            <div>
-              <time datetime="2026-04-09T16:57:46+08:00">2026 · 04 · 09</time>
-              <span class="source source-workbuddy">.workbuddy/reports / CBT4</span>
-            </div>
+        <li class="report">
+          <div>
+            <time datetime="2026-04-09T16:57:46+08:00">2026.04.09</time>
+            <span class="source">.workbuddy/reports · CBT4</span>
           </div>
-          <div class="report-body">
+          <div>
             <h3><a class="report-link" data-date="2026-04-09T16:57:46+08:00" href="./reports/2026-04-09-analysis-v1.html">DanceNew 手游项目全面分析报告</a></h3>
-            <p>本档案最早的基线报告，为后续版本观察提供初始参照。</p>
+            <p>本档案最早的基线报告。</p>
+            <span class="kind">基线分析</span>
           </div>
-          <span class="tag">Baseline</span>
         </li>
       </ol>
-
-      <p class="empty-state" id="empty-state" hidden>当前来源下没有报告。</p>
     </main>
 
-    <footer class="shell footer">
+    <footer class="page">
       <span>DanceNew / 代号 1688 · 静态报告归档</span>
-      <span>按源文件生成时间倒序 · <a href="https://github.com/JekiVado/jekivado.github.io">查看 GitHub 仓库</a></span>
+      <a href="https://github.com/JekiVado/jekivado.github.io">查看 GitHub 仓库</a>
     </footer>
-
-    <script>
-      const buttons = [...document.querySelectorAll('[data-filter]')];
-      const reports = [...document.querySelectorAll('.report-row')];
-      const emptyState = document.querySelector('#empty-state');
-
-      for (const button of buttons) {
-        button.addEventListener('click', () => {
-          const filter = button.dataset.filter;
-          let visible = 0;
-
-          for (const candidate of buttons) {
-            candidate.setAttribute('aria-pressed', String(candidate === button));
-          }
-
-          for (const report of reports) {
-            const matches = filter === 'all' || report.dataset.source === filter;
-            report.hidden = !matches;
-            visible += Number(matches);
-          }
-
-          emptyState.hidden = visible !== 0;
-        });
-      }
-    </script>
   </body>
 </html>
