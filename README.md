@@ -7,7 +7,7 @@
 - 集合导航页：https://jekivado.github.io/collection/
 - 站点根目录：https://jekivado.github.io/
 
-`collection/` 是全部已发布内容的统一入口；根目录当前会跳转到默认内容。
+`collection/` 是全部已发布内容的统一入口；访问根目录会自动跳转到该页面。
 
 ## 目录约定
 

@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const pagePath = new URL('../collection/index.html', import.meta.url);
 const iconPath = new URL('../collection/favicon.svg', import.meta.url);
 const readmePath = new URL('../README.md', import.meta.url);
+const rootPath = new URL('../index.html', import.meta.url);
 
 assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
@@ -23,6 +24,11 @@ assert.match(readme, /https:\/\/jekivado\.github\.io\/collection\//);
 assert.match(readme, /新增页面/);
 assert.match(readme, /GitHub Pages/);
 assert.match(readme, /DanceNewReports/);
+
+assert.ok(existsSync(rootPath), 'Expected a root index.html');
+const root = readFileSync(rootPath, 'utf8');
+assert.match(root, /content="0; url=\.\/collection\/"/);
+assert.match(root, /href="\.\/collection\/"/);
 
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
