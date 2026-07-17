@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 0.1 seconds
+Output:
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -15,6 +18,8 @@ assert.match(html, /DanceNew 报告档案/);
 assert.match(html, /\.codex/);
 assert.match(html, /\.workbuddy\/reports/);
 assert.match(html, /class="archive-list"/);
+assert.match(html, /class="tech-shell"/, 'Expected the archive to use the modern technology layout shell');
+assert.match(html, /class="report-card"/, 'Expected the archive entries to use readable report cards');
 assert.doesNotMatch(html, /data-filter=/, 'Expected a static archive list without filter controls');
 assert.doesNotMatch(html, /<script\b/i, 'Expected the archive page to work without JavaScript');
 
