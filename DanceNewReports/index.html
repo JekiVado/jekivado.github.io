@@ -1,10 +1,13 @@
+Exit code: 0
+Wall time: 0.1 seconds
+Output:
 <!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0b1020" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#f6f8fc" />
+    <meta name="color-scheme" content="light" />
     <meta
       name="description"
       content="DanceNew 项目报告档案：收录 .codex 与 .workbuddy/reports 生成的静态报告，按时间倒序排列。"
@@ -12,15 +15,15 @@
     <title>DanceNew 报告档案</title>
     <style>
       :root {
-        --canvas: #090d18;
-        --surface: rgba(18, 27, 47, 0.82);
-        --surface-hover: rgba(23, 36, 63, 0.94);
-        --ink: #edf4ff;
-        --muted: #9eacc4;
-        --subtle: #71809a;
-        --line: rgba(147, 180, 234, 0.18);
-        --blue: #87b9ff;
-        --cyan: #7ae1db;
+        --canvas: #f6f8fc;
+        --surface: rgba(255, 255, 255, 0.88);
+        --surface-hover: #ffffff;
+        --ink: #17233b;
+        --muted: #5d6d86;
+        --subtle: #7d8ca3;
+        --line: #d9e2ef;
+        --blue: #1769d2;
+        --cyan: #078d91;
         --sans: "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
         --display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, serif;
       }
@@ -34,8 +37,8 @@
         margin: 0;
         color: var(--ink);
         background:
-          radial-gradient(circle at 14% -8%, rgba(66, 118, 218, 0.22), transparent 31rem),
-          radial-gradient(circle at 91% 10%, rgba(57, 190, 186, 0.12), transparent 26rem),
+          radial-gradient(circle at 14% -8%, rgba(61, 125, 225, 0.15), transparent 31rem),
+          radial-gradient(circle at 91% 10%, rgba(15, 158, 155, 0.12), transparent 26rem),
           var(--canvas);
         font-family: var(--sans);
       }
@@ -67,7 +70,7 @@
         gap: 9px;
         align-items: center;
         margin: 0 0 17px;
-        color: var(--muted);
+        color: #53647e;
         font-size: 0.76rem;
         font-weight: 700;
         letter-spacing: 0.1em;
@@ -79,7 +82,7 @@
         height: 8px;
         border-radius: 50%;
         background: var(--cyan);
-        box-shadow: 0 0 0 4px rgba(122, 225, 219, 0.12), 0 0 16px rgba(122, 225, 219, 0.65);
+        box-shadow: 0 0 0 4px rgba(7, 141, 145, 0.12), 0 0 14px rgba(7, 141, 145, 0.32);
       }
 
       h1, h2, h3 { margin: 0; }
@@ -102,10 +105,10 @@
 
       code {
         padding: 2px 5px;
-        border: 1px solid rgba(135, 185, 255, 0.16);
+        border: 1px solid #d6e2f4;
         border-radius: 4px;
-        color: #c8dcff;
-        background: rgba(125, 166, 235, 0.09);
+        color: #24599c;
+        background: #edf4ff;
         font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
         font-size: 0.87em;
       }
@@ -123,7 +126,7 @@
         padding: 7px 10px;
         border: 1px solid var(--line);
         border-radius: 6px;
-        background: rgba(13, 20, 36, 0.46);
+        background: rgba(255, 255, 255, 0.74);
       }
 
       .facts strong { color: var(--ink); }
@@ -167,19 +170,19 @@
         border: 1px solid var(--line);
         border-radius: 12px;
         background: var(--surface);
-        box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
+        box-shadow: 0 8px 22px rgba(31, 60, 106, 0.055), inset 0 1px rgba(255, 255, 255, 0.92);
         transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
       }
 
       .report-card:hover {
-        border-color: rgba(135, 185, 255, 0.43);
+        border-color: #a8c8f5;
         background: var(--surface-hover);
         transform: translateY(-2px);
       }
 
       time {
         display: block;
-        color: #d9e7ff;
+        color: #273d60;
         font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
         font-size: 0.82rem;
         font-weight: 700;
@@ -265,6 +268,7 @@
   </head>
   <body>
     <div class="tech-shell">
+      <div class="light-shell">
       <header>
         <p class="eyebrow"><span class="signal" aria-hidden="true"></span>DanceNew / Project 1688</p>
         <h1>报告档案</h1>
@@ -299,6 +303,7 @@
         <span>DanceNew / 代号 1688 · 静态报告归档</span>
         <a href="https://github.com/JekiVado/jekivado.github.io">查看 GitHub 仓库</a>
       </footer>
+      </div>
     </div>
   </body>
 </html>
