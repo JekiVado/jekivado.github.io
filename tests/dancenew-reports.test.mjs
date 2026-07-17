@@ -10,6 +10,7 @@ const indexPath = resolve(archiveRoot, 'index.html');
 assert.ok(existsSync(indexPath), 'Expected DanceNewReports/index.html to exist');
 
 const html = readFileSync(indexPath, 'utf8');
+assert.match(html, /^<!doctype html>/i, 'Expected the archive file to start directly with its HTML document');
 assert.match(html, /<title>DanceNew 报告档案<\/title>/);
 assert.match(html, /DanceNew 报告档案/);
 assert.match(html, /\.codex/);
