@@ -14,6 +14,7 @@
 - `collection/`：导航集合页及其网页图标。
 - `escape01/`：可试玩的静态原型。
 - `ServerAnalysis/`：云资源复盘页面。
+- `DanceNewReports/`：产品报告档案页面。
 - `index.html`：根目录入口页。
 
 静态页面应使用相对路径引用同目录资源，确保其能在 `https://jekivado.github.io/<目录>/` 下直接访问。
