@@ -57,6 +57,9 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
 Exit code: 0
 Wall time: 0.5 seconds
 Output:
+Exit code: 0
+Wall time: 0.1 seconds
+Output:
 <style data-dancenew-producer-brief="v1">
 /* Producer-facing editorial brief: prioritize decisions and sustained reading over dashboard density. */
 @media screen {
@@ -88,9 +91,9 @@ Output:
   .portable-fallback.portable-enhanced-hidden { display: block !important; }
 
   .portable-fallback[data-portable-surface="dashboard"] {
-    width: min(1280px, calc(100% - 48px)) !important;
-    max-width: 1280px !important;
-    margin: 32px auto 72px !important;
+    width: min(1360px, calc(100% - 48px)) !important;
+    max-width: 1360px !important;
+    margin: 18px auto 56px !important;
     padding: 0 !important;
   }
 
@@ -101,7 +104,7 @@ Output:
     height: auto;
     min-height: 0;
     margin: 0;
-    padding: 44px 52px 38px;
+    padding: 30px 44px 28px;
     border: 0;
     border-top: 7px solid #e7473c;
     background: #1f403c;
@@ -120,14 +123,14 @@ Output:
     letter-spacing: 1.8px;
   }
 
-  .portable-page-heading { max-width: 920px; }
+  .portable-page-heading { max-width: 1080px; }
   .portable-surface-label { display: none; }
   .portable-page-header h1 {
     overflow: visible;
     margin: 0;
     color: #ffffff;
     font-family: "STZhongsong", "Songti SC", serif;
-    font-size: 40px;
+    font-size: 34px;
     font-weight: 600;
     line-height: 1.28;
     letter-spacing: 0;
@@ -145,8 +148,8 @@ Output:
 
   .portable-page-meta {
     position: absolute;
-    top: 48px;
-    right: 52px;
+    top: 34px;
+    right: 44px;
     display: block;
     color: #b8ccc5;
     font-size: 14px;
@@ -160,7 +163,7 @@ Output:
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
-    padding: 42px 52px 56px;
+    padding: 30px 44px 48px;
     background: var(--portable-surface);
   }
 
@@ -258,6 +261,23 @@ Output:
     border-radius: 0;
     background: var(--portable-warning-bg);
   }
+
+  .portable-markdown,
+  .portable-markdown p,
+  .portable-markdown li,
+  .portable-markdown span:not(.portable-source-tooltip-content):not(.portable-source-tooltip-heading):not(.portable-source-meta) {
+    color: #223736 !important;
+    opacity: 1 !important;
+  }
+
+  .portable-markdown .portable-source-value-text {
+    color: #0e766d !important;
+    font-weight: 700;
+  }
+
+  .portable-source-tooltip-content,
+  .portable-inline-source,
+  .portable-source-summary { display: none !important; }
 }
 
 @media screen and (max-width: 760px) {
@@ -283,23 +303,23 @@ Output:
 Exit code: 0
 Wall time: 0.2 seconds
 Output:
+Exit code: 0
+Wall time: 0.1 seconds
+Output:
 <script data-dancenew-producer-brief-runtime="v1">
 (() => {
-  const keepProducerBriefVisible = () => {
+  const prepareProducerBrief = () => {
     const fallback = document.querySelector("[data-portable-fallback]");
     if (fallback) {
       fallback.classList.remove("portable-enhanced-hidden");
       fallback.removeAttribute("aria-hidden");
     }
+    const title = document.querySelector(".portable-page-header h1");
+    if (title) title.textContent = "DanceNew 项目首测复审报告";
+    const description = document.querySelector(".portable-page-header .portable-description");
+    if (description) description.textContent = "当前版本复审、首测风险与候选包门槛";
   };
-  document.addEventListener("DOMContentLoaded", () => {
-    keepProducerBriefVisible();
-    new MutationObserver(keepProducerBriefVisible).observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class", "aria-hidden"],
-      subtree: true,
-    });
-  });
+  document.addEventListener("DOMContentLoaded", prepareProducerBrief, { once: true });
 })();
 </script>
 </head>
@@ -363,7 +383,7 @@ Output:
 <div class="portable-block portable-layout-half" data-artifact-block-id="caveats" data-artifact-block-type="markdown" data-layout="half"><section class="portable-markdown"><h2>证据边界与待验证项</h2>
 <p>本报告是源码、资源、SVN 工作副本元数据和 Unity Editor 编译层面的复审，不替代 Android IL2CPP/HybridCLR 构建、真机测试、服务端联调、支付渠道审核或隐私合规审查。</p>
 <p><span class="portable-source-tooltip portable-source-value" data-portable-source-host="true" tabindex="0" aria-describedby="portable-source-tooltip-127"><span class="portable-source-value-text">166</span><span class="portable-source-tooltip-content" id="portable-source-tooltip-127" role="tooltip"><span class="portable-source-tooltip-heading" aria-hidden="true">Source for 166</span><strong>Source: 2026-07-17 增量复审证据快照</strong><span class="portable-source-meta">File: .codex/review-2026-07-17/证据快照.md</span></span></span> 个 revision 是当前节点中出现的不同 changed revision，不是完整提交总数；资源目录体积不是最终包体；6.0/10 是基于首测门槛的管理审查评分。Android 构建、热更 DLL 映射、首包体积、断线重连、崩溃回传、统计同意门控和外部服务可用性仍需用候选包证据更新结论。</p></section><div class="portable-inline-source portable-source-summary" data-source-id="evidence_snapshot"><div class="portable-inline-source-content portable-source-summary-content"><span class="portable-source-tooltip-heading" aria-hidden="true">Source for 证据边界与待验证项</span><strong>Source: 2026-07-17 增量复审证据快照</strong><span class="portable-source-meta">File: .codex/review-2026-07-17/证据快照.md</span></div></div></div></div><section class="portable-sources" aria-labelledby="portable-sources-heading"><h2 id="portable-sources-heading">Sources</h2><ol><li><strong>2026-07-17 增量复审证据快照</strong><span class="portable-source-meta">.codex/review-2026-07-17/证据快照.md</span></li><li><strong>2026-06-29 源码分析总报告</strong><span class="portable-source-meta">.codex/DanceNew项目源码分析总报告.html</span></li><li><strong>SVN 工作副本元数据</strong><span class="portable-source-meta">.svn/wc.db</span></li><li><strong>SVN 每日变更节点查询</strong><span class="portable-source-meta">.svn/wc.db · sqlite · 2026-07-17T17:30:00+08:00</span><p>统计 2026-06-29 21:20（UTC+8）之后当前 SVN 文件节点的每日变化。</p><details class="portable-source-query" open><summary>SQL query</summary><pre><code>SELECT date(changed_date / 1000000, &#39;unixepoch&#39;, &#39;localtime&#39;) AS date, COUNT(*) AS files, SUM(CASE WHEN local_relpath LIKE &#39;%.cs&#39; THEN 1 ELSE 0 END) AS code_files, COUNT(DISTINCT changed_revision) AS revisions, COUNT(DISTINCT changed_author) AS authors FROM NODES WHERE kind = &#39;file&#39; AND changed_date &gt;= 1782739200000000 GROUP BY date ORDER BY date</code></pre></details></li><li><strong>SVN 业务代码模块变更查询</strong><span class="portable-source-meta">.svn/wc.db · sqlite · 2026-07-17T17:30:00+08:00</span><p>统计复审窗口内主业务源码树中变更 C# 文件数最高的模块。</p><details class="portable-source-query" open><summary>SQL query</summary><pre><code>WITH changed AS (SELECT CASE WHEN local_relpath LIKE &#39;Assets/Scripts/UI/%&#39; THEN &#39;UI&#39; WHEN local_relpath LIKE &#39;Assets/Scripts/SDK/%&#39; THEN &#39;SDK&#39; WHEN local_relpath LIKE &#39;Assets/Scripts/DataManager/%&#39; THEN &#39;DataManager&#39; WHEN local_relpath LIKE &#39;Assets/Scripts/Net/%&#39; THEN &#39;Net&#39; WHEN local_relpath LIKE &#39;Assets/Scripts/GameCommon/%&#39; THEN &#39;GameCommon&#39; WHEN local_relpath LIKE &#39;Assets/Scripts/GamePlay/%&#39; THEN &#39;GamePlay&#39; WHEN local_relpath LIKE &#39;Assets/Scripts/Scene/%&#39; THEN &#39;Scene&#39; WHEN local_relpath LIKE &#39;Assets/Scripts/Config/%&#39; THEN &#39;Config&#39; END AS module FROM NODES WHERE kind = &#39;file&#39; AND changed_date &gt;= 1782739200000000 AND local_relpath LIKE &#39;Assets/Scripts/%.cs&#39;) SELECT module, COUNT(*) AS changed_files FROM changed WHERE module IS NOT NULL GROUP BY module ORDER BY changed_files DESC</code></pre></details></li><li><strong>Unity Editor 批处理编译日志</strong><span class="portable-source-meta">.codex/UnityCompileReview-2026-07-17.log</span></li><li><strong>主业务源码树</strong><span class="portable-source-meta">Assets/Scripts</span></li><li><strong>Unity ProjectSettings</strong><span class="portable-source-meta">ProjectSettings/ProjectSettings.asset</span></li><li><strong>Android HybridCLR 生成输出</strong><span class="portable-source-meta">HybridCLRData/HotUpdateDlls/Android</span></li><li><strong>AssetsPackage 资源目录</strong><span class="portable-source-meta">Assets/AssetsPackage</span></li><li><strong>首测复审摘要指标快照</strong><span class="portable-source-meta">.codex/review-2026-07-17/证据快照.md · sqlite · 2026-07-17T18:00:00+08:00</span><p>将已审查证据固化为宽屏看板的首测摘要指标。</p><details class="portable-source-query" open><summary>SQL query</summary><pre><code>SELECT 6.0 AS readiness, 6.5 AS prior_readiness, -0.5 AS readiness_delta, 6 AS p0, 2 AS conditional_p0, 2576 AS changed_files, 166 AS changed_revisions, 2791 AS changed_nodes, 285611 AS current_lines, 37346 AS line_delta, 0.1504 AS line_growth_rate, 0 AS compile_errors, 41 AS compile_warnings, 124 AS conflict_count</code></pre></details></li><li><strong>首测维度审查评分</strong><span class="portable-source-meta">.codex/review-2026-07-17/证据快照.md · sqlite · 2026-07-17T18:00:00+08:00</span><p>把复审证据按九个首测维度映射为 0-10 管理评分；各维度不做简单平均。</p><details class="portable-source-query" open><summary>SQL query</summary><pre><code>WITH scores(dimension, score, basis) AS (VALUES (&#39;研发推进&#39;,8.0,&#39;两周 2,576 个文件节点变化，业务代码增加 37,346 行&#39;),(&#39;Editor 主干稳定&#39;,8.0,&#39;13 个业务程序集、0 编译错误&#39;),(&#39;配置/场景一致性&#39;,8.0,&#39;68/68 配置匹配，10/10 场景匹配&#39;),(&#39;资源治理&#39;,6.5,&#39;Animation 工作资源减少约 1.59 GB&#39;),(&#39;核心链路可靠性&#39;,5.0,&#39;重连和频道 Loading 状态机未闭环&#39;),(&#39;首测范围控制&#39;,4.5,&#39;功能入口继续扩大，白名单未冻结&#39;),(&#39;发布可复现性&#39;,4.0,&#39;热更产物陈旧且当前工作副本有 124 个冲突&#39;),(&#39;可观测性&#39;,4.0,&#39;统计埋点推进，但崩溃聚合无启用证据&#39;),(&#39;自动化回归&#39;,2.0,&#39;自动化测试命中仍为 0&#39;)) SELECT dimension, score, basis FROM scores ORDER BY score DESC</code></pre></details></li><li><strong>风险级别汇总</strong><span class="portable-source-meta">.codex/review-2026-07-17/证据快照.md · sqlite · 2026-07-17T18:00:00+08:00</span><p>汇总 2026-07-17 复审风险台账中的确定 P0、条件 P0 和 P1。</p><details class="portable-source-query" open><summary>SQL query</summary><pre><code>WITH risks(risk_level, risk_count, sort_order) AS (VALUES (&#39;确定 P0&#39;,6,1),(&#39;条件 P0&#39;,2,2),(&#39;P1&#39;,4,3)) SELECT risk_level, risk_count, sort_order AS &#39;order&#39; FROM risks ORDER BY sort_order</code></pre></details></li><li><strong>模块代码行增量快照</strong><span class="portable-source-meta">.codex/review-2026-07-17/证据快照.md · sqlite · 2026-07-17T18:00:00+08:00</span><p>列出相对 2026-06-29 基线代码行增长最多的八个模块。</p><details class="portable-source-query" open><summary>SQL query</summary><pre><code>WITH growth(module, line_delta, current_lines, category) AS (VALUES (&#39;Proto&#39;,10902,128652,&#39;生成协议&#39;),(&#39;SDK&#39;,10300,21302,&#39;平台/统计&#39;),(&#39;UI&#39;,7938,67426,&#39;业务 UI&#39;),(&#39;DataManager&#39;,1719,14117,&#39;数据管理&#39;),(&#39;Config&#39;,1649,12247,&#39;配置&#39;),(&#39;GamePlay&#39;,1459,11028,&#39;玩法&#39;),(&#39;Net&#39;,971,9067,&#39;网络&#39;),(&#39;GameCommon&#39;,927,8758,&#39;公共层&#39;)) SELECT module, line_delta, current_lines, category FROM growth ORDER BY line_delta DESC</code></pre></details></li><li><strong>重点资源目录规模快照</strong><span class="portable-source-meta">.codex/review-2026-07-17/证据快照.md · sqlite · 2026-07-17T18:00:00+08:00</span><p>固化复审时七个重点资源目录的文件数和工作目录体积。</p><details class="portable-source-query" open><summary>SQL query</summary><pre><code>WITH resources(sort_order, directory, files, size_mb, delta, interpretation) AS (VALUES (1,&#39;StreamingAssets&#39;,37275,3562.66,&#39;基本不变&#39;,&#39;最终包体与首启下载仍未证明&#39;),(2,&#39;Animation&#39;,4341,4245.46,&#39;-1590.75 MB&#39;,&#39;明确的工作资源优化成果&#39;),(3,&#39;Scene&#39;,1433,1988.40,&#39;-11.63 MB，+2 文件&#39;,&#39;体积小幅下降，内容仍变化&#39;),(4,&#39;Role&#39;,12512,1280.33,&#39;未重算&#39;,&#39;大体量角色资源，需构建压缩验证&#39;),(5,&#39;Sequence&#39;,12546,1228.10,&#39;未重算&#39;,&#39;大体量序列资源，需分包验证&#39;),(6,&#39;Sound&#39;,1398,1109.33,&#39;未重算&#39;,&#39;音频压缩和首包范围需专项&#39;),(7,&#39;UI&#39;,585,21.54,&#39;+14 文件，+0.43 MB&#39;,&#39;体积可控，但入口与 Prefab 一致性未改善&#39;)) SELECT sort_order AS &#39;order&#39;, directory, files, size_mb, delta, interpretation FROM resources ORDER BY sort_order</code></pre></details></li></ol></section></main>
-<script data-data-analytics-portable-source-tooltips="true">(() => {
+<script type="application/disabled" data-data-analytics-portable-source-tooltips="true">(() => {
   const RUNTIME_FLAG = "__dataAnalyticsPortableSourceTooltipsInitialized";
   const READY_ATTRIBUTE = "data-portable-source-tooltips-ready";
   const OPEN_ATTRIBUTE = "data-portable-source-tooltip-open";
@@ -5271,7 +5291,7 @@ wYcXC8yD1aK34AJ3uFxXrfh9PRqTKfEWHL/RbwIlMjc5JenPk3AQcPK4kyePD3/8w5fqWP5hOf3j
 h08fJM7287ss+/RB3ITI/xKT92d55fBpXX3JqrVAVB4LwKkvkZxqTMloP4HTeP/504d19UXlpbL4
 9EGQrH5+9394IAYu/6QNAA==
 </template>
-<script data-data-analytics-portable-loader="true">(() => {
+<script type="application/disabled" data-data-analytics-portable-loader="true">(() => {
   const RUNTIME_STYLE_ATTRIBUTE = "data-data-analytics-portable-runtime-style";
   const fallback = document.getElementById("data-analytics-portable-fallback");
   const reader = document.getElementById("data-analytics-portable-reader");
