@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#0b1020" />
+    <meta name="color-scheme" content="dark" />
     <meta
       name="description"
       content="DanceNew 项目报告档案：收录 .codex 与 .workbuddy/reports 生成的静态报告，按时间倒序排列。"
@@ -11,375 +12,293 @@
     <title>DanceNew 报告档案</title>
     <style>
       :root {
-        --ink: #1f2933;
-        --muted: #667085;
-        --line: #d9dde3;
-        --blue: #1d4ed8;
-        --blue-dark: #173ea6;
-        --paper: #ffffff;
-        --wash: #f7f8fa;
-        --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, Georgia, serif;
+        --canvas: #090d18;
+        --surface: rgba(18, 27, 47, 0.82);
+        --surface-hover: rgba(23, 36, 63, 0.94);
+        --ink: #edf4ff;
+        --muted: #9eacc4;
+        --subtle: #71809a;
+        --line: rgba(147, 180, 234, 0.18);
+        --blue: #87b9ff;
+        --cyan: #7ae1db;
         --sans: "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+        --display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, serif;
       }
 
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; }
+
+      html { background: var(--canvas); }
 
       body {
         min-width: 320px;
         margin: 0;
         color: var(--ink);
-        background: var(--paper);
+        background:
+          radial-gradient(circle at 14% -8%, rgba(66, 118, 218, 0.22), transparent 31rem),
+          radial-gradient(circle at 91% 10%, rgba(57, 190, 186, 0.12), transparent 26rem),
+          var(--canvas);
         font-family: var(--sans);
       }
 
-      a {
-        color: inherit;
-      }
+      a { color: inherit; }
 
-      .page {
-        width: min(920px, calc(100% - 40px));
+      .tech-shell {
+        width: min(1060px, calc(100% - 40px));
         margin: 0 auto;
       }
 
       header {
-        padding: 56px 0 28px;
-        border-bottom: 1px solid var(--ink);
+        position: relative;
+        padding: 62px 0 40px;
+      }
+
+      header::after {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 1px;
+        background: linear-gradient(90deg, var(--cyan), var(--line) 45%, transparent);
+        content: "";
       }
 
       .eyebrow {
-        margin: 0 0 14px;
-        color: var(--blue);
-        font-size: 0.74rem;
+        display: flex;
+        gap: 9px;
+        align-items: center;
+        margin: 0 0 17px;
+        color: var(--muted);
+        font-size: 0.76rem;
         font-weight: 700;
-        letter-spacing: 0.09em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
       }
 
-      h1,
-      h2 {
-        font-family: var(--serif);
+      .signal {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 0 4px rgba(122, 225, 219, 0.12), 0 0 16px rgba(122, 225, 219, 0.65);
       }
 
+      h1, h2, h3 { margin: 0; }
+
       h1 {
-        margin: 0;
-        font-size: clamp(2rem, 5vw, 3.1rem);
+        font-family: var(--display);
+        font-size: clamp(2.3rem, 5.6vw, 4.25rem);
         font-weight: 600;
-        letter-spacing: -0.04em;
-        line-height: 1.15;
+        letter-spacing: -0.055em;
+        line-height: 1.05;
       }
 
       .summary {
-        max-width: 660px;
-        margin: 14px 0 0;
-        color: #475467;
-        font-size: 0.97rem;
-        line-height: 1.8;
+        max-width: 690px;
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.85;
       }
 
-      .summary code,
-      .source,
-      time,
-      .kind,
-      footer {
-        font-family: var(--sans);
-      }
-
-      .summary code {
-        padding: 1px 4px;
-        border-radius: 3px;
-        color: #344054;
-        background: var(--wash);
-        font-size: 0.9em;
+      code {
+        padding: 2px 5px;
+        border: 1px solid rgba(135, 185, 255, 0.16);
+        border-radius: 4px;
+        color: #c8dcff;
+        background: rgba(125, 166, 235, 0.09);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.87em;
       }
 
       .facts {
         display: flex;
         flex-wrap: wrap;
-        gap: 18px 34px;
-        margin: 24px 0 0;
+        gap: 11px;
+        margin: 27px 0 0;
         color: var(--muted);
         font-size: 0.78rem;
       }
 
-      .facts strong {
-        margin-right: 6px;
-        color: var(--ink);
-        font-weight: 700;
+      .facts span {
+        padding: 7px 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: rgba(13, 20, 36, 0.46);
       }
 
-      main {
-        padding: 34px 0 64px;
-      }
+      .facts strong { color: var(--ink); }
+
+      main { padding: 34px 0 62px; }
 
       .section-heading {
         display: flex;
         gap: 20px;
         align-items: baseline;
         justify-content: space-between;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
       }
 
       .section-heading h2 {
-        margin: 0;
-        font-size: 1.35rem;
-        font-weight: 600;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
       }
 
       .section-heading p {
         margin: 0;
-        color: var(--muted);
-        font-size: 0.78rem;
+        color: var(--subtle);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.73rem;
       }
 
       .archive-list {
+        display: grid;
+        gap: 11px;
         margin: 0;
         padding: 0;
         list-style: none;
-        border-top: 1px solid var(--line);
       }
 
-      .report {
+      .report-card {
         display: grid;
-        grid-template-columns: 152px minmax(0, 1fr);
-        gap: 30px;
-        padding: 22px 0;
-        border-bottom: 1px solid var(--line);
+        grid-template-columns: 166px minmax(0, 1fr);
+        gap: 26px;
+        padding: 21px 22px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface);
+        box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
+        transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+      }
+
+      .report-card:hover {
+        border-color: rgba(135, 185, 255, 0.43);
+        background: var(--surface-hover);
+        transform: translateY(-2px);
       }
 
       time {
         display: block;
-        color: #344054;
-        font-size: 0.84rem;
+        color: #d9e7ff;
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.82rem;
         font-weight: 700;
         font-variant-numeric: tabular-nums;
-        letter-spacing: 0.02em;
+        letter-spacing: 0.025em;
       }
 
       .source {
         display: block;
-        margin-top: 6px;
-        color: var(--muted);
-        font-size: 0.72rem;
-        line-height: 1.45;
+        margin-top: 7px;
+        color: var(--subtle);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.68rem;
+        line-height: 1.55;
       }
 
-      .report h3 {
-        margin: 0;
-        font-family: var(--serif);
-        font-size: 1.14rem;
-        font-weight: 600;
+      .report-card h3 {
+        font-size: 1.08rem;
+        font-weight: 700;
         letter-spacing: -0.015em;
         line-height: 1.45;
       }
 
       .report-link {
-        color: var(--blue-dark);
-        text-decoration-color: #b7c8f7;
-        text-decoration-thickness: 1px;
-        text-underline-offset: 0.2em;
+        color: var(--ink);
+        text-decoration: none;
       }
 
-      .report-link:hover,
-      .report-link:focus-visible {
+      .report-link::after {
+        margin-left: 8px;
         color: var(--blue);
-        text-decoration-color: currentColor;
-        outline: none;
+        content: "↗";
+        font-size: 0.9em;
       }
 
-      .report p {
-        margin: 7px 0 0;
-        color: #667085;
-        font-size: 0.9rem;
+      .report-link:hover, .report-link:focus-visible { color: var(--blue); }
+
+      .report-link:focus-visible {
+        outline: 2px solid var(--cyan);
+        outline-offset: 4px;
+      }
+
+      .report-card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 0.88rem;
         line-height: 1.7;
       }
 
       .kind {
         display: inline-block;
-        margin: 9px 0 0;
-        color: var(--muted);
-        font-size: 0.72rem;
+        margin-top: 11px;
+        color: var(--cyan);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.67rem;
+        letter-spacing: 0.035em;
       }
 
       footer {
         display: flex;
         gap: 16px;
         justify-content: space-between;
-        padding: 22px 0 38px;
+        padding: 22px 0 39px;
         border-top: 1px solid var(--line);
-        color: var(--muted);
+        color: var(--subtle);
         font-size: 0.75rem;
         line-height: 1.6;
       }
 
-      footer a {
-        color: var(--blue-dark);
-        text-underline-offset: 0.2em;
-      }
+      footer a { color: var(--blue); text-underline-offset: 0.2em; }
 
       @media (max-width: 620px) {
-        .page {
-          width: min(100% - 28px, 920px);
-        }
+        .tech-shell { width: min(100% - 28px, 1060px); }
+        header { padding: 42px 0 31px; }
+        .section-heading, footer { align-items: flex-start; flex-direction: column; }
+        .report-card { grid-template-columns: 1fr; gap: 11px; padding: 19px 18px; }
+      }
 
-        header {
-          padding-top: 36px;
-        }
-
-        .section-heading,
-        footer {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .report {
-          grid-template-columns: 1fr;
-          gap: 9px;
-          padding: 20px 0;
-        }
-
-        .source {
-          display: inline;
-          margin-left: 8px;
-        }
+      @media (prefers-reduced-motion: reduce) {
+        .report-card { transition: none; }
       }
     </style>
   </head>
   <body>
-    <header class="page">
-      <p class="eyebrow">DanceNew / Project 1688</p>
-      <h1>报告档案</h1>
-      <p class="summary">
-        收录 <code>.codex</code> 与 <code>.workbuddy/reports</code> 中已生成的静态报告，按生成时间倒序排列。
-      </p>
-      <div class="facts" aria-label="档案概览">
-        <span><strong>9</strong>份报告</span>
-        <span><strong>2026.04—07</strong>归档跨度</span>
-        <span><strong>2026.07.17</strong>最新更新</span>
-      </div>
-    </header>
+    <div class="tech-shell">
+      <header>
+        <p class="eyebrow"><span class="signal" aria-hidden="true"></span>DanceNew / Project 1688</p>
+        <h1>报告档案</h1>
+        <p class="summary">收录 <code>.codex</code> 与 <code>.workbuddy/reports</code> 中已生成的静态报告，按生成时间倒序排列。</p>
+        <div class="facts" aria-label="档案概览">
+          <span><strong>09</strong> 份报告</span>
+          <span><strong>2026.04—07</strong> 归档跨度</span>
+          <span><strong>2026.07.17</strong> 最新更新</span>
+        </div>
+      </header>
 
-    <main class="page">
-      <div class="section-heading">
-        <h2>全部报告</h2>
-        <p>按时间倒序</p>
-      </div>
+      <main>
+        <div class="section-heading">
+          <h2>全部报告</h2>
+          <p>ORDER / NEWEST FIRST</p>
+        </div>
 
-      <ol class="archive-list">
-        <li class="report">
-          <div>
-            <time datetime="2026-07-17T19:37:16+08:00">2026.07.17</time>
-            <span class="source">.codex · 19:37</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-07-17T19:37:16+08:00" href="./reports/2026-07-17-biweekly-review-widescreen.html">两周增量复审报告（宽屏版）</a></h3>
-            <p>近期增量、编译证据、架构风险与交付建议的宽屏阅读版本。</p>
-            <span class="kind">增量复审</span>
-          </div>
-        </li>
+        <ol class="archive-list">
+          <li class="report-card"><div><time datetime="2026-07-17T19:37:16+08:00">2026.07.17</time><span class="source">.codex · 19:37</span></div><div><h3><a class="report-link" data-date="2026-07-17T19:37:16+08:00" href="./reports/2026-07-17-biweekly-review-widescreen.html">两周增量复审报告（宽屏版）</a></h3><p>近期增量、编译证据、架构风险与交付建议的宽屏阅读版本。</p><span class="kind">增量复审</span></div></li>
+          <li class="report-card"><div><time datetime="2026-07-17T18:08:27+08:00">2026.07.17</time><span class="source">.codex · 18:08</span></div><div><h3><a class="report-link" data-date="2026-07-17T18:08:27+08:00" href="./reports/2026-07-17-biweekly-review.html">两周增量复审报告</a></h3><p>常规阅读宽度版本，保留同一轮分析的结论与证据。</p><span class="kind">增量复审</span></div></li>
+          <li class="report-card"><div><time datetime="2026-07-05T23:58:44+08:00">2026.07.05</time><span class="source">.workbuddy/reports · CBT5</span></div><div><h3><a class="report-link" data-date="2026-07-05T23:58:44+08:00" href="./reports/2026-07-05-cbt5-launch-analysis.html">CBT5 启动分析与改进方案</a></h3><p>整理 CBT5 启动阶段的问题、优先级和改进路径。</p><span class="kind">CBT5</span></div></li>
+          <li class="report-card"><div><time datetime="2026-07-05T23:57:21+08:00">2026.07.05</time><span class="source">.workbuddy/reports · CBT4</span></div><div><h3><a class="report-link" data-date="2026-07-05T23:57:21+08:00" href="./reports/2026-07-05-cbt4-retrospective.html">CBT4 版本回顾</a></h3><p>总结 CBT4 的版本成果、遗留问题与下一阶段输入。</p><span class="kind">CBT4</span></div></li>
+          <li class="report-card"><div><time datetime="2026-06-29T21:20:04+08:00">2026.06.29</time><span class="source">.codex · 源码总览</span></div><div><h3><a class="report-link" data-date="2026-06-29T21:20:04+08:00" href="./reports/2026-06-29-source-analysis-overview.html">项目源码分析总报告</a></h3><p>架构、模块完成度、首测准备度、风险与资源配置的综合入口。</p><span class="kind">源码分析</span></div></li>
+          <li class="report-card"><div><time datetime="2026-06-17T22:25:30+08:00">2026.06.17</time><span class="source">.workbuddy/reports · CBT4</span></div><div><h3><a class="report-link" data-date="2026-06-17T22:25:30+08:00" href="./reports/2026-06-17-analysis-v4.html">DanceNew 深度分析报告 v4.0</a></h3><p>第 4 轮工程与产品状态分析。</p><span class="kind">版本分析</span></div></li>
+          <li class="report-card"><div><time datetime="2026-06-01T13:14:26+08:00">2026.06.01</time><span class="source">.workbuddy/reports · CBT4</span></div><div><h3><a class="report-link" data-date="2026-06-01T13:14:26+08:00" href="./reports/2026-06-01-analysis-v3.html">DanceNew 深度分析报告 v3.0</a></h3><p>记录 6 月初的系统结构、质量信号与版本判断。</p><span class="kind">版本分析</span></div></li>
+          <li class="report-card"><div><time datetime="2026-05-08T16:12:02+08:00">2026.05.08</time><span class="source">.workbuddy/reports · CBT4</span></div><div><h3><a class="report-link" data-date="2026-05-08T16:12:02+08:00" href="./reports/2026-05-08-analysis-v2.html">DanceNew 深度分析报告 v2.0</a></h3><p>第二轮项目深度分析与阶段问题评估。</p><span class="kind">版本分析</span></div></li>
+          <li class="report-card"><div><time datetime="2026-04-09T16:57:46+08:00">2026.04.09</time><span class="source">.workbuddy/reports · CBT4</span></div><div><h3><a class="report-link" data-date="2026-04-09T16:57:46+08:00" href="./reports/2026-04-09-analysis-v1.html">DanceNew 手游项目全面分析报告</a></h3><p>本档案最早的基线报告。</p><span class="kind">基线分析</span></div></li>
+        </ol>
+      </main>
 
-        <li class="report">
-          <div>
-            <time datetime="2026-07-17T18:08:27+08:00">2026.07.17</time>
-            <span class="source">.codex · 18:08</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-07-17T18:08:27+08:00" href="./reports/2026-07-17-biweekly-review.html">两周增量复审报告</a></h3>
-            <p>常规阅读宽度版本，保留同一轮分析的结论与证据。</p>
-            <span class="kind">增量复审</span>
-          </div>
-        </li>
-
-        <li class="report">
-          <div>
-            <time datetime="2026-07-05T23:58:44+08:00">2026.07.05</time>
-            <span class="source">.workbuddy/reports · CBT5</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-07-05T23:58:44+08:00" href="./reports/2026-07-05-cbt5-launch-analysis.html">CBT5 启动分析与改进方案</a></h3>
-            <p>整理 CBT5 启动阶段的问题、优先级和改进路径。</p>
-            <span class="kind">CBT5</span>
-          </div>
-        </li>
-
-        <li class="report">
-          <div>
-            <time datetime="2026-07-05T23:57:21+08:00">2026.07.05</time>
-            <span class="source">.workbuddy/reports · CBT4</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-07-05T23:57:21+08:00" href="./reports/2026-07-05-cbt4-retrospective.html">CBT4 版本回顾</a></h3>
-            <p>总结 CBT4 的版本成果、遗留问题与下一阶段输入。</p>
-            <span class="kind">CBT4</span>
-          </div>
-        </li>
-
-        <li class="report">
-          <div>
-            <time datetime="2026-06-29T21:20:04+08:00">2026.06.29</time>
-            <span class="source">.codex · 源码总览</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-06-29T21:20:04+08:00" href="./reports/2026-06-29-source-analysis-overview.html">项目源码分析总报告</a></h3>
-            <p>架构、模块完成度、首测准备度、风险与资源配置的综合入口。</p>
-            <span class="kind">源码分析</span>
-          </div>
-        </li>
-
-        <li class="report">
-          <div>
-            <time datetime="2026-06-17T22:25:30+08:00">2026.06.17</time>
-            <span class="source">.workbuddy/reports · CBT4</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-06-17T22:25:30+08:00" href="./reports/2026-06-17-analysis-v4.html">DanceNew 深度分析报告 v4.0</a></h3>
-            <p>第 4 轮工程与产品状态分析。</p>
-            <span class="kind">版本分析</span>
-          </div>
-        </li>
-
-        <li class="report">
-          <div>
-            <time datetime="2026-06-01T13:14:26+08:00">2026.06.01</time>
-            <span class="source">.workbuddy/reports · CBT4</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-06-01T13:14:26+08:00" href="./reports/2026-06-01-analysis-v3.html">DanceNew 深度分析报告 v3.0</a></h3>
-            <p>记录 6 月初的系统结构、质量信号与版本判断。</p>
-            <span class="kind">版本分析</span>
-          </div>
-        </li>
-
-        <li class="report">
-          <div>
-            <time datetime="2026-05-08T16:12:02+08:00">2026.05.08</time>
-            <span class="source">.workbuddy/reports · CBT4</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-05-08T16:12:02+08:00" href="./reports/2026-05-08-analysis-v2.html">DanceNew 深度分析报告 v2.0</a></h3>
-            <p>第二轮项目深度分析与阶段问题评估。</p>
-            <span class="kind">版本分析</span>
-          </div>
-        </li>
-
-        <li class="report">
-          <div>
-            <time datetime="2026-04-09T16:57:46+08:00">2026.04.09</time>
-            <span class="source">.workbuddy/reports · CBT4</span>
-          </div>
-          <div>
-            <h3><a class="report-link" data-date="2026-04-09T16:57:46+08:00" href="./reports/2026-04-09-analysis-v1.html">DanceNew 手游项目全面分析报告</a></h3>
-            <p>本档案最早的基线报告。</p>
-            <span class="kind">基线分析</span>
-          </div>
-        </li>
-      </ol>
-    </main>
-
-    <footer class="page">
-      <span>DanceNew / 代号 1688 · 静态报告归档</span>
-      <a href="https://github.com/JekiVado/jekivado.github.io">查看 GitHub 仓库</a>
-    </footer>
+      <footer>
+        <span>DanceNew / 代号 1688 · 静态报告归档</span>
+        <a href="https://github.com/JekiVado/jekivado.github.io">查看 GitHub 仓库</a>
+      </footer>
+    </div>
   </body>
 </html>
