@@ -272,6 +272,64 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
   .portable-source-tooltip-content,
   .portable-inline-source,
   .portable-source-summary { display: none !important; }
+
+  .portable-block-stack {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 34px;
+  }
+
+  .portable-layout-half,
+  .portable-layout-full { grid-column: 1; min-width: 0; }
+
+  .portable-markdown { max-width: 1120px; }
+  .portable-markdown p { margin: 0 0 22px; }
+  .portable-markdown * { overflow-wrap: anywhere; }
+
+  .portable-source-tooltip,
+  .portable-source-tooltip:hover,
+  .portable-source-tooltip:focus {
+    cursor: inherit;
+    text-decoration: none !important;
+  }
+
+  .producer-table-wrap {
+    width: 100%;
+    margin: 18px 0 28px;
+    overflow-x: auto;
+    border-top: 2px solid #1f403c;
+    border-bottom: 1px solid #cbd7d2;
+  }
+
+  .producer-table {
+    width: 100%;
+    min-width: 920px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #ffffff;
+  }
+
+  .producer-table th,
+  .producer-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #d7e0dc;
+    color: #223736;
+    font-size: 15px;
+    line-height: 1.55;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  .producer-table th {
+    background: #edf3f0;
+    color: #1f403c;
+    font-weight: 700;
+  }
+
+  .producer-table th:nth-child(1),
+  .producer-table td:nth-child(1) { width: 8%; }
+  .producer-table th:nth-child(2),
+  .producer-table td:nth-child(2) { width: 10%; }
 }
 
 @media screen and (max-width: 760px) {
@@ -296,6 +354,60 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
 </style>
 <script data-dancenew-producer-brief-runtime="v1">
 (() => {
+  const removeSourceChrome = () => {
+    document.querySelectorAll(".portable-source-tooltip-content, .portable-inline-source").forEach((node) => node.remove());
+    document.querySelectorAll(".portable-source-tooltip").forEach((node) => {
+      node.classList.remove("portable-source-tooltip", "portable-source-value");
+      node.removeAttribute("tabindex");
+      node.removeAttribute("aria-describedby");
+    });
+  };
+
+  const convertRawTables = () => {
+    document.querySelectorAll(".portable-markdown p").forEach((paragraph) => {
+      const raw = paragraph.textContent.trim();
+      if (!raw.startsWith("|") || !raw.includes("|---")) return;
+
+      const rows = raw.replace(/\|\s*\|/g, "\n").split("\n")
+        .map((row) => row.trim())
+        .filter(Boolean);
+      if (rows.length < 3 || !/^\|?\s*-{3,}/.test(rows[1])) return;
+
+      const cells = (row) => row.split("|").map((cell) => cell.trim()).filter(Boolean);
+      const headers = cells(rows[0]);
+      const dataRows = rows.slice(2).map(cells).filter((row) => row.length === headers.length);
+      if (!headers.length || !dataRows.length) return;
+
+      const wrap = document.createElement("div");
+      wrap.className = "producer-table-wrap";
+      const table = document.createElement("table");
+      table.className = "producer-table";
+      const head = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      headers.forEach((value) => {
+        const cell = document.createElement("th");
+        cell.textContent = value;
+        headRow.appendChild(cell);
+      });
+      head.appendChild(headRow);
+      table.appendChild(head);
+
+      const body = document.createElement("tbody");
+      dataRows.forEach((row) => {
+        const tableRow = document.createElement("tr");
+        row.forEach((value) => {
+          const cell = document.createElement("td");
+          cell.textContent = value;
+          tableRow.appendChild(cell);
+        });
+        body.appendChild(tableRow);
+      });
+      table.appendChild(body);
+      wrap.appendChild(table);
+      paragraph.replaceWith(wrap);
+    });
+  };
+
   const prepareProducerBrief = () => {
     const fallback = document.querySelector("[data-portable-fallback]");
     if (fallback) {
@@ -306,6 +418,8 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
     if (title) title.textContent = "DanceNew 项目首测复审报告";
     const description = document.querySelector(".portable-page-header .portable-description");
     if (description) description.textContent = "当前版本复审、首测风险与候选包门槛";
+    removeSourceChrome();
+    convertRawTables();
   };
   document.addEventListener("DOMContentLoaded", prepareProducerBrief, { once: true });
 })();
