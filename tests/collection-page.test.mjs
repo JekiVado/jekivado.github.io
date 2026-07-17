@@ -20,8 +20,12 @@ assert.match(html, /class="category prototype-section"/);
 assert.match(html, /class="category analysis-section"/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
-assert.match(html, /\.category\s*\{[^}]*padding:\s*16px/);
+assert.match(html, /\.category\s*\{[^}]*padding:\s*20px/);
 assert.match(html, /background:\s*#fff/);
+assert.match(html, /main\s*\{[^}]*width:\s*min\(1440px/);
+assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1fr\)\)/);
+assert.match(html, /class="card-grid prototype-grid"/);
+assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
 
 for (const route of [
   '../escape01/',

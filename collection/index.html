@@ -32,13 +32,13 @@
         font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
       }
       a { color: inherit; }
-      main { width: min(1060px, calc(100% - 40px)); margin: 0 auto; padding: 54px 0 52px; }
+      main { width: min(1440px, calc(100% - 72px)); margin: 0 auto; padding: 54px 0 56px; }
       header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 25px; border-bottom: 1px solid var(--rule); }
       .eyebrow { margin: 0 0 10px; color: var(--cool-accent); font: 700 11px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .14em; }
       h1 { margin: 0; font-size: clamp(36px, 5vw, 52px); font-weight: 650; letter-spacing: -.065em; line-height: 1; }
       .count { margin: 0 0 3px; color: var(--muted); font: 11px/1.4 "SFMono-Regular", Menlo, monospace; letter-spacing: .06em; white-space: nowrap; }
-      .intro { max-width: 620px; margin: 15px 0 33px; color: var(--muted); font-size: 16px; line-height: 1.65; }
-      .category { --module-bg: var(--cool-bg); --module-border: var(--cool-border); --module-accent: var(--cool-accent); --module-ink: var(--cool-ink); padding: 16px; border: 1px solid var(--module-border); border-radius: 16px; background: var(--module-bg); box-shadow: 0 10px 22px rgba(37, 56, 61, .08); }
+      .intro { max-width: 720px; margin: 15px 0 33px; color: var(--muted); font-size: 16px; line-height: 1.65; }
+      .category { --module-bg: var(--cool-bg); --module-border: var(--cool-border); --module-accent: var(--cool-accent); --module-ink: var(--cool-ink); padding: 20px; border: 1px solid var(--module-border); border-radius: 16px; background: var(--module-bg); box-shadow: 0 10px 22px rgba(37, 56, 61, .08); }
       .prototype-section { --module-bg: var(--warm-bg); --module-border: var(--warm-border); --module-accent: var(--warm-accent); --module-ink: var(--warm-ink); }
       .category + .category { margin-top: 20px; }
       .category-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--module-border); }
@@ -46,11 +46,13 @@
       .category-index { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--module-border); border-radius: 7px; color: var(--module-ink); background: rgba(255, 255, 255, .56); font: 700 9px/1 "SFMono-Regular", Menlo, monospace; }
       h2 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.02em; }
       .category-count { color: var(--muted); font: 11px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .08em; }
-      .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+      .prototype-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .prototype-grid .card { grid-column: span 2; }
       .card {
         position: relative;
         display: flex;
-        min-height: 164px;
+        min-height: 172px;
         flex-direction: column;
         padding: 17px;
         overflow: hidden;
@@ -74,10 +76,11 @@
       footer strong { color: var(--ink); font-weight: 600; }
 
       @media (max-width: 720px) {
-        main { width: min(100% - 28px, 1060px); padding-top: 32px; }
+        main { width: min(100% - 28px, 1440px); padding-top: 32px; }
         header { align-items: flex-start; flex-direction: column; gap: 8px; }
         .category { padding: 13px; }
-        .card-grid { grid-template-columns: 1fr; }
+        .card-grid, .prototype-grid { grid-template-columns: 1fr; }
+        .prototype-grid .card { grid-column: auto; }
         .card { min-height: 154px; }
         footer { align-items: flex-start; flex-direction: column; gap: 7px; }
       }
@@ -99,7 +102,7 @@
           <div class="category-title"><span class="category-index">01</span><h2 id="prototype-title">可试玩原型</h2></div>
           <span class="category-count">01 ITEM</span>
         </div>
-        <div class="card-grid">
+        <div class="card-grid prototype-grid">
           <a class="card prototype" data-category="prototype" href="../escape01/">
             <span class="card-top"><span class="kind">INTERACTIVE</span><span class="arrow">↗</span></span>
             <strong class="card-name">escape01</strong>
