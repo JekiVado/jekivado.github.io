@@ -1,0 +1,572 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DanceNew 手游项目全面分析报告</title>
+<style>
+  :root { --primary:#1a73e8;--primary-dark:#0d47a1;--accent:#ff6f00;--green:#2e7d32;--orange:#e65100;--red:#c62828;--bg:#f8f9fa;--card:#fff;--border:#dee2e6;--text:#212529;--muted:#6c757d; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Microsoft YaHei','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  header{background:linear-gradient(135deg,#0d47a1 0%,#1565c0 40%,#1976d2 70%,#42a5f5 100%);color:#fff;padding:48px 40px 40px;position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:rgba(255,255,255,.06);border-radius:50%}
+  header::after{content:'';position:absolute;bottom:-80px;left:10%;width:360px;height:360px;background:rgba(255,255,255,.04);border-radius:50%}
+  .header-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+  header h1{font-size:2.2rem;font-weight:700;letter-spacing:1px;margin-bottom:10px}
+  header .subtitle{opacity:.85;font-size:1.05rem;margin-bottom:20px}
+  .badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 14px;font-size:.82rem;backdrop-filter:blur(4px)}
+  .toc-bar{background:#fff;border-bottom:2px solid var(--primary);padding:12px 40px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .toc-inner{max-width:1100px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .toc-bar span{font-weight:600;color:var(--primary);margin-right:8px;font-size:.9rem}
+  .toc-bar a{color:var(--muted);text-decoration:none;font-size:.85rem;padding:3px 10px;border-radius:12px;transition:all .2s}
+  .toc-bar a:hover{background:var(--primary);color:#fff}
+  main{max-width:1100px;margin:0 auto;padding:32px 24px 60px}
+  section{margin-bottom:48px}
+  h2{font-size:1.55rem;font-weight:700;color:var(--primary-dark);border-left:4px solid var(--primary);padding-left:14px;margin-bottom:24px;margin-top:8px}
+  h3{font-size:1.15rem;font-weight:600;color:#2c3e50;margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+  h3::before{content:'';display:inline-block;width:6px;height:6px;background:var(--primary);border-radius:50%}
+  .card{background:var(--card);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.07);border:1px solid var(--border);padding:20px 24px;margin-bottom:20px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}.toc-bar{padding:10px 16px}header{padding:32px 16px}main{padding:20px 12px}}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th{background:var(--primary);color:#fff;padding:10px 14px;text-align:left;font-weight:600}
+  td{padding:9px 14px;border-bottom:1px solid var(--border)}
+  tr:nth-child(even) td{background:#f1f5fb}
+  tr:hover td{background:#e8f0fe}
+  code,pre{font-family:'Cascadia Code','Consolas','Courier New',monospace;background:#1e2a3a;color:#a8d8ea;border-radius:8px}
+  pre{padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;margin:12px 0}
+  code{padding:2px 6px;font-size:.85em;background:#e8f0fe;color:var(--primary-dark);border-radius:4px}
+  .progress-bar{height:22px;background:#e9ecef;border-radius:11px;overflow:hidden;margin:4px 0 2px}
+  .progress-fill{height:100%;border-radius:11px;display:flex;align-items:center;padding-left:10px;font-size:.75rem;font-weight:600;color:#fff;transition:width .8s ease}
+  .fill-green{background:linear-gradient(90deg,#2e7d32,#43a047)}
+  .fill-lime{background:linear-gradient(90deg,#558b2f,#7cb342)}
+  .fill-yellow{background:linear-gradient(90deg,#f57f17,#fbc02d);color:#333}
+  .fill-orange{background:linear-gradient(90deg,#e65100,#fb8c00)}
+  .fill-red{background:linear-gradient(90deg,#b71c1c,#e53935)}
+  .progress-label{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:2px}
+  .progress-label .name{font-weight:600;color:var(--text)}
+  .progress-label .pct{font-weight:700;color:var(--primary)}
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .stat-card{background:linear-gradient(135deg,var(--primary),#1565c0);color:#fff;border-radius:10px;padding:18px 20px;text-align:center}
+  .stat-card .val{font-size:1.8rem;font-weight:700}
+  .stat-card .lbl{font-size:.82rem;opacity:.85;margin-top:4px}
+  .tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.78rem;font-weight:600;margin:2px}
+  .tag-green{background:#e8f5e9;color:#2e7d32}
+  .tag-yellow{background:#fff8e1;color:#e65100}
+  .tag-red{background:#ffebee;color:#c62828}
+  .tag-blue{background:#e3f2fd;color:#0d47a1}
+  .arch-box{background:#1e2a3a;color:#a8d8ea;border-radius:10px;padding:20px 24px;font-family:monospace;font-size:.88rem;line-height:1.8;overflow-x:auto;margin:12px 0}
+  .arch-box .layer-title{color:#ffd700;font-weight:bold}
+  .arch-box .layer-content{color:#90caf9;margin-left:2px}
+  .arch-box .arrow{color:#ff9800}
+  .summary-box{background:linear-gradient(135deg,#e3f2fd,#f3e5f5);border-radius:12px;padding:24px 28px;border-left:5px solid var(--primary);margin-bottom:32px}
+  .summary-box h2{border:none;padding:0;margin-bottom:12px;font-size:1.3rem}
+  .flow-chart{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:16px;background:#f8f9fa;border-radius:8px;margin:12px 0}
+  .flow-node{background:#fff;border:2px solid var(--primary);border-radius:8px;padding:8px 16px;font-size:.85rem;font-weight:600;color:var(--primary-dark);white-space:nowrap}
+  .flow-arrow{color:var(--primary);font-size:1.2rem;font-weight:700}
+  .conclusion{background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff;border-radius:12px;padding:28px 32px;margin-top:40px}
+  .conclusion h2{color:#fff;border-color:rgba(255,255,255,.5);margin-bottom:20px}
+  .conclusion p{opacity:.92;line-height:1.8;margin-bottom:12px}
+  .conclusion .highlight{background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-weight:600}
+  footer{text-align:center;padding:24px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);background:#fff}
+  .module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+  .module-card{background:#fff;border-radius:10px;border:1px solid var(--border);padding:16px 18px;transition:transform .2s,box-shadow .2s}
+  .module-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+  .module-card h4{font-size:1rem;font-weight:700;color:var(--primary-dark);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .module-card .status{font-size:.8rem;padding:2px 8px;border-radius:10px;font-weight:600}
+  .module-card ul{list-style:none;font-size:.85rem;color:var(--muted);padding-left:4px}
+  .module-card ul li::before{content:'▸ ';color:var(--primary)}
+  .event-table td:first-child{font-family:monospace;color:var(--primary);font-weight:600}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>🎮 DanceNew 手游项目全面分析报告</h1>
+    <div class="subtitle">架构分析 · 功能模块总结 · 开发进度评估</div>
+    <div class="badges">
+      <span class="badge">Unity 2022.3.4f1c1</span>
+      <span class="badge">URP 渲染管线</span>
+      <span class="badge">HybridCLR 热更新</span>
+      <span class="badge">Protobuf 网络协议</span>
+      <span class="badge">Luban 配置工具</span>
+      <span class="badge">版本 0.1106.001</span>
+      <span class="badge">包名 com.auforever.jwzx</span>
+      <span class="badge">生成于 2026-04-09</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc-bar">
+  <div class="toc-inner">
+    <span>目录</span>
+    <a href="#overview">总览</a>
+    <a href="#arch">架构分析</a>
+    <a href="#hotupdate">热更新</a>
+    <a href="#events">事件系统</a>
+    <a href="#modules">功能模块</a>
+    <a href="#progress">开发进度</a>
+    <a href="#quality">代码质量</a>
+    <a href="#conclusion">总结</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- 总览卡片 -->
+<section id="overview">
+  <div class="stat-row">
+    <div class="stat-card"><div class="val">12</div><div class="lbl">热更新 DLL 模块</div></div>
+    <div class="stat-card" style="background:linear-gradient(135deg,#e65100,#f57c00)"><div class="val">80+</div><div class="lbl">UI Panel 数量</div></div>
+    <div class="stat-card" style="background:linear-gradient(135deg,#2e7d32,#388e3c)"><div class="val">63</div><div class="lbl">Luban 配置表</div></div>
+    <div class="stat-card" style="background:linear-gradient(135deg,#6a1b9a,#8e24aa)"><div class="val">9</div><div class="lbl">游戏场景（4启用/5注释）</div></div>
+  </div>
+
+  <div class="summary-box">
+    <h2>📋 项目简介</h2>
+    <p><strong>DanceNew</strong> 是一款以跳舞社交为核心玩法的手游，定位类似"舞蹈派对+社交平台"的融合产品。玩家可在游戏中跳舞、换装、交友、组建家族、与 CP 互动，以及参与各类活动。</p>
+    <p>项目采用 <strong>HybridCLR 热更新</strong> + <strong>Luban 配置工具</strong> 的现代 Unity 工程方案，代码架构层次清晰，具备良好的扩展性与长期迭代能力。</p>
+  </div>
+
+  <div class="card">
+    <h3>技术选型一览</h3>
+    <table>
+      <tr><th>维度</th><th>详情</th><th>说明</th></tr>
+      <tr><td>游戏引擎</td><td><code>Unity 2022.3.4f1c1 (LTS)</code></td><td>长期支持版，稳定性有保障</td></tr>
+      <tr><td>渲染管线</td><td>URP (Universal Render Pipeline)</td><td>移动端性能优化首选</td></tr>
+      <tr><td>热更新方案</td><td><strong>HybridCLR</strong></td><td>il2cpp 运行时注入热更 DLL，全量逻辑可热更</td></tr>
+      <tr><td>网络协议</td><td>Protobuf (Google.Protobuf) + TCP 长连接</td><td>高效二进制协议，全量协议文件完整</td></tr>
+      <tr><td>配置系统</td><td>Luban — Excel → 代码/二进制</td><td>63张配置表，覆盖全业务</td></tr>
+      <tr><td>UI 框架</td><td>UGUI + TextMesh Pro</td><td>Unity 原生UI，稳定可控</td></tr>
+      <tr><td>骨骼动画</td><td>Spine + Unity Legacy Animation</td><td>角色动作丰富</td></tr>
+      <tr><td>对象池</td><td>自研 PoolCore.dll</td><td>角色/装备/特效统一管理</td></tr>
+      <tr><td>资源管理</td><td>自研 AssetBundles.dll + Framework.dll</td><td>AB包加载与生命周期管理</td></tr>
+      <tr><td>异步框架</td><td>UniTask (Cysharp)</td><td>零 GC 异步，现代化写法</td></tr>
+      <tr><td>音频/IM</td><td>YouMe SDK（游密）</td><td>语音房间/私信/录音播放</td></tr>
+      <tr><td>三方工具</td><td>DOTween / HighlightPlus / Bugly / NativeGallery</td><td>动画/高亮/崩溃上报/相册</td></tr>
+      <tr><td>数据序列化</td><td>Newtonsoft.Json</td><td>JSON 解析标准库</td></tr>
+      <tr><td>目标平台</td><td>Android (minSdk 22 / targetSdk 30) + iOS</td><td>支持 Android 5.1 以上设备</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 架构分析 -->
+<section id="arch">
+  <h2>🏗️ 一、整体架构分析</h2>
+
+  <div class="card">
+    <h3>架构分层模型</h3>
+    <div class="arch-box">
+<pre style="background:transparent;color:inherit;padding:0">
+<span class="layer-title">╔══════════════════════════════════════════════════════════╗</span>
+<span class="layer-title">║              【启动层 Boot Layer】                        ║</span>
+<span class="layer-content">║     GameLaunch.cs  →  GameMain.cs  →  各 *Mgr 初始化     ║</span>
+<span class="layer-title">╠══════════════════════════════════════════════════════════╣</span>
+<span class="layer-title">║           【核心桥接层 GameCore Layer】                   ║</span>
+<span class="layer-content">║   ConfigMgr / DataMgr / NetMgr / UIMgr / SceneMgr       ║</span>
+<span class="layer-content">║   GamePlayMgr — 通过 反射 调用热更 DLL 的业务方法         ║</span>
+<span class="layer-title">╠══════════════════════════════════════════════════════════╣</span>
+<span class="layer-title">║         【热更新 DLL 层 HybridCLR Hot-Update】            ║</span>
+<span class="layer-content">║  Config │ GameCommon │ Proto │ DataManager │ Net          ║</span>
+<span class="layer-content">║  Character │ GamePlay │ Scene │ UI │ Battle │ Timeline    ║</span>
+<span class="layer-title">╠══════════════════════════════════════════════════════════╣</span>
+<span class="layer-title">║               【业务逻辑层 Business Layer】               ║</span>
+<span class="layer-content">║  DataManager (17个Manager) / GamePlay / Scene            ║</span>
+<span class="layer-title">╠══════════════════════════════════════════════════════════╣</span>
+<span class="layer-title">║               【表现层 Presentation Layer】               ║</span>
+<span class="layer-content">║  Character渲染系统 / 80+ UI面板 / 场景 / 特效              ║</span>
+<span class="layer-title">╠══════════════════════════════════════════════════════════╣</span>
+<span class="layer-title">║             【基础设施层 Infrastructure Layer】           ║</span>
+<span class="layer-content">║  AssetBundle / PoolManager / EventManager / NetSocket    ║</span>
+<span class="layer-content">║  SDK (YouMe / JWGameSDK / NativeGallery) / Bugly         ║</span>
+<span class="layer-title">╚══════════════════════════════════════════════════════════╝</span>
+</pre>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>数据流向</h3>
+      <div class="flow-chart">
+        <div class="flow-node">服务器 Protobuf 消息</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">NetworkManager（解包/分发）</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">Net层 ProtoExtension</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">DataManager（存储+广播事件）</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">UI层 / GamePlay层（刷新显示）</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>角色继承体系</h3>
+      <pre>Actor（基础 GameObject 管理）
+  └─ BasePlayer（换装/骨骼/动画/皮肤）
+       ├─ ScenePlayer（场景中普通玩家）
+       ├─ HeartbeatMatePlayer（心动搭子专属）
+       └─ RTTPlayer（渲染到纹理，UI中3D预览）</pre>
+      <p style="font-size:.85rem;color:var(--muted);margin-top:8px">支持头/上衣/下衣/鞋/背饰/手持/底座/DJ台 全部位换装，白/黑/黄三种肤色</p>
+    </div>
+  </div>
+</section>
+
+<!-- 热更新 -->
+<section id="hotupdate">
+  <h2>🔥 二、HybridCLR 热更新架构</h2>
+
+  <div class="card">
+    <h3>热更新流程</h3>
+    <div class="flow-chart" style="justify-content:flex-start">
+      <div class="flow-node">App 启动</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">GameLaunch（AOT宿主）</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">下载/校验热更 DLL</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Assembly.Load(bytes)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">反射调用热更入口</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">业务逻辑运行</div>
+    </div>
+    <div style="margin-top:12px">
+    <table>
+      <tr><th>层次</th><th>包含模块</th><th>是否可热更</th></tr>
+      <tr><td>宿主层 (AOT)</td><td>GameLaunch / GameMain / GameCore.*Mgr</td><td><span class="tag tag-red">❌ 不可热更</span></td></tr>
+      <tr><td>热更层 DLL①</td><td>Config / GameCommon / Proto</td><td><span class="tag tag-green">✅ 可热更</span></td></tr>
+      <tr><td>热更层 DLL②</td><td>Manager / DataManager / Net</td><td><span class="tag tag-green">✅ 可热更</span></td></tr>
+      <tr><td>热更层 DLL③</td><td>Character / Battle / GamePlay</td><td><span class="tag tag-green">✅ 可热更</span></td></tr>
+      <tr><td>热更层 DLL④</td><td>Scene / UI / Timeline</td><td><span class="tag tag-green">✅ 可热更</span></td></tr>
+    </table>
+    </div>
+    <div style="background:#fff3e0;border-left:4px solid #ff9800;padding:12px 16px;border-radius:0 8px 8px 0;margin-top:14px;font-size:.88rem">
+      <strong>桥接机制：</strong>GameCore 层通过 <code>反射</code> 调用热更 DLL 方法，例如：<br>
+      <code>_type.GetMethod("InitConfig").Invoke(null, null);</code><br>
+      宿主层与业务层完全解耦，支持不更新安装包的情况下全量更新游戏逻辑。
+    </div>
+  </div>
+</section>
+
+<!-- 事件系统 -->
+<section id="events">
+  <h2>⚡ 三、事件系统设计</h2>
+  <div class="card">
+    <p style="margin-bottom:14px">采用<strong>强类型事件总线</strong>，所有事件 ID 用 <code>EEventID</code> 枚举定义，按 ID 段分业务。同时保留旧式字符串常量（<code>MessageName</code>），两套并存（建议逐步迁移）。</p>
+    <table class="event-table">
+      <tr><th>ID 段</th><th>业务域</th><th>典型事件</th></tr>
+      <tr><td>0 – 100</td><td>基础层</td><td>输入事件 / UIManager / 货币刷新 / 红点</td></tr>
+      <tr><td>100 – 200</td><td>SDK 层</td><td>登录结果 / 支付回调 / YouMe 语音状态</td></tr>
+      <tr><td>201 – 300</td><td>场景管理</td><td>场景加载开始/完成/切换</td></tr>
+      <tr><td>1000 – 9999</td><td>网络协议</td><td>各 s2c_xxx.proto 消息事件</td></tr>
+      <tr><td>10000 – 19999</td><td>数据层</td><td>玩家数据更新 / 房间数据刷新 / 好友列表变动</td></tr>
+      <tr><td>20000 – 30000</td><td>UI 层</td><td>面板打开/关闭 / 弹窗触发 / 按钮点击</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 功能模块 -->
+<section id="modules">
+  <h2>🧩 四、功能模块总结</h2>
+
+  <h3>核心玩法模块</h3>
+  <div class="module-grid">
+    <div class="module-card">
+      <h4>🥊 斗舞系统 (Battle)<span class="status tag tag-yellow">50% 逻辑待接入</span></h4>
+      <ul>
+        <li>BattleDefine.cs 数据结构完整</li>
+        <li>舞步判定：Perfect/Great/Cool/Bad/Miss</li>
+        <li>s2c_battle.proto 协议完整</li>
+        <li>UIBattle* 界面完整</li>
+        <li>BattleManager 已注释</li>
+      </ul>
+    </div>
+    <div class="module-card">
+      <h4>💞 心动搭子 (HeartbeatMate)<span class="status tag tag-green">85% 最完整玩法</span></h4>
+      <ul>
+        <li>HeartbeatMateManager（8个Partial）</li>
+        <li>礼物/位置/麦克风/搭档全功能</li>
+        <li>独立房间列表与玩法逻辑</li>
+        <li>SoulmateRoom 场景启用</li>
+        <li>抽奖/匹配完整</li>
+      </ul>
+    </div>
+    <div class="module-card">
+      <h4>📸 照相馆 (PhotoStudio)<span class="status tag tag-yellow">40% 入口注释</span></h4>
+      <ul>
+        <li>PhotoStudioDesign 架构完整</li>
+        <li>ScenePhotograph 场景存在</li>
+        <li>PhotoRoom 加载被注释</li>
+        <li>拍照/分享功能设计完整</li>
+      </ul>
+    </div>
+    <div class="module-card">
+      <h4>💒 婚礼系统 (Wedding)<span class="status tag tag-yellow">40% 场景注释</span></h4>
+      <ul>
+        <li>s2c_wedding.proto 完整</li>
+        <li>UIWedding* 界面完整</li>
+        <li>WeddingScene 加载被注释</li>
+        <li>Timeline 播放逻辑待实现</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>社交系统</h3>
+  <div class="card">
+    <table>
+      <tr><th>功能</th><th>内容</th><th>状态</th></tr>
+      <tr><td>聊天系统</td><td>文字/语音/喇叭(付费广播)/私信/频道公屏</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>好友系统</td><td>申请/删除/屏蔽/关注/赠礼/备注/推荐</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>家族系统</td><td>创建/申请/踢出/管理员/公告/转让</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>CP/情侣</td><td>情侣登记证/CP等级/CP商城/解除</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>排行榜</td><td>多维度排名显示</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>个人名片</td><td>头像/名字/生日/签名/VIP等级/成就展示</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+    </table>
+  </div>
+
+  <h3>经济系统</h3>
+  <div class="card">
+    <table>
+      <tr><th>模块</th><th>核心功能</th><th>状态</th></tr>
+      <tr><td>普通商城</td><td>分类浏览 / 购物车 / 赠礼 / 购买</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>CP 商城</td><td>情侣专属商品购买</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>背包系统</td><td>服装/徽章/CP戒指/昵称特效/搭配保存</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>VIP 系统</td><td>等级特权 / 首充 / 兑换 / 礼物</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>服饰交换所</td><td>蓝图抽奖 / PC端账号绑定 / 蓝图赠送（最新模块）</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>心动抽奖</td><td>概率抽奖 / 兑换 / 历史记录</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>礼物系统</td><td>发送礼物 / 礼物盒 / 房间服装礼物</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      <tr><td>签到系统</td><td>普通签到 / 付费签到 / 记录查看</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+    </table>
+  </div>
+
+  <h3>房间 & 场景系统</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h3>房间类型</h3>
+      <table>
+        <tr><th>类型</th><th>规格</th><th>状态</th></tr>
+        <tr><td>普通房间</td><td>最多30人，16座位，支持密码/LBS</td><td><span class="tag tag-green">✅</span></td></tr>
+        <tr><td>房间设置</td><td>背景/场景/BGM/游戏模式/反键数量</td><td><span class="tag tag-green">✅</span></td></tr>
+        <tr><td>心动搭子房间</td><td>独立列表，特殊玩法</td><td><span class="tag tag-green">✅</span></td></tr>
+        <tr><td>结婚房间</td><td>2人专属婚礼房间</td><td><span class="tag tag-yellow">⚠️ 加载注释</span></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>场景列表（9个）</h3>
+      <table>
+        <tr><th>场景</th><th>用途</th><th>状态</th></tr>
+        <tr><td>SceneLogin</td><td>登录界面</td><td><span class="tag tag-green">✅ 启用</span></td></tr>
+        <tr><td>Hall_001</td><td>频道/广场</td><td><span class="tag tag-green">✅ 启用</span></td></tr>
+        <tr><td>SceneRoom</td><td>普通房间</td><td><span class="tag tag-green">✅ 启用</span></td></tr>
+        <tr><td>SoulmateRoom</td><td>心动搭子</td><td><span class="tag tag-green">✅ 启用</span></td></tr>
+        <tr><td>Basketball Court</td><td>斗舞场景</td><td><span class="tag tag-yellow">⚠️ 注释</span></td></tr>
+        <tr><td>Wedding</td><td>婚礼场景</td><td><span class="tag tag-yellow">⚠️ 注释</span></td></tr>
+        <tr><td>SceneRoomW</td><td>婚礼房间</td><td><span class="tag tag-yellow">⚠️ 注释</span></td></tr>
+        <tr><td>Ghostroom</td><td>幽灵房间</td><td><span class="tag tag-yellow">⚠️ 注释</span></td></tr>
+        <tr><td>PhotoRoom</td><td>照相馆</td><td><span class="tag tag-yellow">⚠️ 注释</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>活动系统 & 配置数据</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h3>活动类型</h3>
+      <table>
+        <tr><th>活动</th><th>状态</th></tr>
+        <tr><td>每日/付费签到</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+        <tr><td>活动中心</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+        <tr><td>幸运抽奖</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+        <tr><td>任务中心</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+        <tr><td>成就系统</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+        <tr><td>问卷调查</td><td><span class="tag tag-green">✅ 完整</span></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Luban 配置表（63张）</h3>
+      <p style="font-size:.88rem;color:var(--muted);margin-bottom:10px">覆盖所有业务领域：</p>
+      <div>
+        <span class="tag tag-blue">舞步级别</span><span class="tag tag-blue">舞曲列表</span>
+        <span class="tag tag-blue">道具配置</span><span class="tag tag-blue">皮肤数据</span>
+        <span class="tag tag-blue">VIP特权</span><span class="tag tag-blue">任务配置</span>
+        <span class="tag tag-blue">成就定义</span><span class="tag tag-blue">引导流程</span>
+        <span class="tag tag-blue">房间设置</span><span class="tag tag-blue">场景配置</span>
+        <span class="tag tag-blue">活动模板</span><span class="tag tag-blue">签到奖励</span>
+        <span class="tag tag-blue">抽奖概率</span><span class="tag tag-blue">心动礼物</span>
+        <span class="tag tag-blue">省份数据</span><span class="tag tag-blue">换装部位</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 开发进度 -->
+<section id="progress">
+  <h2>📈 五、开发进度分析</h2>
+
+  <div class="card">
+    <h3>各模块完成度</h3>
+
+    <div class="progress-label"><span class="name">基础框架架构</span><span class="pct">95%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-green" style="width:95%">启动流程/事件/热更/资源管理完整</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">角色换装 & 渲染</span><span class="pct">90%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-green" style="width:90%">BasePlayer 逻辑完整，少量接口补全中</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">网络通信层</span><span class="pct">90%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-green" style="width:90%">Proto 全量定义，协议扩展类健全</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">登录 / 创角流程</span><span class="pct">85%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-green" style="width:85%">UI 完整，流程正常</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">房间系统</span><span class="pct">85%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-green" style="width:85%">普通房间功能完整</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">心动搭子玩法</span><span class="pct">85%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-green" style="width:85%">最完整的玩法模块，Manager 拆分细致</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">社交系统</span><span class="pct">80%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-lime" style="width:80%">好友/家族/CP/聊天 均已实现</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">商城 & 经济系统</span><span class="pct">80%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-lime" style="width:80%">服饰交换所是最新模块</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">活动系统</span><span class="pct">75%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-lime" style="width:75%">多活动模板已完成</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">新手引导</span><span class="pct">50%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-yellow" style="width:50%">UIGuide 已定义，GuideManager 被注释</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">🎯 斗舞核心玩法 (最高优先级)</span><span class="pct">50%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-yellow" style="width:50%">数据结构完整，BattleManager 被注释</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">婚礼系统</span><span class="pct">40%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-orange" style="width:40%">UI 完整，场景加载被注释</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">照相馆</span><span class="pct">40%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-orange" style="width:40%">架构在，入口注释</div></div>
+
+    <div class="progress-label" style="margin-top:12px"><span class="name">Timeline 系统</span><span class="pct">10%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-red" style="width:10%">仅 asmdef 空壳</div></div>
+  </div>
+
+  <div class="card" style="border-left:4px solid var(--accent)">
+    <h3>⚠️ 关键待完成事项（按优先级排列）</h3>
+    <table>
+      <tr><th>优先级</th><th>模块</th><th>具体问题</th><th>影响</th></tr>
+      <tr>
+        <td><span class="tag tag-red">🔴 P0</span></td>
+        <td>斗舞核心玩法</td>
+        <td><code>BattleManager</code>、<code>BattleRenderManager</code>、<code>PlayerManager</code> 在 <code>GamePlay.Init()</code> 中全部注释；Basketball Court 场景加载注释</td>
+        <td>核心玩法缺失，影响上线</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-red">🔴 P1</span></td>
+        <td>婚礼 & Timeline</td>
+        <td><code>WeddingScene/WeddingRoomScene</code> 加载注释；Timeline 模块空壳</td>
+        <td>婚礼玩法不可用</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-yellow">🟡 P1</span></td>
+        <td>照相馆</td>
+        <td><code>PhotoRoom</code> 加载注释，照相馆入口逻辑不完整</td>
+        <td>功能入口无法访问</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-yellow">🟡 P2</span></td>
+        <td>红点系统</td>
+        <td><code>RedDotManager.Init()</code> 被注释，消息提示不生效</td>
+        <td>用户体验降级</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-yellow">🟡 P2</span></td>
+        <td>新手引导</td>
+        <td><code>GuideManager.Init()</code> 被注释</td>
+        <td>新用户无引导流程</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- 代码质量 -->
+<section id="quality">
+  <h2>🔬 六、代码质量评估</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="color:var(--green)">✅ 优点</h3>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">🏛️ <strong>架构层次清晰</strong>，热更新设计成熟，宿主层与业务层完全解耦</li>
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">📦 <strong>DataManager 层</strong>每个业务独立 Manager，职责单一，易于维护</li>
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">🔀 <strong>HeartbeatMateManager</strong> 大量 Partial 类拆分，可读性出色</li>
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">⚡ <strong>UniTask 异步</strong>用法现代化，零 GC 分配</li>
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">🏷️ <strong>事件系统强类型枚举</strong>，避免魔法字符串，编译期检查</li>
+        <li style="padding:7px 0">📋 <strong>Proto 文件覆盖全量业务</strong>，服务端协议定义完整</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--orange)">⚠️ 改进建议</h3>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">🔀 <code>MessageName.cs</code> 旧字符串事件与 <code>EEventID</code> 枚举<strong>并存冗余</strong>，建议逐步迁移</li>
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">🧹 <code>ScenePlayerManager.cs</code> 底部约 300 行已注释的旧代码，建议清理</li>
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">📱 <code>GameDefine.cs</code> 帧率设为 <strong>120fps</strong>，需关注低端 Android 机型适配</li>
+        <li style="padding:7px 0;border-bottom:1px solid var(--border)">🔗 <code>BattleManager</code> 注释量大，接入时需仔细整合原有逻辑</li>
+        <li style="padding:7px 0">📚 <strong>Timeline 模块</strong>仅有 asmdef 空壳，婚礼剧情播放逻辑完全缺失</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 总结 -->
+<section id="conclusion">
+  <div class="conclusion">
+    <h2>📌 七、综合总结</h2>
+    <p><strong>DanceNew</strong> 是一款以 <span class="highlight">跳舞社交</span> 为核心的手游，定位"舞蹈派对 + 社交平台"融合产品。采用 <span class="highlight">HybridCLR + Luban</span> 的现代 Unity 工程方案，架构成熟，扩展性强。</p>
+
+    <div class="grid-3" style="margin:20px 0">
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:16px">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px">✅ 可交付</div>
+        <ul style="list-style:none;font-size:.88rem;opacity:.9">
+          <li>• 社交系统（好友/家族/聊天/CP）</li>
+          <li>• 经济系统（商城/背包/VIP/活动）</li>
+          <li>• 心动搭子特色玩法</li>
+          <li>• 基础房间功能</li>
+          <li>• 角色换装系统</li>
+        </ul>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:16px">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px">⚠️ 下阶段重点</div>
+        <ul style="list-style:none;font-size:.88rem;opacity:.9">
+          <li>• 🎯 斗舞逻辑层接入（最高优先）</li>
+          <li>• 婚礼系统场景启用</li>
+          <li>• 照相馆入口打通</li>
+          <li>• 新手引导系统</li>
+          <li>• 红点系统启用</li>
+        </ul>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:16px">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px">🔮 长期规划</div>
+        <ul style="list-style:none;font-size:.88rem;opacity:.9">
+          <li>• Timeline 婚礼动画系统</li>
+          <li>• 断线重连优化</li>
+          <li>• 低端机型性能适配</li>
+          <li>• 事件系统统一迁移</li>
+          <li>• 注释代码清理</li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="opacity:.85;font-size:.92rem">整体工程质量较高，代码结构清晰，技术债务可控。当前主要任务是将斗舞核心玩法的逻辑层（BattleManager）从注释状态中接入激活，这是游戏正式上线的关键路径。</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>DanceNew 手游项目分析报告 &nbsp;|&nbsp; 生成于 2026-04-09 &nbsp;|&nbsp; Unity 2022.3.4f1c1 &nbsp;|&nbsp; v0.1106.001</p>
+</footer>
+
+</body>
+</html>

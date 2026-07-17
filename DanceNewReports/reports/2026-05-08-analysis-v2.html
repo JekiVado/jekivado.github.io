@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DanceNew 项目深度分析报告 (v2.0)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #0f0f11; color: #e0e0e0; line-height: 1.8; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+
+  /* Header */
+  .header { text-align: center; padding: 48px 0; border-bottom: 1px solid #2a2a2e; margin-bottom: 40px; }
+  .header h1 { font-size: 2.2em; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+  .header .subtitle { color: #888; font-size: 0.95em; margin-top: 12px; }
+  .header .meta { color: #666; font-size: 0.85em; margin-top: 8px; }
+
+  /* Cards */
+  .card { background: #1a1a1e; border: 1px solid #2a2a2e; border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+  .card h2 { font-size: 1.3em; font-weight: 600; margin-bottom: 16px; color: #c0c0ff; display: flex; align-items: center; gap: 8px; }
+  .card h3 { font-size: 1.05em; font-weight: 600; margin: 16px 0 8px; color: #90c0ff; }
+  .card p, .card li { color: #b0b0b4; font-size: 0.92em; }
+
+  /* Progress Bar */
+  .progress-bar { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+  .progress-track { flex: 1; height: 20px; background: #2a2a2e; border-radius: 10px; overflow: hidden; position: relative; }
+  .progress-fill { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+  .progress-bar .label { min-width: 48px; text-align: right; font-size: 0.85em; font-weight: 600; }
+
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 0.8em; font-weight: 500; }
+  .tag-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .tag-yellow { background: rgba(234,179,8,0.15); color: #eab308; }
+  .tag-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .tag-blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .tag-purple { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+
+  /* Stats Grid */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 12px 0; }
+  .stat-item { background: #222226; border-radius: 10px; padding: 14px; text-align: center; }
+  .stat-item .num { font-size: 1.6em; font-weight: 700; }
+  .stat-item .desc { font-size: 0.78em; color: #888; margin-top: 4px; }
+
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #333; }
+  .timeline-item { position: relative; margin-bottom: 16px; }
+  .timeline-item::before { content: ''; position: absolute; left: -20px; top: 8px; width: 10px; height: 10px; border-radius: 50%; }
+  .timeline-item.complete::before { background: #22c55e; }
+  .timeline-item.partial::before { background: #eab308; }
+  .timeline-item.pending::before { background: #ef4444; }
+
+  .changes-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.88em; }
+  .changes-table th { background: #222226; padding: 8px 12px; text-align: left; font-weight: 600; color: #90c0ff; border-bottom: 1px solid #333; }
+  .changes-table td { padding: 8px 12px; border-bottom: 1px solid #28282c; }
+  .changes-table tr:last-child td { border-bottom: none; }
+
+  .divider { height: 1px; background: #2a2a2e; margin: 24px 0; }
+
+  .alert { padding: 14px 18px; border-radius: 10px; margin: 12px 0; font-size: 0.9em; }
+  .alert-warn { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); color: #fbbf24; }
+  .alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; }
+  .alert-danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+
+  @media (max-width: 768px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } .header h1 { font-size: 1.6em; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>DanceNew 项目深度分析报告 v2.0</h1>
+  <div class="subtitle">Unity 2022.3 LTS · URP · HybridCLR · 手游社交舞蹈项目</div>
+  <div class="meta">分析日期: 2026-05-08 · 周期: 2026-04-09 → 2026-05-08 (一个月)</div>
+</div>
+
+<!-- Executive Summary -->
+<div class="card">
+  <h2>📊 月度开发综述</h2>
+  <p>过去一个月中，研发团队对 <strong>DanceNew</strong> 项目进行了大幅度的功能补充与底层重构，涉及 <strong>358 个 CS 源文件</strong>的修改/新增。核心变化集中在 <strong>战斗系统激活</strong>、<strong>婚礼系统重建</strong>、<strong>Timeline 模块从零搭建</strong>、<strong>照相馆系统完善</strong> 四个方向，同时伴随 <strong>GameCommon 数据层重构</strong>和 <strong>网络协议扩展</strong>。</p>
+
+  <div class="stat-grid">
+    <div class="stat-item"><div class="num" style="color:#22c55e">358</div><div class="desc">本月变更 CS 文件</div></div>
+    <div class="stat-item"><div class="num" style="color:#3b82f6">1,124</div><div class="desc">项目总 CS 文件</div></div>
+    <div class="stat-item"><div class="num" style="color:#8b5cf6">12</div><div class="desc">HybridCLR DLL</div></div>
+    <div class="stat-item"><div class="num" style="color:#eab308">63</div><div class="desc">Luban 配置表</div></div>
+  </div>
+</div>
+
+<!-- Module Change Matrix -->
+<div class="card">
+  <h2>🔬 各模块变更深度分析</h2>
+  <table class="changes-table">
+    <thead><tr><th>模块</th><th>变更文件数</th><th>性质</th><th>核心变更</th></tr></thead>
+    <tbody>
+      <tr><td>Config/cfg/Data</td><td>28</td><td><span class="tag tag-blue">配置扩展</span></td><td>新增 28 个配置数据类（婚礼、照相馆、活动等）</td></tr>
+      <tr><td>GameCommon</td><td>22</td><td><span class="tag tag-purple">数据层重构</span></td><td>BattlePlayerData、ScenePlayerData、RoomDefine 等核心结构体重构，含新的 EPlayerType 枚举</td></tr>
+      <tr><td>UI/Battle</td><td>19</td><td><span class="tag tag-green">新增</span></td><td>完整的战斗 UI 系统：方向键面板(4/8 方向)、双人舞、单人自由、音乐、视频、得分、排名、命中特效</td></tr>
+      <tr><td>UI/PhotoStudio</td><td>18</td><td><span class="tag tag-green">大规模新增</span></td><td>照相馆面板、场景选择、动画选择、触摸拖拽、相机过渡、3D 菜单系统</td></tr>
+      <tr><td>DataManager</td><td>15</td><td><span class="tag tag-yellow">数据层扩展</span></td><td>ScenePlayerDataManager、物品数据管理器扩展</td></tr>
+      <tr><td>Timeline</td><td>13</td><td><span class="tag tag-green">从零搭建</span></td><td>从空 asmdef 壳到完整 Timeline 系统：PlayableDirector + Cinemachine + 婚礼自定义轨道</td></tr>
+      <tr><td>Character</td><td>13</td><td><span class="tag tag-purple">重构+新增</span></td><td>新增 TimelinePlayer、RTTPlayer；重构 ScenePlayer、RoomPlayer、BattlePlayer 基类</td></tr>
+      <tr><td>Net/ProtoExtensions</td><td>13</td><td><span class="tag tag-yellow">协议扩展</span></td><td>婚礼、战斗、房间协议扩展；Proto 消息 ID 增至 1157 行</td></tr>
+      <tr><td>GamePlay</td><td>11</td><td><span class="tag tag-green">核心逻辑新增</span></td><td>BattleRenderManager、WeddingManager、TimelineManager、BattleReportManager 全部新增</td></tr>
+      <tr><td>Net/DataExtensions</td><td>10</td><td><span class="tag tag-yellow">数据处理</span></td><td>战斗结果、房间、频道、家族等数据扩展</td></tr>
+      <tr><td>Scene</td><td>8</td><td><span class="tag tag-green">场景系统</span></td><td>BattleScene、BasketballScene、WeddingScene、WeddingRoomScene、PhotoRoom 全部新增</td></tr>
+      <tr><td>UI/Wedding</td><td>6</td><td><span class="tag tag-green">新增</span></td><td>6 个婚礼 UI 面板：Loading、Love、Photo、Result、Target、Task</td></tr>
+      <tr><td>UI/Friend</td><td>15</td><td><span class="tag tag-yellow">社交扩展</span></td><td>好友系统 UI 扩展</td></tr>
+      <tr><td>Proto</td><td>9</td><td><span class="tag tag-yellow">协议定义</span></td><td>S2CWedding (2173行)、S2CBattle (5409行)、S2CRoom (27454行)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Battle System Deep Dive -->
+<div class="card">
+  <h2>⚔️ 战斗系统 — 从锁闭到激活的全面升级</h2>
+  <div class="alert alert-warn"><strong>⚠️ 关键发现：</strong>上一阶段 BattleManager.Init() 被注释，处于不可用状态；本月已全部激活，并配套构建了完整上下游。</div>
+
+  <h3>当前结构</h3>
+  <table class="changes-table">
+    <thead><tr><th>层级</th><th>组件</th><th>状态</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>管理</td><td>BattleManager (Battle.dll)</td><td><span class="tag tag-green">激活</span></td><td>核心战斗管理器，控制战斗状态机、玩家数据、箭头、命中数据</td></tr>
+      <tr><td>渲染</td><td>BattleRenderManager</td><td><span class="tag tag-green">新增</span></td><td>战斗玩家生命周期管理：创建/删除/更新、命中反应、胜利/失败动画</td></tr>
+      <tr><td>战报</td><td>BattleReportManager</td><td><span class="tag tag-green">新增</span></td><td>战斗回放系统：二进制序列化完整战斗数据（玩家、箭头、P 点特效、结算）</td></tr>
+      <tr><td>场景</td><td>BattleScene</td><td><span class="tag tag-yellow">#if aa 包裹</span></td><td>完整 BattleScene 实现（含玩家初始化、排名切换、相机抖动），但被条件编译宏控制</td></tr>
+      <tr><td>场景</td><td>BasketballScene</td><td><span class="tag tag-green">激活</span></td><td>篮球场模式的战斗场景，无条件编译宏包裹，完整可用</td></tr>
+      <tr><td>场景</td><td>WeddingScene 内战斗</td><td><span class="tag tag-green">激活</span></td><td>婚礼流程中包含 BattlePlayer 初始化 (InitBattlePlayers)</td></tr>
+      <tr><td>UI</td><td>UIBattle / UIBattle4Dir / UIBattle8Dir / UIBattleDGroup / UIBattleSingle / UIBattleSpace / UIBattleMusic / UIBattleVideo</td><td><span class="tag tag-green">新增</span></td><td>8 个 UI 组件覆盖全部舞种模式：4 键、8 键、双人、自由、空间</td></tr>
+      <tr><td>UI</td><td>UIHitEffect / UIShowEffect / UIUIBattleScore / UIRankItem</td><td><span class="tag tag-green">新增</span></td><td>命中特效、得分、排名 UI 配套</td></tr>
+      <tr><td>角色</td><td>BattlePlayer</td><td><span class="tag tag-yellow">重构</span></td><td>从旧版 PlayerData 迁移到新版 BattlePlayerData + 泛型回调</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert alert-info"><strong>技术细节：</strong>BattleScene 被 <code>#if aa</code> 包裹可能出于调试目的——BasketballScene 作为其实际使用版本已完全可用。SceneManager 中场景路由：ESceneType.BASKETBALL → BasketballScene，无需走 BattleScene 条件。</div>
+</div>
+
+<!-- Wedding System -->
+<div class="card">
+  <h2>💒 婚礼系统 — 从 40% 到接近完成的跨越</h2>
+
+  <h3>婚礼全流程 (EWeddingStage)</h3>
+  <div style="background:#222226; border-radius:10px; padding:16px; margin:10px 0; font-size:0.9em; text-align:center;">
+    <span class="tag tag-green">Start</span> → <span class="tag tag-green">Battle</span> → <span class="tag tag-green">Love</span> → <span class="tag tag-green">Flower</span> → <span class="tag tag-green">Photo</span> → <span class="tag tag-green">End</span>
+    <div style="margin-top:8px; color:#888;font-size:0.85em;">失败时走 WeddingFailed Timeline → End</div>
+  </div>
+
+  <h3>核心组件</h3>
+  <ul>
+    <li><strong>WeddingManager</strong> (GamePlay) — 婚礼流程控制中枢，管理新人/好友/伴娘的 TimelinePlayer 生命周期、花球抛物线运动、截图功能</li>
+    <li><strong>WeddingScene</strong> (Scene) — 婚礼仪式场景，加载舞蹈音乐、初始化玩家，触发 BattleManager.OnPreLoad</li>
+    <li><strong>WeddingRoomScene</strong> (Scene) — 婚礼准备房间，12 个座位（2 新人 + 10 好友）、场景背景切换</li>
+    <li><strong>TimelineManager</strong> (GamePlay) — Timeline 播放中枢，PlayableDirector + Cinemachine 集成，支持婚礼事件驱动</li>
+    <li><strong>WeddingTrack + Custom Clips</strong> — 自定义轨道系统：EventClip / CreateClip / MoveClip / AnimClip</li>
+    <li><strong>UIWeddingLoading / UIWeddingLove / UIWeddingPhoto / UIWeddingResult / UIWeddingTarget / UIWeddingTask</strong> — 6 个婚礼 UI 面板</li>
+  </ul>
+
+  <h3>协议层</h3>
+  <p><strong>S2CWedding.cs</strong> — 2173 行，包含完整的婚礼协议定义（邀请、仪式阶段同步、角色控制、截图等）</p>
+
+  <div class="alert alert-info"><strong>架构评价：</strong>婚礼系统设计为 Timeline 驱动的"舞台剧"模式——服务端下放剧本（Event → Create角色 → Move移动 → Anim动画），客户端按 Timeline 时间线播放。这种模式复用了战斗系统的 Player 渲染框架（BattlePlayer -> BattleRenderManager），通过泛型 TimelinePlayer 实现婚礼特化。命名上遗留了一些"BattlePlayer"引用（如 CreateTimelinePlayer 中的 Name 前缀"Battle"），表明其代码复用的演进轨迹。</div>
+</div>
+
+<!-- Timeline System -->
+<div class="card">
+  <h2>🎬 Timeline 系统 — 从空壳到可用的国产化方案</h2>
+
+  <p>上一个分析周期中，Timeline 模块仅是一个空的 asmdef 壳。本月研发团队从零搭建了完整的 Timeline 驱动系统：</p>
+
+  <div class="stat-grid">
+    <div class="stat-item"><div class="num" style="color:#22c55e">13</div><div class="desc">C# 文件</div></div>
+    <div class="stat-item"><div class="num" style="color:#3b82f6">PlayableDirector</div><div class="desc">核心播放器</div></div>
+    <div class="stat-item"><div class="num" style="color:#8b5cf6">Cinemachine</div><div class="desc">相机轨道绑定</div></div>
+    <div class="stat-item"><div class="num" style="color:#eab308">5</div><div class="desc">Timeline 资源</div></div>
+  </div>
+
+  <h3>TimelineManager 内部架构</h3>
+  <ul>
+    <li><strong>资源加载：</strong>ResManager.LoadAsyncTimeline — 异步加载 Timeline 预制体</li>
+    <li><strong>轨道绑定：</strong>SetGenericBinding — 自动按轨道名绑定 GameObject，支持 CinemachineTrack 虚拟相机查找</li>
+    <li><strong>事件系统：</strong>EventManager 驱动婚礼事件 (EWeddingEvent)，支持 StageLove/StageResult/StageFlower/StagePhoto/ShowLove/PhotoFocus/PhotoGraph/Result</li>
+    <li><strong>生命周期：</strong>Init/Dispose/Pause/Resume/Stop/OnUpdate 完整生命周期</li>
+    <li><strong>Signal Track：</strong>SignalEmitter（注释状态）— 已预留标记系统接口</li>
+  </ul>
+
+  <h3>自定义 Timeline 资源</h3>
+  <table class="changes-table">
+    <thead><tr><th>资源路径</th><th>用途</th><th>状态</th></tr></thead>
+    <tbody>
+      <tr><td>Timeline/weddingStart</td><td>婚礼开场</td><td><span class="tag tag-green">引用</span></td></tr>
+      <tr><td>Timeline/weddingLove</td><td>爱的宣言</td><td><span class="tag tag-green">引用</span></td></tr>
+      <tr><td>Timeline/weddingFlower</td><td>抛花球</td><td><span class="tag tag-green">引用</span></td></tr>
+      <tr><td>Timeline/weddingPhoto</td><td>拍照环节</td><td><span class="tag tag-green">引用</span></td></tr>
+      <tr><td>Timeline/weddingFailed</td><td>失败结局</td><td><span class="tag tag-green">引用</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PhotoStudio System -->
+<div class="card">
+  <h2>📷 照相馆系统 — 功能完善化</h2>
+
+  <p>照相馆系统从 40% 推进到约 75%。PhotoRoom 场景加载已从注释状态激活（SceneManager 第 124-126 行），配套的 UI 和管理器体系基本完整。</p>
+
+  <h3>关键进展</h3>
+  <ul>
+    <li><strong>PhotoRoom (Scene)：</strong>场景级实现，含 PhotoRoomInitialPartial 初始化分部类</li>
+    <li><strong>PhotoStudioManager (Singleton)：</strong>包含完整的房间逻辑：场景/动画配置加载、玩家管理（增删查）、位置索引、邀请系统、权限控制、相机同步、装备更换</li>
+    <li><strong>UI 系统：</strong>18 个 UI 文件，含 3D 菜单系统（UIClickUnitImpl）、相机过渡、玩家过渡、交互（拖动/点击）、场景和动画选择</li>
+    <li><strong>协议：</strong>C2SRoomPhotoPlayerModifyMontion / C2SRoomPhotoPlayerModifyTransition / C2SPhotoRoomCamera 等完整请求/响应链</li>
+    <li><strong>埋点系统：</strong>OnEventTracking 方法已预留（当前注释），记录玩家 ID、位置、动作、背景、性别、旋转、相机信息、服饰</li>
+  </ul>
+
+  <div class="alert alert-warn"><strong>已知问题：</strong>OnEventTracking 埋点方法被整体注释，标注 <code>// 函数缺失，等补全 TODO</code>。PhotoLoadSceneAsync 在 SceneManager 中仍被注释。</div>
+</div>
+
+<!-- Architecture & Framework Updates -->
+<div class="card">
+  <h2>🏗️ 底层架构优化与重构</h2>
+
+  <h3>1. Player 类体系重构</h3>
+  <p>旧的 PlayerManager 单体架构被迁移为<strong>多类型 Player 体系</strong>：</p>
+  <ul>
+    <li><strong>BasePlayer (abstract)</strong> — 统一基类，提供 ID、初始化、Update、LateUpdate、Dispose 生命周期</li>
+    <li><strong>ScenePlayer</strong> — 普通场景玩家（原 NONE 类型替代）</li>
+    <li><strong>RoomPlayer</strong> — 房间玩家（原 ROOM 类型，带 DJ 台）</li>
+    <li><strong>BattlePlayer</strong> — 战斗玩家（原 BATTLE 类型，带箭头和计分）</li>
+    <li><strong>TimelinePlayer</strong> — Timeline 演出玩家（原 WEDDING 类型，用于婚礼/剧情）</li>
+    <li><strong>RTTPlayer</strong> — 实时传输玩家（旁观者/观战）</li>
+    <li><strong>PhotoPlayer</strong> — 照相馆玩家（原 PHOTO 类型，带点击触发）</li>
+  </ul>
+
+  <h3>2. ScenePlayerManager -> Singleton 化</h3>
+  <p>旧版 <code>PlayerManager</code> 被注释，新 <code>ScenePlayerManager</code> 采用 <code>Singleton&lt;T&gt;</code> 模式，通过 EventManager 驱动 <code>MN_SCENE_UPDATE_PLAYER</code> 事件来增删玩家。旧 PlayerManager 的代码以大段注释保留（约 200 行），供架构过渡参考。</p>
+
+  <h3>3. 网络协议层扩展</h3>
+  <ul>
+    <li>新增 S2CWedding.cs (2173 行) — 婚礼专用协议</li>
+    <li>S2CBattle.cs 扩展至 5409 行 — 战斗协议增强</li>
+    <li>S2CRoom.cs 扩展至 27454 行 — 房间协议（含照相馆子协议）</li>
+    <li>S2CMsgId.cs 扩展至 1157 行 — 消息 ID 定义</li>
+  </ul>
+
+  <h3>4. GameCommon 数据层重构</h3>
+  <ul>
+    <li>BattlePlayerData — 战斗玩家数据序列化增强（新增 Badges、Partner、Family、Photo、AvatarFrame、ScoreBackgroundCard 等字段）</li>
+    <li>ScenePlayerData — 场景玩家数据结构化</li>
+    <li>RoomDefine / BattleDefine — 模式/类型枚举扩展</li>
+    <li>GameUtility — 通用工具方法增强</li>
+  </ul>
+</div>
+
+<!-- Progress Comparison -->
+<div class="card">
+  <h2>📈 开发进度对比 (上月 vs 本月)</h2>
+
+  <table class="changes-table">
+    <thead><tr><th>模块</th><th>上月进度</th><th>本月进度</th><th>Δ</th><th>状态说明</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>框架 (Framework)</td>
+        <td>95%</td><td>96%</td><td><span class="tag tag-yellow">+1%</span></td>
+        <td>Singleton 架构完善，EventManager 全面采用</td>
+      </tr>
+      <tr>
+        <td>角色 (Character)</td>
+        <td>90%</td><td>95%</td><td><span class="tag tag-green">+5%</span></td>
+        <td>Player 子类体系重构完成，新增 TimelinePlayer/RTTPlayer</td>
+      </tr>
+      <tr>
+        <td>网络 (Network)</td>
+        <td>90%</td><td>95%</td><td><span class="tag tag-green">+5%</span></td>
+        <td>婚礼/照相馆协议完善，Proto 扩展至 27454 行</td>
+      </tr>
+      <tr>
+        <td>战斗 (Battle)</td>
+        <td>50% ⚠️</td><td>85%</td><td><span class="tag tag-green">+35%</span></td>
+        <td>核心战斗激活，BattleRender/BattleReport 新增，UI 全配套</td>
+      </tr>
+      <tr>
+        <td>婚礼 (Wedding)</td>
+        <td>40%</td><td>85%</td><td><span class="tag tag-green">+45%</span></td>
+        <td>全流程打通（Start→Battle→Love→Flower→Photo→End），Timeline 驱动</td>
+      </tr>
+      <tr>
+        <td>照相馆 (Photo)</td>
+        <td>40%</td><td>75%</td><td><span class="tag tag-green">+35%</span></td>
+        <td>PhotoRoom 激活，Manager 完整，UI 系统完善</td>
+      </tr>
+      <tr>
+        <td>Timeline</td>
+        <td>10%</td><td>75%</td><td><span class="tag tag-green">+65%</span></td>
+        <td>从空壳到完整 Timeline+Cinemachine 系统</td>
+      </tr>
+      <tr>
+        <td>心印 (HeartbeatMate)</td>
+        <td>85%</td><td>85%</td><td><span class="tag tag-yellow">持平</span></td>
+        <td>无显著变更</td>
+      </tr>
+      <tr>
+        <td>社交 (Social)</td>
+        <td>80%</td><td>85%</td><td><span class="tag tag-yellow">+5%</span></td>
+        <td>好友/家族/邮件 UI 扩展</td>
+      </tr>
+      <tr>
+        <td>经济 (Economy)</td>
+        <td>80%</td><td>85%</td><td><span class="tag tag-yellow">+5%</span></td>
+        <td>商店/个人商店 UI 扩展</td>
+      </tr>
+      <tr>
+        <td>活动 (Activity)</td>
+        <td>75%</td><td>80%</td><td><span class="tag tag-yellow">+5%</span></td>
+        <td>配置数据扩展，UI 更新</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="divider"></div>
+
+  <h3>🎯 开发进度条总览</h3>
+  <div class="progress-bar"><span style="width:100px;">婚礼</span><div class="progress-track"><div class="progress-fill" style="width:85%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">85%</span></div>
+  <div class="progress-bar"><span style="width:100px;">战斗</span><div class="progress-track"><div class="progress-fill" style="width:85%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">85%</span></div>
+  <div class="progress-bar"><span style="width:100px;">照相馆</span><div class="progress-track"><div class="progress-fill" style="width:75%;background:linear-gradient(90deg,#eab308,#ca8a04);"></div></div><span class="label">75%</span></div>
+  <div class="progress-bar"><span style="width:100px;">Timeline</span><div class="progress-track"><div class="progress-fill" style="width:75%;background:linear-gradient(90deg,#eab308,#ca8a04);"></div></div><span class="label">75%</span></div>
+  <div class="progress-bar"><span style="width:100px;">角色</span><div class="progress-track"><div class="progress-fill" style="width:95%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">95%</span></div>
+  <div class="progress-bar"><span style="width:100px;">网络</span><div class="progress-track"><div class="progress-fill" style="width:95%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">95%</span></div>
+  <div class="progress-bar"><span style="width:100px;">社交</span><div class="progress-track"><div class="progress-fill" style="width:85%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">85%</span></div>
+</div>
+
+<!-- Critical Issues -->
+<div class="card">
+  <h2>🚨 遗留问题与风险项</h2>
+
+  <div class="alert alert-danger">
+    <strong>🔴 P0 — GuideManager / RedDotManager 仍被注释</strong>
+    <p style="margin-top:6px;">GuideManager.Init() 和 RedDotManager.Instance.Init() 自上一阶段起持续注释，这意味着<strong>新手引导系统</strong>和<strong>红点提示系统</strong>完全不可用。对于一款面向新玩家的社交游戏，缺少新手引导将严重影响用户留存。建议尽快修复。</p>
+  </div>
+
+  <div class="alert alert-warn">
+    <strong>🟡 P1 — BattleScene 被 #if aa 条件编译宏包裹</strong>
+    <p style="margin-top:6px;">BattleScene 的全部实现代码被 <code>#if aa ... #endif</code> 包裹（第 27-227 行），在正常编译下不可用。BasketballScene 作为替代方案已独立实现，但若团队计划保留 BattleScene 作为通用战斗场景入口，需移除该条件宏。</p>
+  </div>
+
+  <div class="alert alert-warn">
+    <strong>🟡 P1 — PhotoStudio 埋点系统注释</strong>
+    <p style="margin-top:6px;">PhotoStudioManager.OnEventTracking 方法整体注释，标注 <code>TODO</code>。埋点是运营数据分析的基础，上线前必须补全。</p>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>🔵 P2 — 旧代码遗留</strong>
+    <p style="margin-top:6px;">多处旧版 PlayerManager 代码以大块注释形式保留（ScenePlayerManager.cs 第 257-533 行），增加了代码维护成本。建议在架构过渡完成后清理。</p>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>🔵 P2 — 命名一致性</strong>
+    <p style="margin-top:6px;">TimelinePlayer 的 CreateTimelinePlayer 方法内部 Name 前缀仍为 "Battle"（第 627 行），为代码复用痕迹，建议在功能验证后修正。</p>
+  </div>
+</div>
+
+<!-- Technical Deep Dive -->
+<div class="card">
+  <h2>🔧 技术深度解析</h2>
+
+  <h3>1. 舞蹈战斗的 P 点判定架构</h3>
+  <p>BattleRenderManager 对外暴露三个事件驱动管道：</p>
+  <ul>
+    <li><strong>MN_BATTLE_HIT_EFFECT</strong> — 命中特效 (id, 结果, 连击数) → 触发粒子/颜色反馈</li>
+    <li><strong>MN_BATTLE_HIT_ACTION</strong> — 命中动画 (id, 结果, 成功动画, 失败动画) → Perfect 触发 TAction 加速播放，其他结果触发 FAction</li>
+    <li><strong>MN_BATTLE_FINISH_ACTION</strong> — 完成动画 (id, 模式, 阵营) → 按胜负播放 WinAction/LoseAction</li>
+  </ul>
+  <p>这种事件驱动的设计将 <strong>判定逻辑 (BattleManager)</strong> 与 <strong>表现逻辑 (BattleRenderManager)</strong> 解耦，便于支持多种玩法模式（单人/双人/篮球场）。</p>
+
+  <h3>2. Timeline 婚礼演出的"剧本"模式</h3>
+  <p>婚礼系统采用服务端驱动的"剧本"模式：</p>
+  <ul>
+    <li>服务端通过 Timeline 协议下发剧情节点（EWeddingEvent）</li>
+    <li>客户端 TimelineManager 监听事件，按需加载/播放不同 Timeline 资源</li>
+    <li>Timeline 资源内嵌自定义轨道（WeddingTrack）：EventClip（触发事件）、CreateClip（创建角色）、MoveClip（移动角色）、AnimClip（播放动画）</li>
+    <li>WeddingManager 管理和驱动的 TimelinePlayer 直接嵌入 Timeline 时间线</li>
+  </ul>
+
+  <h3>3. 照相馆的实时同步架构</h3>
+  <p>PhotoStudioManager 实现了全双工实时同步：</p>
+  <ul>
+    <li><strong>动作同步：</strong>C2SRoomPhotoPlayerModifyMontion → 服务端广播 → 全部客户端映射到 PhotoAnimaPair 定义</li>
+    <li><strong>位置同步：</strong>C2SRoomPhotoPlayerModifyTransition → 服务端广播 → 客户端 Lerp 插值</li>
+    <li><strong>相机同步：</strong>C2SPhotoRoomCamera → 服务端转发 → 非房主客户端接收 PhotoCameraTransitionEsp</li>
+    <li><strong>装备预览：</strong>C2SPhotoRoomChangeClothes → 服务端通知 → ReloadingEquipMaskObject 遮罩切换</li>
+  </ul>
+
+  <h3>4. HybridCLR 热更新架构</h3>
+  <p>12 个热更新 DLL 与项目 csproj 对齐：Config (28.3KB) + GameCommon (125KB) + Proto (307KB) + Manager (147KB) + DataManager + Character + Battle + GamePlay + Net + Scene + UI + Timeline。所有新增的业务逻辑（WeddingManager、TimelineManager、BattleRenderManager）均位于 GamePlay.dll 热更新层，支持线上热修。</p>
+</div>
+
+<!-- Architecture Diagram (ASCII) -->
+<div class="card">
+  <h2>📐 当前架构全景图</h2>
+  <pre style="background:#121216; border:1px solid #2a2a2e; border-radius:10px; padding:20px; font-size:0.78em; line-height:1.5; overflow-x:auto; color:#90c0ff;">
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        Boot Layer (原生)                                 │
+│  GameLaunch → GameMain → SceneManager → EventManager → ResManager       │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │ 反射调用
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    HybridCLR 热更新层 (12 DLLs)                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐│
+│  │   Battle     │  │GamePlay      │  │   Timeline   │  │   Scene      ││
+│  │   Manager    │  │Manager群     │  │   Manager    │  │   场景簇     ││
+│  │   RenderMgr  │  │WeddingMgr    │  │   自定义轨道  │  │Battle/Basket ││
+│  │   ReportMgr  │  │PhotoStudioMgr│  │   5个Timeline │  │Wedding/Room  ││
+│  │              │  │TimelineMgr   │  │              │  │Photo/Heart   ││
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘│
+├──────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐│
+│  │Character     │  │  UI 80+面板  │  │  Net 协议层  │  │DataManager  ││
+│  │Player体系    │  │Battle(19)    │  │Proto(1157ID) │  │17个管理器    ││
+│  │7个子类       │  │Photo(18)     │  │Wedding(2173) │  │全数据层     ││
+│  │Spine绑定     │  │Wedding(6)    │  │Battle(5409)  │  │              ││
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘│
+├──────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌───────────────┐│
+│  │Config    │ │ GameCore │ │GameCommon│ │  Proto   │ │ 基础设施     ││
+│  │Luban(63) │ │Pool/Event│ │数据定义  │ │通信协议  │ │AB/Pool/Effect││
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └───────────────┘│
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     基础设施层 (原生/第三方)                               │
+│  UniTask · DOTween · HighlightPlus · YouMe SDK · Bugly · NativeGallery  │
+│  Newtonsoft.Json · PoolCore · Spine Runtime · HybridCLR                  │
+└──────────────────────────────────────────────────────────────────────────┘</pre>
+</div>
+
+<!-- Conclusion -->
+<div class="card">
+  <h2>📋 总结</h2>
+  <p>过去一个月是 <strong>DanceNew 项目从原型验证走向功能完备的关键阶段</strong>。团队实现了：</p>
+  <ul>
+    <li>✅ <strong>战斗系统</strong>从不可用到可玩，BattleManager 全链路激活，配套 UI 齐全</li>
+    <li>✅ <strong>婚礼系统</strong>从 40% 推进到 85%，全流程打通，Timeline 驱动的"舞台剧"模式</li>
+    <li>✅ <strong>Timeline 模块</strong>从零搭建，Cinemachine 集成，自定义轨道支持</li>
+    <li>✅ <strong>照相馆系统</strong>从 40% 推进到 75%，实时多人协同拍照功能完善</li>
+    <li>✅ <strong>Player 类体系</strong>重构，从单体 PlayerManager 迁移到类型化 Player 子类</li>
+    <li>✅ <strong>网络协议</strong>大规模扩展，覆盖婚礼/照相馆/战斗三块核心玩法</li>
+  </ul>
+
+  <div class="progress-bar" style="margin-top:16px;">
+    <span style="width:100px;">综合进度</span>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:82%;background:linear-gradient(90deg,#667eea,#764ba2);"></div>
+    </div>
+    <span class="label">82%</span>
+  </div>
+  <p style="color:#888;font-size:0.85em;margin-top:4px;">上月综合进度约 68%，提升 14 个百分点。项目核心玩法链路已基本跑通，进入 QA 和打磨阶段。</p>
+</div>
+
+</div>
+</body>
+</html>

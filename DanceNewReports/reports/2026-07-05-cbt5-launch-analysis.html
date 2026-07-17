@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT5 启动分析与改进方案 — 代号1688</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{--red:#E74C3C;--orange:#F39C12;--green:#27AE60;--blue:#2E86C1;--purple:#8E44AD;--dark:#2C3E50;--gray:#7F8C8D}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#F4F6F7;color:var(--dark);line-height:1.7}
+  .container{max-width:1100px;margin:0 auto;padding:24px}
+  .header{background:linear-gradient(135deg,#1a1a2e,#0f3460);color:#fff;padding:44px 40px;border-radius:16px;margin-bottom:32px}
+  .header h1{font-size:28px;margin-bottom:6px}
+  .header .sub{font-size:15px;opacity:0.85;margin-bottom:14px}
+  .header .meta{font-size:13px;opacity:0.7;display:flex;gap:16px;flex-wrap:wrap}
+  .header .meta span{background:rgba(255,255,255,0.12);padding:3px 10px;border-radius:12px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+  .card h3{font-size:18px;margin-bottom:14px;border-bottom:2px solid #EEF0F2;padding-bottom:10px}
+  .card h4{font-size:15px;margin:18px 0 10px;color:#34495E}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+  .stat-card{background:#fff;border-radius:10px;padding:18px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.06);border-top:3px solid var(--blue)}
+  .stat-card.danger{border-top-color:var(--red)}
+  .stat-card.warn{border-top-color:var(--orange)}
+  .stat-card.good{border-top-color:var(--green)}
+  .stat-value{font-size:30px;font-weight:700;margin:6px 0}
+  .stat-label{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px}
+  .stat-sub{font-size:11px;color:var(--gray)}
+  .chart-box canvas{max-height:280px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid #EEF0F2}
+  th{background:#F8F9FA;font-weight:600;color:#666;font-size:11px}
+  tr:hover{background:#F8F9FA}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .bg-green{background:#D5F5E3;color:var(--green)}
+  .bg-orange{background:#FDEBD0;color:var(--orange)}
+  .bg-red{background:#FADBD8;color:var(--red)}
+  .bg-blue{background:#D6EAF8;color:var(--blue)}
+  .bg-purple{background:#E8DAEF;color:var(--purple)}
+  .alert{padding:14px 18px;border-radius:8px;margin-bottom:16px;font-size:13px;display:flex;align-items:flex-start;gap:10px}
+  .alert-danger{background:#FADBD8;border-left:4px solid var(--red);color:#922B21}
+  .alert-warn{background:#FDEBD0;border-left:4px solid var(--orange);color:#7D6608}
+  .alert-info{background:#D6EAF8;border-left:4px solid var(--blue);color:#1A5276}
+  .alert-good{background:#D5F5E3;border-left:4px solid var(--green);color:#1E8449}
+  .process-card{border:1px solid #E8E8E8;border-radius:10px;padding:16px;margin-bottom:12px}
+  .process-card h4{margin:0 0 6px;font-size:14px;display:flex;align-items:center;gap:8px}
+  .process-card p{font-size:13px;color:#666;margin:0}
+  .process-card .icon-step{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+  .icon-plan{background:#D6EAF8;color:var(--blue)}
+  .icon-dev{background:#FDEBD0;color:var(--orange)}
+  .icon-test{background:#D5F5E3;color:var(--green)}
+  .icon-release{background:#E8DAEF;color:var(--purple)}
+  .risk-item{padding:12px 16px;border-radius:8px;margin-bottom:8px;border-left:4px solid var(--red);background:#FFF5F5;font-size:13px}
+  .risk-item .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;margin-right:6px;color:#fff;vertical-align:2px}
+  .tag-p0{background:var(--red)}
+  .tag-p1{background:var(--orange)}
+  .divider{border:none;border-top:1px solid #E5E7E9;margin:28px 0}
+  .section-title{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .section-num{width:32px;height:32px;background:var(--dark);color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .flow{display:flex;align-items:center;gap:0;padding:16px 0}
+  .flow-node{text-align:center;flex:1;position:relative}
+  .flow-node .dot{width:48px;height:48px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .flow-node .label{font-size:12px;font-weight:600}
+  .flow-node .desc{font-size:11px;color:#999}
+  .flow-arrow{font-size:20px;color:#CCC;padding:0 4px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>代号1688 — CBT5 启动分析与改进方案</h1>
+<div class="sub">版本 0.6.0 | 全面流程化：总单 → 策划 → 开发 → 测试 全链路 TAPD 管理</div>
+<div class="meta">
+<span>📅 版本周期: 2026.06.01 ~ 08.31</span>
+<span>📊 当前迭代: 0.6.0_新系统</span>
+<span>🔗 仓库: r4355 | 6名开发者</span>
+<span>📝 分析日期: 2026.07.05</span>
+</div>
+</div>
+
+<!-- 1. Current State -->
+<div class="section-title"><div class="section-num">1</div><h2>CBT5 当前状态</h2></div>
+
+<div class="card">
+<h3>1.1 迭代进度</h3>
+<div class="grid-3">
+<div class="stat-card danger"><div class="stat-label">0.6.0 需求</div><div class="stat-value" style="color:var(--red)">3</div><div class="stat-sub">全部规划中，完成率 0%</div></div>
+<div class="stat-card warn"><div class="stat-label">CBT5版本需求</div><div class="stat-value" style="color:var(--orange)">18</div><div class="stat-sub">CB5标签需求 + 新增</div></div>
+<div class="stat-card danger"><div class="stat-label">进度滞后</div><div class="stat-value" style="color:var(--red)">35天</div><div class="stat-sub">6/1至今仅3个需求录入</div></div>
+</div>
+
+<div class="alert alert-danger" style="margin-top:16px">
+<span>🔴</span>
+<div><strong>CBT5 启动严重滞后：</strong>迭代 6月1日开始，至今已过 35天（总迭代 92天，已消耗 38%），但仅录入 3 个需求且全部处于规划中状态。按此速度，8月31日前不可能完成任何有意义的功能交付。</div>
+</div>
+
+<div class="alert alert-warn">
+<span>⚠️</span>
+<div><strong>100个需求仍悬空：</strong>CBT4 遗留的 100 个未分配迭代需求中，46 个尚未完成。这些需要尽快明确归属——要么划入 CBT5，要么评估后关闭。</div>
+</div>
+</div>
+
+<div class="card">
+<h3>1.2 活跃缺陷状况（71个）</h3>
+<div class="grid-2">
+<div class="chart-box"><canvas id="activeBugChart"></canvas></div>
+<div>
+<h4>缺陷状态分布</h4>
+<table>
+<tr><th>状态</th><th>数量</th><th>风险</th></tr>
+<tr><td>🔄 转测试</td><td><strong>45</strong></td><td><span class="badge bg-orange">中</span></td></tr>
+<tr><td>🆕 新</td><td><strong>19</strong></td><td><span class="badge bg-red">高</span></td></tr>
+<tr><td>⏸️ 挂起</td><td>5</td><td><span class="badge bg-orange">中</span></td></tr>
+<tr><td>🔧 处理中</td><td>1</td><td><span class="badge bg-blue">低</span></td></tr>
+<tr><td>🔄 重新打开</td><td>1</td><td><span class="badge bg-red">高</span></td></tr>
+</table>
+<h4 style="margin-top:14px">缺陷热点模块</h4>
+<div style="display:flex;flex-wrap:wrap;gap:5px;font-size:11px">
+<span class="badge bg-red">搭档派对 (4)</span><span class="badge bg-red">自由舞步 (3)</span>
+<span class="badge bg-red">新手引导 (3)</span><span class="badge bg-orange">聊天 (4)</span>
+<span class="badge bg-orange">任务中心 (已大量修复)</span><span class="badge bg-orange">我的道具 (3)</span>
+<span class="badge bg-orange">角色创建 (3)</span><span class="badge bg-red">IOS适配 (3+)</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 2. TAPD Full Process -->
+<div class="section-title"><div class="section-num">2</div><h2>CBT5 全面流程化设计</h2></div>
+<div class="alert alert-info" style="margin-bottom:20px">
+<span>🎯</span><div><strong>CBT5 目标：</strong>TAPD 覆盖「总单 → 策划 → 开发 → 测试」全链路，让每个需求从诞生到上线的每一步都有迹可循。</div>
+</div>
+<div class="card">
+<h3>2.1 四阶段流程</h3>
+
+<div class="process-card">
+<h4><span class="icon-step icon-plan">1</span> 策划阶段 — 总单驱动</h4>
+<p><strong>TAPD操作：</strong>策划创建【总单】（如"家族系统-任务-兑换商店"），在总单下拆分【子需求】（策划案、配置表、功能实现等），每个子需求明确负责人和预估工时。</p>
+<p style="margin-top:4px;color:var(--blue)">✅ 当前已有实践：家族系统已使用三级嵌套结构（总单→策划总单→策划案/配置表），CBT5 将此模式推广到所有系统。</p>
+</div>
+
+<div class="process-card">
+<h4><span class="icon-step icon-dev">2</span> 开发阶段 — 代码可追溯</h4>
+<p><strong>TAPD + SVN 联动：</strong>开发在 TAPD 中将需求状态更新为"开发中"，SVN 提交消息强制包含 <code>--story=ID</code> 或 <code>--bug=ID</code>。通过 SVN pre-commit hook 自动校验格式，TAPD 端自动关联代码变更记录。</p>
+<p style="margin-top:4px;color:var(--orange)">⚠️ 当前问题：仅 7% 提交有 TAPD 关联。需要 hook + 团队培训双管齐下。</p>
+</div>
+
+<div class="process-card">
+<h4><span class="icon-step icon-test">3</span> 测试阶段 — 缺陷闭环</h4>
+<p><strong>TAPD操作：</strong>开发完成后需求状态 → "转测试"。测试在 TAPD 中提单关联对应需求。缺陷按 SLA 流转：致命 4h / 严重 24h / 一般迭代内。验证通过后缺陷 → "已关闭"、需求 → "产品体验" → "已关闭"。</p>
+</div>
+
+<div class="process-card">
+<h4><span class="icon-step icon-release">4</span> 发布阶段 — 质量门禁</h4>
+<p><strong>TAPD看板：</strong>迭代结束前创建发布 Checklist 需求单，逐项确认：所有 P0 缺陷关闭、核心模块回归通过、IOS/Android 兼容性验证完成。版本发布后在 SVN 创建 release 分支打 tag。</p>
+</div>
+</div>
+
+<div class="card">
+<h3>2.2 TAPD 字段使用规范（CBT5版）</h3>
+<table>
+<tr><th>字段</th><th>CBT4 现状</th><th>CBT5 要求</th></tr>
+<tr><td><strong>优先级</strong></td><td>70.8% 未设置</td><td><span class="badge bg-green">强制必填</span> High/Middle/Low</td></tr>
+<tr><td><strong>迭代</strong></td><td>33.2% 未分配</td><td><span class="badge bg-green">强制必填</span> 新需求必须关联迭代</td></tr>
+<tr><td><strong>标签</strong></td><td>0 使用（阻塞/有风险/等待转测均为0）</td><td><span class="badge bg-green">强制使用</span> 每日站会 Review 标签</td></tr>
+<tr><td><strong>开发人员</strong></td><td>大量留空</td><td><span class="badge bg-green">强制填写</span> 需求分配给具体开发</td></tr>
+<tr><td><strong>预估工时</strong></td><td>全部为 0</td><td><span class="badge bg-orange">建议填写</span> 用于排期和负载评估</td></tr>
+<tr><td><strong>版本</strong></td><td>277/301 已填</td><td>保持现状，CBT5 需求统一标记 0.6.0_CB5</td></tr>
+</table>
+</div>
+
+<!-- 3. SVN Code -->
+<div class="section-title"><div class="section-num">3</div><h2>代码工程改进</h2></div>
+
+<div class="card">
+<h3>3.1 分支策略重构方案</h3>
+<div class="grid-2">
+<div>
+<h4>当前结构（混乱）</h4>
+<pre style="background:#f8f8f8;padding:12px;border-radius:8px;font-size:12px;line-height:1.6;overflow-x:auto">
+dance_client_develop/
+├── DanceNew/          ← 所有人直接提交
+├── Branch_Libohao/    ← 8个散乱个人分支
+├── Branch__liuyuchen/
+├── Branch_New_liuyuchen/
+├── Branch_song/
+├── Branch_chenkangfu/
+├── Branch_xinwanjun/
+├── Branch_Store_1/
+├── Branch_XinWanJun_Main/
+├── Dance/
+└── DanceIOS/
+</pre>
+</div>
+<div>
+<h4>推荐结构</h4>
+<pre style="background:#f0fdf0;padding:12px;border-radius:8px;font-size:12px;line-height:1.6;overflow-x:auto">
+dance_client_develop/
+├── trunk/             ← 主线
+├── branches/
+│   ├── feature/       ← 功能开发分支
+│   ├── release/0.6.0  ← CBT5 发布分支
+│   └── hotfix/        ← 紧急修复
+└── tags/
+    └── v0.5.0         ← CBT4 版本标签
+</pre>
+</div>
+</div>
+
+<div class="alert alert-good" style="margin-top:12px">
+<span>✅</span><div><strong>SVN 支持原地分支：</strong>不需要物理迁移代码，只需创建目录结构并在团队内约定新工作流即可。旧个人分支可以保留作历史参考。</div>
+</div>
+</div>
+
+<div class="card">
+<h3>3.2 提交消息规范</h3>
+<table>
+<tr><th>类型</th><th>格式模板</th><th>示例</th></tr>
+<tr><td>新功能</td><td><code>feat(模块): 描述 --story=ID</code></td><td><code>feat(家族): 实现家族任务系统 --story=1140753624001000561</code></td></tr>
+<tr><td>Bug修复</td><td><code>fix(模块): 描述 --bug=ID</code></td><td><code>fix(聊天): 修复页签切换不刷新 --bug=1140753624001001491</code></td></tr>
+<tr><td>配置更新</td><td><code>chore(config): 描述 --story=ID</code></td><td><code>chore(config): 更新家族配置表 --story=1140753624001000565</code></td></tr>
+<tr><td>重构</td><td><code>refactor(模块): 描述</code></td><td><code>refactor(Battle): 提取舞蹈计分逻辑</code></td></tr>
+<tr><td>资源更新</td><td><code>asset(模块): 描述</code></td><td><code>asset(UI): 更新家族界面资源</code></td></tr>
+</table>
+<p style="margin-top:8px;font-size:12px;color:#666">CBT4 中 57% 提交消息模糊（"更新代码"），CBT5 通过 pre-commit hook 强制规范。</p>
+</div>
+
+<div class="card">
+<h3>3.3 代码健康度基线</h3>
+<div class="grid-2">
+<div>
+<h4>CBT4 代码热点（需重构）</h4>
+<table>
+<tr><th>文件</th><th>6月变更</th></tr>
+<tr><td>TaskDataManager.cs</td><td><span class="badge bg-red">48次</span></td></tr>
+<tr><td>BattleManager.cs</td><td><span class="badge bg-red">31次</span></td></tr>
+<tr><td>RedDotDataManager.cs</td><td><span class="badge bg-orange">26次</span></td></tr>
+<tr><td>ChatDataManagerPartial.cs</td><td><span class="badge bg-orange">10次</span></td></tr>
+</table>
+</div>
+<div>
+<h4>CBT5 监控指标</h4>
+<table>
+<tr><th>指标</th><th>目标值</th></tr>
+<tr><td>TAPD 关联率</td><td><span class="badge bg-green">> 80%</span></td></tr>
+<tr><td>单文件月变更</td><td><span class="badge bg-green">< 15次</span></td></tr>
+<tr><td>重开缺陷</td><td><span class="badge bg-green">0</span></td></tr>
+<tr><td>周末提交率</td><td><span class="badge bg-green">< 5%</span></td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<!-- 4. Risk -->
+<div class="section-title"><div class="section-num">4</div><h2>关键风险与行动项</h2></div>
+
+<div class="card">
+<div class="risk-item"><span class="tag tag-p0">P0</span><strong>迭代进度严重滞后：</strong>0.6.0_新系统已消耗38%时间但进度为0。立即召开 CBT5 启动会，本周内完成需求评审并录入至少 30 个需求到迭代中。</div>
+<div class="risk-item"><span class="tag tag-p0">P0</span><strong>100个游离需求：</strong>本周内由 PM 牵头完成全量梳理——归入 CBT5、关闭、或标记为后续版本。</div>
+<div class="risk-item"><span class="tag tag-p0">P0</span><strong>SVN 分支混乱：</strong>CBT5 第1周内建立 trunk + branches/release/0.6.0 结构，后续开发从 feature 分支合入。</div>
+<div class="risk-item"><span class="tag tag-p0">P0</span><strong>IOS 适配缺陷增多：</strong>灵动岛遮挡、emoji 乱码、息屏断线等问题需安排专项测试窗口。</div>
+<div class="risk-item"><span class="tag tag-p1">P1</span><strong>TAPD 流程培训：</strong>CBT5 第1周组织全员 TAPD 使用培训（总单模式、字段规范、状态流转），确保团队对齐。</div>
+<div class="risk-item"><span class="tag tag-p1">P1</span><strong>团队负载不均：</strong>前2名开发者占 55% 提交量，建议增加 Code Review 和知识分享机制降低 Bus Factor。</div>
+</div>
+
+<hr class="divider">
+<div class="card">
+<h3>📋 CBT5 启动周行动清单</h3>
+<table>
+<tr><th>#</th><th>行动项</th><th>负责</th><th>截止</th></tr>
+<tr><td>1</td><td>CBT5 启动会：确认迭代范围、拆分总单</td><td>PM</td><td>第1天</td></tr>
+<tr><td>2</td><td>100个游离需求全量梳理</td><td>PM</td><td>第3天</td></tr>
+<tr><td>3</td><td>TAPD 需求模板 + 字段规范培训</td><td>PM</td><td>第3天</td></tr>
+<tr><td>4</td><td>SVN 分支策略实施（trunk + branches）</td><td>技术负责人</td><td>第5天</td></tr>
+<tr><td>5</td><td>SVN pre-commit hook 开发部署</td><td>技术负责人</td><td>第7天</td></tr>
+<tr><td>6</td><td>缺陷值班人 + SLA 规则上线</td><td>QA</td><td>第7天</td></tr>
+<tr><td>7</td><td>0.5.0_新功能 剩余5需求关闭</td><td>相关开发</td><td>第3天</td></tr>
+</table>
+</div>
+
+<div class="card" style="text-align:center;color:#999;font-size:12px">
+<p>CBT5 启动分析 — 代号1688 | TAPD #40753624 | SVN r4355 | 生成: 2026.07.05</p>
+</div>
+
+</div>
+
+<script>
+Chart.defaults.font.family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif";
+Chart.defaults.font.size=12;
+const C={green:'#27AE60',orange:'#F39C12',blue:'#2E86C1',red:'#E74C3C',gray:'#95A5A6',purple:'#8E44AD',teal:'#17A589'};
+
+new Chart(document.getElementById('activeBugChart'),{
+type:'doughnut',
+data:{labels:['转测试(45)','新(19)','挂起(5)','处理中(1)','重新打开(1)'],datasets:[{data:[45,19,5,1,1],backgroundColor:[C.blue,C.red,C.gray,C.orange,C.purple]}]},
+options:{plugins:{legend:{position:'bottom'}}}
+});
+</script>
+</body>
+</html>
