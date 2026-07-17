@@ -54,6 +54,232 @@ html:not([data-portable-source-tooltips-ready]) .portable-chart-summary>.portabl
   }
 }
 </style>
+Exit code: 0
+Wall time: 0.5 seconds
+Output:
+<style data-dancenew-producer-brief="v1">
+/* Producer-facing editorial brief: prioritize decisions and sustained reading over dashboard density. */
+@media screen {
+  :root {
+    --portable-canvas: #edf2ef;
+    --portable-surface: #ffffff;
+    --portable-surface-subtle: #f5f8f6;
+    --portable-ink: #172526;
+    --portable-muted: #536765;
+    --portable-tertiary: #71817e;
+    --portable-border: #cbd7d2;
+    --portable-accent: #0e766d;
+    --portable-positive: #08785e;
+    --portable-positive-bg: #dcefe7;
+    --portable-negative: #bd3b36;
+    --portable-negative-bg: #f8e4e1;
+    --portable-warning-bg: #fff2e4;
+    --portable-warning-border: #dd9a61;
+  }
+
+  body {
+    background: var(--portable-canvas);
+    font-family: "Microsoft YaHei UI", "PingFang SC", sans-serif;
+    font-size: 18px;
+    line-height: 1.72;
+  }
+
+  #data-analytics-portable-reader { display: none !important; }
+  .portable-fallback.portable-enhanced-hidden { display: block !important; }
+
+  .portable-fallback[data-portable-surface="dashboard"] {
+    width: min(1280px, calc(100% - 48px)) !important;
+    max-width: 1280px !important;
+    margin: 32px auto 72px !important;
+    padding: 0 !important;
+  }
+
+  .portable-page-header {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 44px 52px 38px;
+    border: 0;
+    border-top: 7px solid #e7473c;
+    background: #1f403c;
+    color: #ffffff;
+  }
+
+  .portable-page-header::before {
+    content: "DANCENEW / PRODUCER REVIEW";
+    display: block;
+    margin-bottom: 18px;
+    color: #9dd2c5;
+    font-family: "Microsoft YaHei UI", "PingFang SC", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 1.8px;
+  }
+
+  .portable-page-heading { max-width: 920px; }
+  .portable-surface-label { display: none; }
+  .portable-page-header h1 {
+    overflow: visible;
+    margin: 0;
+    color: #ffffff;
+    font-family: "STZhongsong", "Songti SC", serif;
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.28;
+    letter-spacing: 0;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .portable-description {
+    max-width: 820px;
+    margin: 18px 0 0;
+    color: #d8e6e0;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  .portable-page-meta {
+    position: absolute;
+    top: 48px;
+    right: 52px;
+    display: block;
+    color: #b8ccc5;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .portable-block-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 38px 28px;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 42px 52px 56px;
+    background: var(--portable-surface);
+  }
+
+  .portable-layout-full { grid-column: 1 / -1; }
+  .portable-markdown { max-width: 900px; }
+  .portable-markdown h1,
+  .portable-markdown h2,
+  .portable-markdown h3 {
+    color: #172526;
+    font-family: "STZhongsong", "Songti SC", serif;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .portable-markdown h2 {
+    margin: 0 0 18px;
+    font-size: 30px;
+    line-height: 1.35;
+  }
+
+  .portable-markdown h3 {
+    margin: 28px 0 12px;
+    font-size: 22px;
+    line-height: 1.42;
+  }
+
+  .portable-markdown p,
+  .portable-markdown li { font-size: 18px; line-height: 1.82; }
+  .portable-markdown strong { color: #113f3b; }
+  .portable-markdown ul,
+  .portable-markdown ol { padding-left: 1.4em; }
+  .portable-markdown li + li { margin-top: 8px; }
+  .portable-markdown blockquote {
+    margin: 20px 0;
+    padding: 12px 20px;
+    border-left: 5px solid #e7473c;
+    background: #f6f1ef;
+    color: #2f4340;
+  }
+
+  .portable-metric-grid { gap: 12px; }
+  .portable-metric-card {
+    min-height: 168px;
+    padding: 22px 20px 18px;
+    border: 1px solid #cbd7d2;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: none;
+  }
+
+  .portable-metric-label {
+    color: #526764;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .portable-metric-value {
+    margin: 10px 0 8px;
+    color: #133c38;
+    font-family: "STZhongsong", "Songti SC", serif;
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.12;
+  }
+
+  .portable-card-description { color: #536765; font-size: 15px; line-height: 1.5; }
+  .portable-metric-badge { font-size: 13px; line-height: 1.45; }
+
+  .portable-visual-header { margin: 0 0 16px; }
+  .portable-visual-header > strong,
+  .portable-visual-header h1,
+  .portable-visual-header h2,
+  .portable-visual-header h3 {
+    font-family: "STZhongsong", "Songti SC", serif;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .portable-visual-header > span,
+  .portable-visual-header > p,
+  .portable-visual-header p,
+  .portable-visual-header li { color: #536765; font-size: 16px; line-height: 1.65; }
+
+  .portable-static-chart { margin-top: 8px; }
+  .portable-static-chart svg { font-size: 14px; }
+  .portable-table-scroll th { font-size: 14px; line-height: 1.45; }
+  .portable-table-scroll td { font-size: 16px; line-height: 1.55; }
+  .portable-table-note { font-size: 14px; line-height: 1.55; }
+
+  .portable-notice {
+    padding: 22px 24px;
+    border: 1px solid var(--portable-warning-border);
+    border-left: 5px solid #d56b36;
+    border-radius: 0;
+    background: var(--portable-warning-bg);
+  }
+}
+
+@media screen and (max-width: 760px) {
+  body { font-size: 16px; }
+  .portable-fallback[data-portable-surface="dashboard"] {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .portable-page-header { padding: 32px 24px 30px; }
+  .portable-page-header::before { margin-bottom: 14px; font-size: 11px; }
+  .portable-page-header h1 { font-size: 29px; line-height: 1.34; }
+  .portable-description { margin-top: 14px; font-size: 16px; }
+  .portable-page-meta { position: static; margin-top: 16px; font-size: 12px; }
+  .portable-block-stack { grid-template-columns: minmax(0, 1fr); gap: 30px; padding: 30px 24px 42px; }
+  .portable-layout-half,.portable-layout-full { grid-column: 1; }
+  .portable-markdown h2 { font-size: 26px; }
+  .portable-markdown h3 { font-size: 20px; }
+  .portable-markdown p,.portable-markdown li { font-size: 16px; line-height: 1.78; }
+  .portable-metric-grid { grid-template-columns: 1fr; }
+  .portable-metric-card { min-height: 0; }
+}
+</style>
 </head>
 <body>
 <main id="data-analytics-portable-fallback" class="portable-fallback" data-portable-fallback="true" data-portable-surface="dashboard"><header class="portable-page-header"><div class="portable-page-heading"><p class="portable-surface-label">Data Analytics dashboard</p><h1>DanceNew 项目两周增量复审报告（2026-07-17，宽屏版）</h1><p class="portable-description">面向制作人的 16:9 宽屏首测复审看板：结论、研发增量、架构健康度、风险、资源与候选包门槛。</p></div><div class="portable-page-meta"><time datetime="2026-07-17T18:00:00+08:00">Jul 17, 2026, 10:00 AM UTC</time></div></header><div class="portable-block-stack">
