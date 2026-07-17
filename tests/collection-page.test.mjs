@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const pagePath = new URL('../collection/index.html', import.meta.url);
 const iconPath = new URL('../collection/favicon.svg', import.meta.url);
+const readmePath = new URL('../README.md', import.meta.url);
 
 assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
@@ -14,6 +15,13 @@ const icon = readFileSync(iconPath, 'utf8');
 assert.match(icon, /viewBox="0 0 64 64"/);
 assert.match(icon, /#16777d/);
 assert.match(icon, /#bc5a1a/);
+
+assert.ok(existsSync(readmePath), 'Expected a root README.md');
+const readme = readFileSync(readmePath, 'utf8');
+assert.match(readme, /# JekiVado GitHub Pages/);
+assert.match(readme, /https:\/\/jekivado\.github\.io\/collection\//);
+assert.match(readme, /新增页面/);
+assert.match(readme, /GitHub Pages/);
 
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
@@ -34,6 +42,7 @@ assert.match(html, /main\s*\{[^}]*width:\s*min\(1440px/);
 assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1fr\)\)/);
 assert.match(html, /class="card-grid prototype-grid"/);
 assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
+assert.match(html, /UPDATED 2026\.07\.17/);
 
 for (const route of [
   '../escape01/',
