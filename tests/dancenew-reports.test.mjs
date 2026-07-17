@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.1 seconds
-Output:
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
