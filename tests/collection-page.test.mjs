@@ -10,16 +10,18 @@ const html = readFileSync(pagePath, 'utf8');
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
 assert.match(html, /data-category="analysis"/);
-assert.match(html, /--surface:\s*#171a1f/);
+assert.match(html, /--canvas:\s*#f6f6f2/);
 assert.match(html, /class="card-grid"/);
 assert.match(html, /box-shadow:\s*0 14px 30px/);
 assert.doesNotMatch(html, /feTurbulence/);
-assert.match(html, /--muted:\s*#b5c0ce/);
+assert.match(html, /--warm-bg:\s*#fff0e3/);
+assert.match(html, /--cool-bg:\s*#e7f4f5/);
+assert.match(html, /class="category prototype-section"/);
+assert.match(html, /class="category analysis-section"/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
-assert.match(html, /--module:\s*#12171e/);
 assert.match(html, /\.category\s*\{[^}]*padding:\s*16px/);
-assert.match(html, /--card-border:\s*#526172/);
+assert.match(html, /background:\s*#fff/);
 
 for (const route of [
   '../escape01/',

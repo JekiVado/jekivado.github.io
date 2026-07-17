@@ -4,20 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#0d0f12" />
+    <meta name="theme-color" content="#f6f6f2" />
     <title>集合 · JekiVado</title>
     <style>
       :root {
-        --canvas: #0d0f12;
-        --module: #12171e;
-        --surface: #171a1f;
-        --surface-hover: #20262f;
-        --ink: #f7f9fc;
-        --muted: #b5c0ce;
-        --rule: #3a4552;
-        --card-border: #526172;
-        --accent: #78dfbd;
-        --prototype: #f5aa6e;
+        --canvas: #f6f6f2;
+        --ink: #202831;
+        --muted: #64707e;
+        --rule: #d5dbe1;
+        --warm-bg: #fff0e3;
+        --warm-border: #e6a66c;
+        --warm-accent: #bc5a1a;
+        --warm-ink: #7b3510;
+        --cool-bg: #e7f4f5;
+        --cool-border: #74b8bb;
+        --cool-accent: #16777d;
+        --cool-ink: #11565b;
       }
 
       * { box-sizing: border-box; }
@@ -26,23 +28,22 @@
         min-width: 320px;
         margin: 0;
         color: var(--ink);
-        background:
-          radial-gradient(ellipse 70% 38rem at 50% -14rem, rgba(72, 151, 130, .18), transparent 70%),
-          var(--canvas);
+        background: radial-gradient(ellipse 70% 38rem at 50% -14rem, rgba(91, 176, 178, .16), transparent 70%), var(--canvas);
         font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
       }
       a { color: inherit; }
       main { width: min(1060px, calc(100% - 40px)); margin: 0 auto; padding: 54px 0 52px; }
       header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 25px; border-bottom: 1px solid var(--rule); }
-      .eyebrow { margin: 0 0 10px; color: var(--accent); font: 700 11px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .14em; }
+      .eyebrow { margin: 0 0 10px; color: var(--cool-accent); font: 700 11px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .14em; }
       h1 { margin: 0; font-size: clamp(36px, 5vw, 52px); font-weight: 650; letter-spacing: -.065em; line-height: 1; }
       .count { margin: 0 0 3px; color: var(--muted); font: 11px/1.4 "SFMono-Regular", Menlo, monospace; letter-spacing: .06em; white-space: nowrap; }
       .intro { max-width: 620px; margin: 15px 0 33px; color: var(--muted); font-size: 16px; line-height: 1.65; }
-      .category { padding: 16px; border: 1px solid var(--rule); border-radius: 16px; background: linear-gradient(135deg, rgba(120, 223, 189, .045), transparent 32%), var(--module); box-shadow: 0 10px 22px rgba(0, 0, 0, .16); }
+      .category { --module-bg: var(--cool-bg); --module-border: var(--cool-border); --module-accent: var(--cool-accent); --module-ink: var(--cool-ink); padding: 16px; border: 1px solid var(--module-border); border-radius: 16px; background: var(--module-bg); box-shadow: 0 10px 22px rgba(37, 56, 61, .08); }
+      .prototype-section { --module-bg: var(--warm-bg); --module-border: var(--warm-border); --module-accent: var(--warm-accent); --module-ink: var(--warm-ink); }
       .category + .category { margin-top: 20px; }
-      .category-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+      .category-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--module-border); }
       .category-title { display: flex; align-items: center; gap: 10px; }
-      .category-index { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--rule); border-radius: 7px; color: var(--accent); background: rgba(120, 223, 189, .06); font: 700 9px/1 "SFMono-Regular", Menlo, monospace; }
+      .category-index { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--module-border); border-radius: 7px; color: var(--module-ink); background: rgba(255, 255, 255, .56); font: 700 9px/1 "SFMono-Regular", Menlo, monospace; }
       h2 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.02em; }
       .category-count { color: var(--muted); font: 11px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .08em; }
       .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -53,22 +54,19 @@
         flex-direction: column;
         padding: 17px;
         overflow: hidden;
-        border: 1px solid var(--card-border);
+        border: 1px solid var(--module-border);
         border-radius: 12px;
-        background: linear-gradient(145deg, rgba(255, 255, 255, .025), transparent 65%), var(--surface);
-        box-shadow: 0 7px 16px rgba(0, 0, 0, .18);
+        background: #fff;
+        box-shadow: 0 5px 14px rgba(53, 67, 78, .08);
         text-decoration: none;
         transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
       }
-      .card::before { content: ""; position: absolute; top: 0; left: 0; width: 42px; height: 3px; background: var(--accent); }
-      .card.prototype::before { background: var(--prototype); }
-      .card:hover { transform: translateY(-4px); border-color: rgba(120, 223, 189, .58); background: var(--surface-hover); box-shadow: 0 14px 30px rgba(0, 0, 0, .28); }
-      .card.prototype:hover { border-color: rgba(245, 170, 110, .58); }
+      .card::before { content: ""; position: absolute; top: 0; left: 0; width: 42px; height: 3px; background: var(--module-accent); }
+      .card:hover { transform: translateY(-4px); border-color: var(--module-accent); background: #fff; box-shadow: 0 14px 30px rgba(31, 50, 55, .18); }
       .card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-      .kind { display: inline-flex; width: fit-content; padding: 5px 7px; border-radius: 5px; color: var(--accent); background: rgba(120, 223, 189, .12); font: 700 10px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .06em; }
-      .prototype .kind { color: var(--prototype); background: rgba(245, 170, 110, .10); }
-      .arrow { color: var(--muted); font-size: 16px; line-height: 1; transition: color .2s ease, transform .2s ease; }
-      .card:hover .arrow { color: var(--ink); transform: translate(2px, -2px); }
+      .kind { display: inline-flex; width: fit-content; padding: 5px 7px; border-radius: 5px; color: var(--module-ink); background: var(--module-bg); font: 700 10px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .06em; }
+      .arrow { color: var(--module-ink); font-size: 16px; line-height: 1; transition: color .2s ease, transform .2s ease; }
+      .card:hover .arrow { color: var(--module-accent); transform: translate(2px, -2px); }
       .card-name { margin: auto 0 5px; font-size: 24px; font-weight: 650; letter-spacing: -.045em; line-height: 1.1; }
       .card-detail { min-height: 40px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
       .path { display: block; margin-top: 10px; color: #a8b3c2; font: 11px/1.2 "SFMono-Regular", Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -96,7 +94,7 @@
       </header>
       <p class="intro">已发布内容的快捷入口，按用途整理。保留足够信息帮助判断去向，点击即可直达。</p>
 
-      <section class="category" aria-labelledby="prototype-title">
+      <section class="category prototype-section" aria-labelledby="prototype-title">
         <div class="category-head">
           <div class="category-title"><span class="category-index">01</span><h2 id="prototype-title">可试玩原型</h2></div>
           <span class="category-count">01 ITEM</span>
@@ -111,7 +109,7 @@
         </div>
       </section>
 
-      <section class="category" aria-labelledby="analysis-title">
+      <section class="category analysis-section" aria-labelledby="analysis-title">
         <div class="category-head">
           <div class="category-title"><span class="category-index">02</span><h2 id="analysis-title">云资源复盘</h2></div>
           <span class="category-count">04 ITEMS</span>
