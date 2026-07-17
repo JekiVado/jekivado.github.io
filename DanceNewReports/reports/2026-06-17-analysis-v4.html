@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DanceNew 项目深度分析报告 v4.0 (2026-06-17)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #0f0f11; color: #e0e0e0; line-height: 1.8; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+  .header { text-align: center; padding: 48px 0; border-bottom: 1px solid #2a2a2e; margin-bottom: 40px; }
+  .header h1 { font-size: 2.2em; font-weight: 700; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .header .subtitle { color: #888; font-size: 0.95em; margin-top: 12px; }
+  .header .meta { color: #666; font-size: 0.85em; margin-top: 8px; }
+  .card { background: #1a1a1e; border: 1px solid #2a2a2e; border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+  .card h2 { font-size: 1.3em; font-weight: 600; margin-bottom: 16px; color: #fed7aa; display: flex; align-items: center; gap: 8px; }
+  .card h3 { font-size: 1.05em; font-weight: 600; margin: 16px 0 8px; color: #90c0ff; }
+  .card p, .card li { color: #b0b0b4; font-size: 0.92em; }
+  .progress-bar { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+  .progress-track { flex: 1; height: 20px; background: #2a2a2e; border-radius: 10px; overflow: hidden; position: relative; }
+  .progress-fill { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+  .progress-bar .label { min-width: 48px; text-align: right; font-size: 0.85em; font-weight: 600; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 0.8em; font-weight: 500; }
+  .tag-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .tag-yellow { background: rgba(234,179,8,0.15); color: #eab308; }
+  .tag-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .tag-blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .tag-purple { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+  .tag-pink { background: rgba(244,114,182,0.15); color: #f472b6; }
+  .tag-orange { background: rgba(249,115,22,0.15); color: #f97316; }
+  .tag-gray { background: rgba(156,163,175,0.15); color: #9ca3af; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 12px 0; }
+  .stat-item { background: #222226; border-radius: 10px; padding: 14px; text-align: center; }
+  .stat-item .num { font-size: 1.6em; font-weight: 700; }
+  .stat-item .desc { font-size: 0.78em; color: #888; margin-top: 4px; }
+  .changes-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.88em; }
+  .changes-table th { background: #222226; padding: 8px 12px; text-align: left; font-weight: 600; color: #fed7aa; border-bottom: 1px solid #333; }
+  .changes-table td { padding: 8px 12px; border-bottom: 1px solid #28282c; }
+  .divider { height: 1px; background: #2a2a2e; margin: 24px 0; }
+  .alert { padding: 14px 18px; border-radius: 10px; margin: 12px 0; font-size: 0.9em; }
+  .alert-warn { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); color: #fbbf24; }
+  .alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; }
+  .alert-danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+  .alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+  .alert-highlight { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: #fbbf24; }
+  @media (max-width: 768px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } .header h1 { font-size: 1.6em; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>DanceNew 项目深度分析报告 v4.0</h1>
+  <div class="subtitle">Unity 2022.3 LTS · URP · HybridCLR · 手游社交舞蹈项目</div>
+  <div class="meta">分析日期: 2026-06-17 · 周期: 2026-06-01 → 2026-06-17 (17天) · CS 文件总量: 1180 → 1218</div>
+</div>
+
+<!-- Executive Summary -->
+<div class="card">
+  <h2>📊 本轮开发综述</h2>
+  <p>过去十七天，<strong>190 个 CS 文件</strong>被修改/新增。最重要的变化是<strong>拖延三个月的 P0 问题被修复</strong>：新手引导系统 (GuideManager) 从无到有落地并激活。同时完成了成就系统、任务中心扩展、签到系统重构、客服面板等功能的打磨。</p>
+
+  <div class="stat-grid">
+    <div class="stat-item"><div class="num" style="color:#f59e0b">190</div><div class="desc">本轮变更 CS 文件</div></div>
+    <div class="stat-item"><div class="num" style="color:#f59e0b">1,218</div><div class="desc">项目总 CS 文件 +38</div></div>
+    <div class="stat-item"><div class="num" style="color:#ef4444">89%</div><div class="desc">综合进度 +3%</div></div>
+    <div class="stat-item"><div class="num" style="color:#3b82f6">26</div><div class="desc">新增/改配置表</div></div>
+    <div class="stat-item"><div class="num" style="color:#22c55e">14</div><div class="desc">引导类型数</div></div>
+  </div>
+</div>
+
+<!-- Module Change Matrix -->
+<div class="card">
+  <h2>🔬 各模块变更深度分析</h2>
+  <table class="changes-table">
+    <thead><tr><th>模块</th><th>文件数</th><th>性质</th><th>核心变更</th></tr></thead>
+    <tbody>
+      <tr><td>Config/cfg/Data</td><td>26</td><td><span class="tag tag-blue">配置扩展</span></td><td>新增 Guide/GuideBattle/Achievement×3/FreeModeHit/FreeModeUpgrade/TaskPamaComposite 等</td></tr>
+      <tr><td>UI/TaskCenter</td><td>11</td><td><span class="tag tag-green">扩展翻倍</span></td><td>从 5→11 文件：新增 NoteBook 子系(Item/LevelTask/RewardItem)、GiftPreview(Pop+Item)、TabItem</td></tr>
+      <tr><td>Proto</td><td>11</td><td><span class="tag tag-yellow">协议迭代</span></td><td>S2CBattle/S2CTask/S2CFriend/S2CPlayer 等协议扩展</td></tr>
+      <tr><td>DataManager</td><td>11</td><td><span class="tag tag-purple">数据层</span></td><td>Achievement/Friend/Chat/Activity 等数据管理器扩展</td></tr>
+      <tr><td>Net/ProtoExtensions</td><td>8</td><td><span class="tag tag-yellow">协议适配</span></td><td>Proto 扩展器更新</td></tr>
+      <tr><td>GameCommon</td><td>8</td><td><span class="tag tag-yellow">基础层</span></td><td>新增 FreeMode/Achievement 相关定义</td></tr>
+      <tr><td>UI/Guide</td><td>7</td><td><span class="tag tag-orange">P0 修复 ✨</span></td><td>全新引导 UI：UIGuide(核心)、UIGuideBattle、UIGuideChoose、UIGuideHode、UIGuideMask、UIGuideMenu、HollowOutMask</td></tr>
+      <tr><td>GamePlay</td><td>6</td><td><span class="tag tag-orange">P0 修复 ✨</span></td><td>GuideManager(全新Singleton!)、SettingManager 激活、GamePlay.cs 重构</td></tr>
+      <tr><td>UI/Friend</td><td>6</td><td><span class="tag tag-yellow">扩展</span></td><td>好友系统 UI 更新</td></tr>
+      <tr><td>UI/Achievements</td><td>5</td><td><span class="tag tag-purple">新增</span></td><td>成就面板：UIAchievements(主)、Item、RewardItem、Tab、ProgressItem</td></tr>
+      <tr><td>UI/PhotoStudio</td><td>5</td><td><span class="tag tag-yellow">细化</span></td><td>照相馆 UI 继续迭代</td></tr>
+      <tr><td>UI/ClothingExchange</td><td>5</td><td><span class="tag tag-yellow">迭代</span></td><td>服装兑换系统打磨</td></tr>
+      <tr><td>UI/AcitivityCenter/CheckIn</td><td>5</td><td><span class="tag tag-purple">重构</span></td><td>SignIn → CheckIn: UIActivityCheckIn + MakepUpPop + Cumulative + Item + Rule</td></tr>
+      <tr><td>Character</td><td>5</td><td><span class="tag tag-yellow">角色优化</span></td><td>BasePlayer/ScenePlayer/TimelinePlayer 等迭代</td></tr>
+      <tr><td>Scene</td><td>3</td><td><span class="tag tag-yellow">场景调整</span></td><td>SceneManager/PhotoRoom 更新</td></tr>
+      <tr><td>UI/Service</td><td>1</td><td><span class="tag tag-pink">新增</span></td><td>UIService: WebView 客服面板 (auforever.com)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- GUIDE SYSTEM DEEP DIVE -->
+<div class="card">
+  <h2>🎯 新手引导系统 — P0 三个月首次突破</h2>
+
+  <div class="alert alert-success"><strong>✅ 已修复：</strong>自 2026 年 4 月首次分析以来，GuideManager 首次作为完整模块出现。<code>GamePlay.Init()</code> 中 <code>GuideManager.Instance.Init()</code> 已激活（第 24 行），<code>GuideManager.Instance.InitData()</code> 也被调用（第 48 行）。同时 SettingManager 也被首次激活。</div>
+
+  <h3>GuideManager 架构</h3>
+  <ul>
+    <li><strong>GuideManager (Singleton)</strong> — 引导逻辑中枢，基于 Guide 配置表（Luban）驱动引导步骤链</li>
+    <li><strong>事件监听：</strong> MN_UIGUIDE_START / STEP_COMPLETE / SKIP / FINISH / CHOOSE</li>
+    <li><strong>步骤编排：</strong> 配置表定义 Start(起始步) → Goto(下一步) → Back(上一步) → Skip(跳过目标) 的有向图，GuideManager 内部推进</li>
+    <li><strong>消息映射：</strong> 将配置表中的 MessageId 映射为运行时 EventId，通过 TryGetEventId 查询</li>
+    <li><strong>奖励发放：</strong> GetReward 通过 MN_NETGUIDE_SET 向服务端请求引导奖励</li>
+  </ul>
+
+  <h3>引导 UI 系统 — 14 种引导类型</h3>
+  <p>UIGuide 基于配置驱动，在 ShowStep 中根据 EGuideType 分发：</p>
+  <table class="changes-table">
+    <thead><tr><th>类型</th><th>描述</th><th>交互方式</th></tr></thead>
+    <tbody>
+      <tr><td>EGT_Type1</td><td>3D 模型点击引导</td><td>World2UI 坐标转换 + 镂空遮罩 + 箭头 + 对话框</td></tr>
+      <tr><td>EGT_Type2</td><td>2D UI 组件点击引导 (原事件保留)</td><td>复制目标 Button + 箭头 + 对话框</td></tr>
+      <tr><td>EGT_Type3</td><td>2D UI 组件点击引导 (清事件覆盖)</td><td>复制按钮，移除原 onClick 再绑定自定义事件</td></tr>
+      <tr><td>EGT_Type4</td><td>延迟自动推进</td><td>全屏遮罩 + 定时器自动下一步</td></tr>
+      <tr><td>EGT_Type5</td><td>图片模式引导</td><td>加载纹理 Sprite + 箭头翻页</td></tr>
+      <tr><td>EGT_Type6</td><td>关闭 UI 并自动下一步</td><td>广播 MN_UIMANAGER_CLOSE + 自动推进</td></tr>
+      <tr><td>EGT_Type7</td><td>广播事件并自动下一步</td><td>通过 TryGetEventId 广播参数化事件</td></tr>
+      <tr><td>EGT_Type8</td><td>纯对话框+延迟</td><td>全屏遮罩 + 对话框 + 定时器</td></tr>
+      <tr><td>EGT_Type9</td><td>2D UI 组件箭头高亮</td><td>箭头指向目标按钮</td></tr>
+      <tr><td>EGT_Type10</td><td>领取奖励</td><td>GetReward + 自动推进</td></tr>
+      <tr><td>EGT_Type11</td><td>战斗引导</td><td>打开 UIGuideBattle 面板 (舞蹈教学引导)</td></tr>
+      <tr><td>EGT_Type12</td><td>打开 UI 并自动下一步</td><td>广播 MN_UIMANAGER_OPEN</td></tr>
+      <tr><td>EGT_Type13</td><td>2D UI 组件高亮(无箭头)</td><td>复制按钮 + 仅高亮，无箭头</td></tr>
+      <tr><td>EGT_Type14</td><td>购买服装引导</td><td>根据性别自动选择购买道具</td></tr>
+    </tbody>
+  </table>
+
+  <h3>辅助 UI 组件</h3>
+  <ul>
+    <li><strong>UIGuideBattle</strong> — 战斗教学引导面板（Base/Normal/Free 三种模式 + Input + Tips）</li>
+    <li><strong>UIGuideChoose</strong> — 引导分支选择面板</li>
+    <li><strong>UIGuideMask / UIGuideHode</strong> — 遮罩/镂空实现</li>
+    <li><strong>UIGuideMenu</strong> — 引导菜单</li>
+    <li><strong>HollowOutMask</strong> — 镂空遮罩组件</li>
+  </ul>
+</div>
+
+<!-- Achievement System -->
+<div class="card">
+  <h2>🏆 成就系统 — 全新落地</h2>
+
+  <div class="stat-grid">
+    <div class="stat-item"><div class="num" style="color:#22c55e">5</div><div class="desc">UI 文件</div></div>
+    <div class="stat-item"><div class="num" style="color:#3b82f6">3</div><div class="desc">配置表</div></div>
+    <div class="stat-item"><div class="num" style="color:#8b5cf6">Achievement</div><div class="desc">成就基础</div></div>
+    <div class="stat-item"><div class="num" style="color:#eab308">Total</div><div class="desc">总进度</div></div>
+  </div>
+
+  <ul>
+    <li><strong>UIAchievements (主面板)</strong> + <strong>UIAchievementsItem</strong> (条目) + <strong>UIAchievementsTab</strong> (分类标签)</li>
+    <li><strong>UIAchievementRewardItem</strong> (奖励条目) + <strong>UIAchsProgressItem</strong> (进度条目)</li>
+    <li>3 张配置表：Achievement (基础定义) + Achievementclassification (分类) + AchievementTotal (总进度/目标)</li>
+  </ul>
+</div>
+
+<!-- TaskCenter Expansion -->
+<div class="card">
+  <h2>📋 任务中心 — 从 5 到 11 的扩展</h2>
+  <p>上一轮分析时 TaskCenter 只有 5 个文件。本轮新增 6 个：</p>
+  <table class="changes-table">
+    <thead><tr><th>新增文件</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>UITaskCenterNoteBookItem</td><td>笔记本条目 (单个任务)</td></tr>
+      <tr><td>UITaskCenterNoteBookLevelTask</td><td>等级任务视图</td></tr>
+      <tr><td>UITaskCenterNoteBookLevelTaskRewardItem</td><td>等级任务奖励条目</td></tr>
+      <tr><td>UITaskCenterGiftPreviewPop</td><td>礼物预览弹窗</td></tr>
+      <tr><td>UITaskCenterGiftPreviewItem</td><td>礼物预览条目</td></tr>
+      <tr><td>UITaskTabItem</td><td>任务标签页切换组件</td></tr>
+    </tbody>
+  </table>
+  <p>配置层新增 NoteBook、TaskCenterType、TaskPamaComposite 三张表支持等级任务复合参数。</p>
+</div>
+
+<!-- SettingManager Activation -->
+<div class="card">
+  <h2>⚙️ SettingManager 激活 — 新增实时消息跟踪</h2>
+  <p><code>SettingManager.Instance.Init()</code> 在 GamePlay.cs 第 25 行首次被激活。Init 方法中注册了：</p>
+  <ul>
+    <li><strong>MN_YOUME_CHAT_RECEIVEMSG</strong> — 收听 YouMe 聊天字节消息，检测"首次聊天"事件 (Receive_ChatMsg)</li>
+    <li><strong>MN_YOUME_CHAT_RECEIVEAUDIO</strong> — 收听语音消息</li>
+    <li>通过 PlayerPrefs 按角色持久化 FirstChat 标记，用于判断玩家是否完成过首次聊天</li>
+  </ul>
+  <p>SettingManager 现已承担跨模块的状态跟踪职责（音量/画质/按键布局/首次聊天），打破了之前仅做设置存储的单一角色。</p>
+</div>
+
+<!-- Progress Comparison -->
+<div class="card">
+  <h2>📈 开发进度对比 (四轮分析轨迹)</h2>
+
+  <table class="changes-table">
+    <thead><tr><th>模块</th><th>4月</th><th>5月</th><th>6月初</th><th>6月中</th><th>本轮 Δ</th></tr></thead>
+    <tbody>
+      <tr><td>框架</td><td>95%</td><td>96%</td><td>96%</td><td>96%</td><td>-</td></tr>
+      <tr><td>角色</td><td>90%</td><td>95%</td><td>95%</td><td>95%</td><td>-</td></tr>
+      <tr><td>网络</td><td>90%</td><td>95%</td><td>95%</td><td>95%</td><td>-</td></tr>
+      <tr><td>心印</td><td>85%</td><td>85%</td><td>95%</td><td>95%</td><td>-</td></tr>
+      <tr><td>战斗</td><td>50%</td><td>85%</td><td>90%</td><td>90%</td><td>-</td></tr>
+      <tr><td>LBS</td><td>-</td><td>-</td><td>90%</td><td>90%</td><td>-</td></tr>
+      <tr><td>社交</td><td>80%</td><td>85%</td><td>90%</td><td>90%</td><td>-</td></tr>
+      <tr><td>经济</td><td>80%</td><td>85%</td><td>90%</td><td>90%</td><td>-</td></tr>
+      <tr><td>设置 (Setting)</td><td>90%</td><td>90%</td><td>90%</td><td>95%</td><td><span class="tag tag-green">+5%</span></td></tr>
+      <tr><td style="color:#22c55e;">引导 (Guide)</td><td style="color:#f87171;">0%</td><td style="color:#f87171;">0%</td><td style="color:#f87171;">0%</td><td>85%</td><td><span class="tag tag-orange">+85% 🔥</span></td></tr>
+      <tr><td>婚礼</td><td>40%</td><td>85%</td><td>85%</td><td>85%</td><td>-</td></tr>
+      <tr><td>照相馆</td><td>40%</td><td>75%</td><td>80%</td><td>82%</td><td><span class="tag tag-yellow">+2%</span></td></tr>
+      <tr><td>广场</td><td>-</td><td>-</td><td>80%</td><td>80%</td><td>-</td></tr>
+      <tr><td>成就 (Achievement)</td><td>-</td><td>-</td><td>0%</td><td>70%</td><td><span class="tag tag-pink">+70% ✨</span></td></tr>
+      <tr><td>服装兑换</td><td>-</td><td>-</td><td>75%</td><td>78%</td><td><span class="tag tag-yellow">+3%</span></td></tr>
+      <tr><td>活动中心</td><td>-</td><td>-</td><td>75%</td><td>78%</td><td><span class="tag tag-yellow">+3%</span></td></tr>
+      <tr><td>Timeline</td><td>10%</td><td>75%</td><td>75%</td><td>75%</td><td>-</td></tr>
+      <tr><td>任务中心</td><td>-</td><td>-</td><td>65%</td><td>75%</td><td><span class="tag tag-green">+10%</span></td></tr>
+      <tr><td>心动抽卡</td><td>-</td><td>-</td><td>60%</td><td>60%</td><td>-</td></tr>
+      <tr><td style="color:#f87171;">红点 (RedDot)</td><td style="color:#f87171;">0%</td><td style="color:#f87171;">0%</td><td style="color:#f87171;">0%</td><td style="color:#f87171;">0%</td><td>-</td></tr>
+    </tbody>
+  </table>
+
+  <div class="divider"></div>
+
+  <div class="progress-bar" style="margin-top:16px;">
+    <span style="width:100px;">综合进度</span>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:89%;background:linear-gradient(90deg,#f59e0b,#ef4444);"></div>
+    </div>
+    <span class="label">89%</span>
+  </div>
+  <p style="color:#888;font-size:0.85em;margin-top:4px;">三个月轨迹: 68% → 82% → 86% → 89%。本轮最大贡献来自 Guide(+85%)和 Achievement(+70%)两个全新系统。</p>
+</div>
+
+<!-- Critical Issues Update -->
+<div class="card">
+  <h2>🚨 遗留问题追踪</h2>
+
+  <table class="changes-table">
+    <thead><tr><th>优先级</th><th>问题</th><th>发现日期</th><th>本轮状态</th></tr></thead>
+    <tbody>
+      <tr style="background:rgba(34,197,94,0.06);">
+        <td><s><span class="tag tag-red">P0</span></s></td>
+        <td><strong><s>GuideManager 缺失</s></strong></td>
+        <td>04-09</td>
+        <td><span class="tag tag-green">✅ 已修复</span> — GuideManager Singleton 落地，14 种引导类型，GamePlay.Init 激活</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-red">P0</span></td>
+        <td><strong>RedDotManager 注释</strong></td>
+        <td>04-09</td>
+        <td><span class="tag tag-red">未修复</span> — GamePlay.OnUpdate 中仍注释。唯一残留的 P0。</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-yellow">P1</span></td>
+        <td><strong>BattleScene #if aa</strong></td>
+        <td>05-08</td>
+        <td><span class="tag tag-yellow">未清理</span></td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-yellow">P1</span></td>
+        <td><strong>PhotoStudio 埋点注释</strong></td>
+        <td>05-08</td>
+        <td><span class="tag tag-yellow">未修复</span></td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-blue">P2</span></td>
+        <td><strong>PlayerManager 旧代码</strong></td>
+        <td>05-08</td>
+        <td><span class="tag tag-blue">未清理</span></td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-blue">P2</span></td>
+        <td><strong>TimelinePlayer 命名残留</strong></td>
+        <td>05-08</td>
+        <td><span class="tag tag-blue">未修复</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="alert alert-highlight"><strong>🟡 仅剩一个 P0：</strong>RedDotManager 的 OnUpdate 在 GamePlay.cs 中仍被注释。但 RedDotDataManager 数据层已完备（含 InitData/签到/抽卡/成就红点初始化逻辑），接入成本低，预计下一个迭代可解决。</div>
+</div>
+
+<!-- GamePlay.cs Before/After -->
+<div class="card">
+  <h2>🔄 GamePlay.cs 重构对比</h2>
+  <p>本轮对 GamePlay 入口文件进行了重大清理：</p>
+  <ul>
+    <li><strong>新增激活：</strong>GuideManager.Instance.Init()、SettingManager.Instance.Init() 及对应的 Dispose/InitData</li>
+    <li><strong>清理注释块：</strong>旧版注释的 PlayerManager.Init()、RedDotManager.Init()、GuideManager.Init() 大段注释被移除（仅保留 RedDotManager.OnUpdate 和 WeddingManager/PlayerManager 的 Update 注释）</li>
+    <li><strong>代码更干净：</strong>从 105 行缩减到 91 行，减少约 13% 的注释行</li>
+  </ul>
+</div>
+
+<!-- Summary -->
+<div class="card">
+  <h2>📋 总结</h2>
+  
+  <p>本轮开发以<strong>"填坑"和"打磨"</strong>为主旋律：</p>
+  <ul>
+    <li>🔥 <strong>Guide 系统（3 个月 P0 终修复）</strong> — GuideManager + 7 UI 文件 + 14 种引导类型 + GamePlay 激活</li>
+    <li>✨ <strong>成就系统全新落地</strong> — 5 UI + 3 配置表</li>
+    <li>📋 <strong>任务中心扩展</strong> — 笔记本子系 (LevelTask/Reward) + 礼物预览</li>
+    <li>⚙️ <strong>SettingManager 激活</strong> — 首次聊天跟踪 + YouMe 消息监听</li>
+    <li>🔁 <strong>签到重构</strong> — SignIn → CheckIn，新增补签弹窗</li>
+    <li>💬 <strong>客服面板</strong> — WebView 接入 auforever.com</li>
+    <li>🧹 <strong>GamePlay.cs 清理</strong> — 旧注释块精简</li>
+  </ul>
+
+  <p style="margin-top:12px; font-weight:600; color:#c0c0c0;">综合进度: 89%（上月 86%）。P0 仅剩 RedDot 一项。</p>
+</div>
+
+</div>
+</body>
+</html>

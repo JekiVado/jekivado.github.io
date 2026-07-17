@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT4 版本回顾 — 代号1688</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{--red:#E74C3C;--orange:#F39C12;--green:#27AE60;--blue:#2E86C1;--purple:#8E44AD;--dark:#2C3E50;--gray:#7F8C8D}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#F4F6F7;color:var(--dark);line-height:1.7}
+  .container{max-width:1100px;margin:0 auto;padding:24px}
+  .header{background:linear-gradient(135deg,#1a5276,#2980b9);color:#fff;padding:40px;border-radius:16px;margin-bottom:32px}
+  .header h1{font-size:28px;margin-bottom:6px}
+  .header .sub{font-size:15px;opacity:0.85;margin-bottom:12px}
+  .header .meta{font-size:13px;opacity:0.7;display:flex;gap:16px;flex-wrap:wrap}
+  .header .meta span{background:rgba(255,255,255,0.12);padding:3px 10px;border-radius:12px}
+  .card{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+  .card h3{font-size:18px;margin-bottom:14px;border-bottom:2px solid #EEF0F2;padding-bottom:10px}
+  .card h4{font-size:15px;margin:18px 0 10px;color:#34495E}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+  .stat-card{background:#fff;border-radius:10px;padding:18px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.06);border-top:3px solid var(--blue)}
+  .stat-card.good{border-top-color:var(--green)}
+  .stat-card.warn{border-top-color:var(--orange)}
+  .stat-value{font-size:30px;font-weight:700;margin:6px 0}
+  .stat-label{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px}
+  .stat-sub{font-size:11px;color:var(--gray)}
+  .chart-box canvas{max-height:280px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid #EEF0F2}
+  th{background:#F8F9FA;font-weight:600;color:#666;font-size:11px;text-transform:uppercase}
+  tr:hover{background:#F8F9FA}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .bg-green{background:#D5F5E3;color:var(--green)}
+  .bg-orange{background:#FDEBD0;color:var(--orange)}
+  .bg-red{background:#FADBD8;color:var(--red)}
+  .bg-blue{background:#D6EAF8;color:var(--blue)}
+  .alert{padding:14px 18px;border-radius:8px;margin-bottom:16px;font-size:13px;display:flex;align-items:flex-start;gap:10px}
+  .alert-info{background:#D6EAF8;border-left:4px solid var(--blue);color:#1A5276}
+  .alert-good{background:#D5F5E3;border-left:4px solid var(--green);color:#1E8449}
+  .alert-warn{background:#FDEBD0;border-left:4px solid var(--orange);color:#7D6608}
+  .lesson{padding:12px 16px;border-radius:8px;margin-bottom:10px;border-left:4px solid var(--purple);background:#F4ECF7;font-size:13px}
+  .lesson .tag{display:inline-block;background:var(--purple);color:#fff;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;margin-right:8px;vertical-align:2px}
+  .timeline{position:relative;padding-left:24px;border-left:2px solid #D5D8DC}
+  .timeline-item{position:relative;margin-bottom:18px;padding-left:16px}
+  .timeline-item::before{content:'';position:absolute;left:-30px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 0 2px var(--blue)}
+  .timeline-item.done::before{background:var(--green);box-shadow:0 0 0 2px var(--green)}
+  .divider{border:none;border-top:1px solid #E5E7E9;margin:28px 0}
+  .section-title{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .section-num{width:32px;height:32px;background:var(--dark);color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>代号1688 — CBT4 版本回顾</h1>
+<div class="sub">版本 0.5.0 | 流程过渡期：TAPD 中途启用，逐步完善</div>
+<div class="meta">
+<span>📅 版本周期: 2026.03 ~ 2026.06</span>
+<span>📊 迭代: 0.5.0_老功能 + 0.5.0_新功能</span>
+<span>📝 回顾日期: 2026.07.05</span>
+</div>
+</div>
+
+<div class="card">
+<h3>📌 版本总览</h3>
+<div class="grid-3">
+<div class="stat-card good"><div class="stat-label">迭代需求</div><div class="stat-value" style="color:var(--green)">198</div><div class="stat-sub">两个迭代合计</div></div>
+<div class="stat-card good"><div class="stat-label">需求完成率</div><div class="stat-value" style="color:var(--green)">97.5%</div><div class="stat-sub">193/198 已完成</div></div>
+<div class="stat-card good"><div class="stat-label">缺陷关闭率</div><div class="stat-value" style="color:var(--green)">92.6%</div><div class="stat-sub">893/964 已关闭</div></div>
+</div>
+</div>
+
+<div class="section-title"><div class="section-num">1</div><h2>迭代执行回顾</h2></div>
+
+<div class="card">
+<h3>1.1 迭代时间线</h3>
+<div class="timeline">
+<div class="timeline-item done">
+<strong>2026-03-01 ~ 04-30</strong> · <span class="badge bg-green">已完成</span>
+<h4 style="margin:4px 0">0.5.0_老功能</h4>
+<p style="color:#666;font-size:13px">功能移植、部分优化、客户端&服务端联调</p>
+<p style="font-size:13px;margin-top:4px">需求: <strong>150</strong> → 完成: <strong>150 (100%)</strong></p>
+</div>
+<div class="timeline-item done">
+<strong>2026-05-01 ~ 06-12</strong> · <span class="badge bg-orange">97.9%</span>
+<h4 style="margin:4px 0">0.5.0_新功能</h4>
+<p style="color:#666;font-size:13px">热更、照相馆、红点、签到、抽奖、服饰交换所、新手引导、客服、断线重连、跳舞-组队、IOS包、任务</p>
+<p style="font-size:13px;margin-top:4px">需求: <strong>48</strong> → 完成: <strong>43 (89.6%)</strong> | 剩余: 5 (2规划中+1开发中+2产品体验)</p>
+</div>
+</div>
+
+<div class="alert alert-warn" style="margin-top:16px">
+<span>⚠️</span>
+<div><strong>0.5.0_新功能迭代仍有5个需求未关闭：</strong>含2个Bug转需求（抽奖/服饰交换所转化动画-服务端）、1个Bug反馈功能调整。这些虽不影响主功能，但阻碍迭代正式关闭。</div>
+</div>
+</div>
+
+<div class="card">
+<h3>1.2 需求交付质量</h3>
+<div class="grid-2">
+<div class="chart-box"><canvas id="iterStackChart"></canvas></div>
+<div>
+<h4>需求状态明细</h4>
+<table>
+<tr><th>状态</th><th>数量</th><th>占比</th></tr>
+<tr><td>✅ 已关闭</td><td><strong>193</strong></td><td>97.5%</td></tr>
+<tr><td>📋 规划中</td><td>2</td><td>1.0%</td></tr>
+<tr><td>👁️ 产品体验</td><td>2</td><td>1.0%</td></tr>
+<tr><td>💻 开发中</td><td>1</td><td>0.5%</td></tr>
+</table>
+<h4 style="margin-top:14px">CBT4 交付功能模块</h4>
+<div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px">
+<span class="badge bg-blue">热更</span><span class="badge bg-blue">照相馆</span><span class="badge bg-blue">红点系统</span>
+<span class="badge bg-blue">签到</span><span class="badge bg-blue">抽奖</span><span class="badge bg-blue">服饰交换所</span>
+<span class="badge bg-blue">新手引导</span><span class="badge bg-blue">客服功能</span><span class="badge bg-blue">断线重连</span>
+<span class="badge bg-blue">跳舞-组队</span><span class="badge bg-blue">IOS包</span><span class="badge bg-blue">任务中心</span>
+<span class="badge bg-blue">聊天系统</span><span class="badge bg-blue">好友系统</span><span class="badge bg-blue">商城</span>
+<span class="badge bg-blue">排行榜</span><span class="badge bg-blue">BGM</span><span class="badge bg-blue">设置</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>1.3 缺陷情况</h3>
+<div class="grid-3">
+<div class="stat-card"><div class="stat-label">CBT4期间缺陷</div><div class="stat-value" style="color:var(--blue)">~900</div><div class="stat-sub">3月末 ~ 6月中</div></div>
+<div class="stat-card warn"><div class="stat-label">致命+严重</div><div class="stat-value" style="color:var(--orange)">~260</div><div class="stat-sub">占比 ~28%</div></div>
+<div class="stat-card good"><div class="stat-label">已关闭</div><div class="stat-value" style="color:var(--green)">893</div><div class="stat-sub">~99% CBT4缺陷已关闭</div></div>
+</div>
+<div class="chart-box" style="margin-top:16px"><canvas id="bugTrendChart"></canvas></div>
+<p style="font-size:12px;color:#999;margin-top:8px">* 缺陷按月新增趋势：4月测试高峰期新增约350个，5月回落至~250个，6月~250个，质量趋势总体向好。</p>
+</div>
+
+<div class="section-title"><div class="section-num">2</div><h2>CBT4 流程复盘</h2></div>
+
+<div class="card">
+<h3>2.1 做得好的</h3>
+<div class="grid-2">
+<div>
+<div class="alert alert-good"><span>✅</span><div><strong>需求完成率高：</strong>198个迭代需求中193个已关闭，整体交付率高。</div></div>
+<div class="alert alert-good"><span>✅</span><div><strong>缺陷响应快：</strong>893/964 (92.6%) 的缺陷已关闭，团队对问题的响应速度值得肯定。</div></div>
+</div>
+<div>
+<div class="alert alert-good"><span>✅</span><div><strong>模块覆盖面广：</strong>横跨聊天、社交、跳舞、商城、活动等十几个功能模块，基础框架已搭建完成。</div></div>
+<div class="alert alert-good"><span>✅</span><div><strong>缺陷命名规范：</strong>统一使用【模块】【必现/偶现】前缀，方便分类统计。</div></div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>2.2 需要改进 — CBT5 的教训</h3>
+
+<div class="lesson"><span class="tag">教训 1</span><strong>TAPD 中途启用导致数据不完整。</strong>CBT4 前期需求未录入 TAPD，老功能迭代的需求可能遗漏。CBT5 应从第一天就全面使用。</div>
+<div class="lesson"><span class="tag">教训 2</span><strong>需求优先级管理缺失。</strong>70.8% 的需求未设置优先级，导致的后果是所有人都按"感觉"排优先级，资源分配依赖口头沟通。</div>
+<div class="lesson"><span class="tag">教训 3</span><strong>迭代超期无预警机制。</strong>0.5.0_新功能计划 6/12 结束但至今未关闭，缺乏中间里程碑检查和风险预警。</div>
+<div class="lesson"><span class="tag">教训 4</span><strong>需求-代码追溯断裂。</strong>SVN 提交中仅 7% 包含 TAPD 链接，无法从代码变更追溯到需求来源。</div>
+<div class="lesson"><span class="tag">教训 5</span><strong>没有版本发布分支。</strong>SVN 缺少 release 分支，所有人都在主线提交，没有版本隔离和回滚能力。</div>
+<div class="lesson"><span class="tag">教训 6</span><strong>缺陷流转环节不透明。</strong>45 个缺陷在"转测试"状态、19 个处于"新"状态但未分配——流转瓶颈无法被团队感知。</div>
+</div>
+
+<div class="card">
+<h3>2.3 CBT4 → CBT5 过渡清单</h3>
+<table>
+<tr><th>#</th><th>改进项</th><th>负责人</th><th>目标状态</th></tr>
+<tr><td>1</td><td>制定需求命名规范和模板（总单→子任务）</td><td>PM</td><td><span class="badge bg-blue">CBT5 启动前</span></td></tr>
+<tr><td>2</td><td>强制所有需求关联迭代和优先级</td><td>PM + 全员</td><td><span class="badge bg-blue">CBT5 D1</span></td></tr>
+<tr><td>3</td><td>建立 SVN pre-commit hook 校验提交消息格式</td><td>技术负责人</td><td><span class="badge bg-blue">CBT5 第1周</span></td></tr>
+<tr><td>4</td><td>清理 100 个未分配迭代的需求 → 归入 CBT5 或关闭</td><td>PM</td><td><span class="badge bg-blue">CBT5 第1周</span></td></tr>
+<tr><td>5</td><td>建立 SVN release 分支策略</td><td>技术负责人</td><td><span class="badge bg-orange">CBT5 第2周</span></td></tr>
+<tr><td>6</td><td>上线缺陷 SLA 规则 + 值班人制度</td><td>QA + PM</td><td><span class="badge bg-orange">CBT5 第2周</span></td></tr>
+<tr><td>7</td><td>关闭 0.5.0_新功能 剩余 5 个需求</td><td>相关开发</td><td><span class="badge bg-red">立即</span></td></tr>
+</table>
+</div>
+
+<hr class="divider">
+<div class="card" style="text-align:center;color:#999;font-size:12px">
+<p>CBT4 版本回顾 — 代号1688项目 | 数据来源: TAPD #40753624 | 生成: 2026.07.05</p>
+</div>
+
+</div>
+
+<script>
+Chart.defaults.font.family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif";
+Chart.defaults.font.size=12;
+const C={green:'#27AE60',orange:'#F39C12',blue:'#2E86C1',red:'#E74C3C',gray:'#95A5A6',purple:'#8E44AD'};
+
+new Chart(document.getElementById('iterStackChart'),{
+type:'bar',
+data:{labels:['0.5.0_老功能','0.5.0_新功能'],datasets:[
+{label:'已完成',data:[150,43],backgroundColor:C.green},
+{label:'未完成',data:[0,5],backgroundColor:C.orange}
+]},
+options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,max:160}},plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('bugTrendChart'),{
+type:'line',
+data:{labels:['3月','4月','5月','6月'],datasets:[
+{label:'新增缺陷',data:[50,350,250,250],borderColor:C.red,backgroundColor:'rgba(231,76,60,0.08)',fill:true,tension:0.3},
+{label:'关闭缺陷',data:[30,320,240,260],borderColor:C.green,backgroundColor:'rgba(39,174,96,0.08)',fill:true,tension:0.3}
+]},
+options:{responsive:true,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom'}}}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DanceNew 项目源码分析总报告</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5d6875;
+      --line: #d9e0e8;
+      --paper: #ffffff;
+      --soft: #f6f8fb;
+      --blue: #2457a6;
+      --teal: #087c7a;
+      --amber: #b66a00;
+      --red: #b42318;
+      --green: #20704d;
+      --shadow: 0 10px 28px rgba(22, 34, 51, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #edf1f6;
+      font: 15px/1.68 "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 28px auto 60px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    header {
+      padding: 42px 48px 34px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfcfe 0%, #f4f7fb 100%);
+    }
+
+    .kicker {
+      color: var(--blue);
+      font-weight: 700;
+      letter-spacing: 0;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 14px 0 0;
+      color: var(--muted);
+      max-width: 900px;
+      font-size: 16px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .meta div {
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 12px 14px;
+      min-height: 70px;
+    }
+
+    .meta b {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .meta span {
+      display: block;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 48px;
+      background: rgba(255,255,255,0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(6px);
+    }
+
+    nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: #fff;
+      font-size: 13px;
+    }
+
+    main { padding: 34px 48px 54px; }
+
+    section { margin: 0 0 42px; }
+
+    h2 {
+      font-size: 24px;
+      margin: 0 0 16px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      font-size: 18px;
+      margin: 24px 0 10px;
+      letter-spacing: 0;
+    }
+
+    p { margin: 0 0 12px; }
+
+    .lead {
+      font-size: 18px;
+      line-height: 1.7;
+      color: #1b2c40;
+      margin-bottom: 18px;
+    }
+
+    .verdict {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      padding: 18px;
+    }
+
+    .panel.white { background: #fff; }
+
+    .score {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .score .item {
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 15px;
+    }
+
+    .score .num {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--blue);
+      line-height: 1.1;
+    }
+
+    .score .label {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid currentColor;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tag.p0 { color: var(--red); }
+    .tag.p1 { color: var(--amber); }
+    .tag.ok { color: var(--green); }
+    .tag.mid { color: var(--teal); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f2f5f9;
+      color: #26384d;
+      font-weight: 700;
+    }
+
+    td strong { color: #111827; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 16px;
+      min-height: 100%;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+
+    ul, ol {
+      margin: 8px 0 14px 22px;
+      padding: 0;
+    }
+
+    li { margin: 4px 0; }
+
+    code {
+      padding: 1px 4px;
+      background: #eef2f7;
+      border: 1px solid #d7dfea;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+      margin: 16px 0 8px;
+    }
+
+    .flow div {
+      position: relative;
+      border: 1px solid #bfd0e6;
+      background: #f7fbff;
+      padding: 12px 10px;
+      min-height: 78px;
+    }
+
+    .flow b {
+      display: block;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+
+    .flow span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 0;
+      border: 1px solid var(--line);
+    }
+
+    .timeline .when,
+    .timeline .what {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .timeline .when {
+      background: #f2f5f9;
+      font-weight: 700;
+      color: #26384d;
+    }
+
+    .timeline .what:last-child,
+    .timeline .when:nth-last-child(2) { border-bottom: 0; }
+
+    .callout {
+      border-left: 4px solid var(--blue);
+      background: #f5f8fc;
+      padding: 14px 16px;
+      margin: 16px 0;
+    }
+
+    .callout.risk { border-left-color: var(--red); background: #fff7f6; }
+    .callout.ok { border-left-color: var(--green); background: #f5fbf8; }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 18px 48px 30px;
+      color: var(--muted);
+      background: #fafbfc;
+      font-size: 13px;
+    }
+
+    @media (max-width: 920px) {
+      .page { width: 100%; margin: 0; border-left: 0; border-right: 0; }
+      header, main, nav, footer { padding-left: 20px; padding-right: 20px; }
+      .meta, .verdict, .grid-2, .grid-3, .score { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .timeline { grid-template-columns: 1fr; }
+      .timeline .when { border-bottom: 0; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page { width: auto; margin: 0; border: 0; box-shadow: none; }
+      nav { position: static; }
+      a { color: #000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="kicker">手游研发项目源码资料库分析</div>
+      <h1>DanceNew 项目源码分析总报告</h1>
+      <p class="subtitle">
+        面向首次技术测试前的制作人决策材料：汇总架构、功能模块、开发进度、风险台账、资源配置一致性与研发流程质量。
+        本报告基于本地源码与工程资料静态分析，不能替代真机包、服务端联调、灰度压测和渠道验收。
+      </p>
+      <div class="meta">
+        <div><b>项目路径</b><span>D:\Project_Work_SVN\SY_1688_svn\dance_client_develop\DanceNew</span></div>
+        <div><b>分析日期</b><span>2026-06-29</span></div>
+        <div><b>工程类型</b><span>Unity 手游客户端</span></div>
+        <div><b>阶段判断</b><span>首测候选版本，风险中高</span></div>
+      </div>
+    </header>
+
+    <nav>
+      <a href="#summary">核心结论</a>
+      <a href="#evidence">证据快照</a>
+      <a href="#architecture">架构画像</a>
+      <a href="#chain">主链路</a>
+      <a href="#modules">功能进度</a>
+      <a href="#risks">风险台账</a>
+      <a href="#readiness">首测准入</a>
+      <a href="#quality">研发质量</a>
+      <a href="#actions">行动建议</a>
+      <a href="#appendix">分报告</a>
+    </nav>
+
+    <main>
+      <section id="summary">
+        <h2>1. 核心结论</h2>
+        <div class="verdict">
+          <div class="panel">
+            <p class="lead">
+              当前项目不是早期空壳，主体功能、资源内容和主链路代码已经铺开，具备“有条件进入首次技术测试”的基础。
+              但它还不能按普通收尾期乐观处理：底层框架和基础系统经历多次改动后，最大风险已经从“有没有功能”转为“真包运行时各系统是否一致”。
+            </p>
+            <div class="callout risk">
+              建议评级：<strong>有条件可测，风险中高。</strong>
+              只有在 P0 风险关闭、首测入口收敛、真机真包冒烟通过、日志与崩溃采集可用的前提下，下月首次技术测试才是合理的。
+            </div>
+          </div>
+          <div class="score">
+            <div class="item"><div class="num">6.5/10</div><div class="label">首测可测性：主链路可测，但依赖真包验证</div></div>
+            <div class="item"><div class="num">6/10</div><div class="label">架构稳健性：框架成型，运行时装配风险偏高</div></div>
+            <div class="item"><div class="num">P0 x 6</div><div class="label">必须在首测前关闭或验证的高优先风险</div></div>
+          </div>
+        </div>
+
+        <h3>制作人视角的一句话判断</h3>
+        <p>
+          这个版本可以作为<strong>首次技术测试候选版本</strong>，但测试目标应定义为“验证主链路稳定性与技术可靠性”，而不是“展示完整商业化和外围玩法”。
+          如果团队把活动、VIP、首充、礼包、婚礼、拍照、心动房、家族等外围入口一起打开，首测反馈很可能被资源缺失、卡 loading、弱网状态错乱和未完成体验淹没。
+        </p>
+      </section>
+
+      <section id="evidence">
+        <h2>2. 关键证据快照</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>工程与构建</h3>
+            <ul>
+              <li>Unity 版本：<code>2022.3.57f1c1</code></li>
+              <li>客户端版本：<code>0.0622.000</code></li>
+              <li>Android 包名：<code>com.auforever.jwzx</code></li>
+              <li>Android 后端：IL2CPP</li>
+              <li>关键技术：HybridCLR、AssetBundle、URP、UniTask、DOTween、Spine、Bugly、YouMe、NativeGallery</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>代码规模</h3>
+            <ul>
+              <li>UI：375 个脚本，约 59,488 行</li>
+              <li>Proto：27 个脚本，约 117,750 行</li>
+              <li>DataManager：23 个脚本，约 12,398 行</li>
+              <li>SDK：44 个脚本，约 11,002 行</li>
+              <li>GamePlay、Net、Config、Character 等模块均已成型</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>资源体量</h3>
+            <ul>
+              <li><code>StreamingAssets</code>：约 37,275 文件，3.56 GB</li>
+              <li>动画资源：约 5.84 GB</li>
+              <li>场景资源：约 2.00 GB</li>
+              <li>角色资源：约 1.28 GB</li>
+              <li>序列资源：约 1.23 GB，音频约 1.11 GB</li>
+            </ul>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>检查项</th>
+              <th>结果</th>
+              <th>首测含义</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>场景与 BuildSettings</td>
+              <td>10 个场景，BuildSettings 中均存在</td>
+              <td><span class="tag ok">相对健康</span> 场景配置基础一致，但仍需真包加载验证</td>
+            </tr>
+            <tr>
+              <td>配置 JSON</td>
+              <td>声明 69 项，去重 68 项；JSON 68 项；缺失 0；重复 1 项</td>
+              <td><span class="tag ok">基础可用</span> 但重复声明和空资源处理仍应修正</td>
+            </tr>
+            <tr>
+              <td>UIConfig 与 Prefab</td>
+              <td>146 个唯一路径，124 个命中，22 个缺失或路径不匹配</td>
+              <td><span class="tag p1">中高风险</span> 主要集中在活动、VIP、首充、礼包、抽卡、礼物、CP 商城等外围系统</td>
+            </tr>
+            <tr>
+              <td>热更 DLL / AOT</td>
+              <td>运行时固定加载 13 个热更 DLL 与 4 个 AOT 元数据；当前目录不能直接证明最终包清单完整</td>
+              <td><span class="tag p0">P0</span> 必须用首测 Android 真包输出加载日志和资源映射校验</td>
+            </tr>
+            <tr>
+              <td>崩溃采集</td>
+              <td><code>GameLaunch.Awake()</code> 中 <code>BuglyInit</code> 调用被注释</td>
+              <td><span class="tag p0">P0</span> 首测若无崩溃聚合，问题定位效率会明显下降</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="architecture">
+        <h2>3. 架构画像</h2>
+        <p>
+          项目是典型 Unity + 热更 + 资源包 + 业务 DLL 分层结构。底层通过启动器、资源管理、HybridCLR、配置系统和管理器框架完成运行时装配；业务层以 UI、DataManager、GamePlay、Net、Battle、Scene 等模块承载玩法与交互。
+        </p>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>正向信号</h3>
+            <ul>
+              <li>启动、热更、配置、UI、网络、场景、玩法管理器均有明确代码路径。</li>
+              <li>asmdef 分层存在，说明团队有模块边界意识，不是单体脚本堆砌。</li>
+              <li>资源、配置、协议和 UI 规模已经进入“内容生产后期”，不是原型阶段。</li>
+              <li>有 AssetBundle、配置导出、Protobuf、Bugly、资源依赖等编辑器工具痕迹。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>结构性风险</h3>
+            <ul>
+              <li>运行时装配点多：反射、事件总线、热更 DLL、AOT 元数据、资源包、配置路径必须同时对齐。</li>
+              <li>UI 是最大业务层，且直接连接数据、网络、玩法、SDK，集成风险集中。</li>
+              <li>历史重构痕迹较明显，部分模块出现注释、临时方案、TODO、协议注册不一致。</li>
+              <li>自动化测试缺失，出包质量高度依赖人工冒烟。</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>简化分层图</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>层级</th>
+              <th>主要模块</th>
+              <th>判断</th>
+              <th>风险点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>启动与热更层</td>
+              <td><code>GameLaunch</code>、<code>GameMain</code>、<code>LoadDll</code>、AssetBundle、HybridCLR</td>
+              <td>链路完整，首测前置能力基本具备</td>
+              <td>真包差异、DLL/AOT 清单、资源包映射</td>
+            </tr>
+            <tr>
+              <td>基础管理层</td>
+              <td>Input、Config、Data、Net、GamePlay、UI、Scene</td>
+              <td>管理器职责基本清楚</td>
+              <td>初始化顺序、单例状态、切号/重进游戏</td>
+            </tr>
+            <tr>
+              <td>业务玩法层</td>
+              <td>Room、Battle、Chat、Bag、Shop、Friend、Activity、Family、Wedding、PhotoStudio</td>
+              <td>覆盖面较广，主链路具备测试基础</td>
+              <td>外围功能成熟度不均，入口需治理</td>
+            </tr>
+            <tr>
+              <td>表现与内容层</td>
+              <td>UI Prefab、场景、角色、动画、Spine、音频、序列</td>
+              <td>内容量充足</td>
+              <td>包体压力、加载压力、路径漂移</td>
+            </tr>
+            <tr>
+              <td>SDK 与运维层</td>
+              <td>Bugly、YouMe、NativeGallery、支付/分享/渠道接口</td>
+              <td>接入痕迹完整</td>
+              <td>首测环境、权限、崩溃采集、渠道回调</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="chain">
+        <h2>4. 启动、热更、登录、进服最小闭环</h2>
+        <p>
+          最小闭环已经能从源码中追出完整路径：启动初始化、热更资源、加载 DLL、初始化管理器、加载配置、打开登录、连接服务器、进入频道、加载广场或房间、进入基础玩法。
+          首测最大不确定性不是“有没有路径”，而是这条路径在 Android 真包、真实网络和真实服务端环境下是否稳定。
+        </p>
+
+        <div class="flow">
+          <div><b>1. 启动</b><span><code>GameLaunch.Awake/Start</code><br>SDK、帧率、热更入口</span></div>
+          <div><b>2. 热更</b><span>InitHotUpdate<br>InitAssetBundle<br>资源版本与包体</span></div>
+          <div><b>3. DLL</b><span><code>LoadDll</code><br>13 个热更 DLL<br>4 个 AOT 元数据</span></div>
+          <div><b>4. 管理器</b><span>Config/Data/Net/UI<br>Scene/GamePlay</span></div>
+          <div><b>5. 登录</b><span>登录 UI<br>协议注册<br>角色数据</span></div>
+          <div><b>6. 进服玩法</b><span>频道/广场/房间<br>基础战斗/结算</span></div>
+        </div>
+
+        <div class="callout risk">
+          重点风险节点：断线重连逻辑不完整；频道加入存在“先关闭 UI 再等服务端回包”的卡 loading 风险；Bugly 初始化疑似未启用；热更 DLL 与 AOT 元数据必须通过首测包实际清单确认。
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>节点</th>
+              <th>当前判断</th>
+              <th>首测前必须验证</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>启动与热更</td>
+              <td>代码链路清晰，但运行时依赖重</td>
+              <td>Android 冷启动、更新失败兜底、资源包清单、DLL 加载日志</td>
+            </tr>
+            <tr>
+              <td>配置加载</td>
+              <td>声明与 JSON 基本一致</td>
+              <td>缺失配置不应空引用；首测配置版本锁定</td>
+            </tr>
+            <tr>
+              <td>登录和频道</td>
+              <td>有完整链路，频道加入状态处理偏乐观</td>
+              <td>失败、超时、断线、重复点击、服务器拒绝时必须能回退</td>
+            </tr>
+            <tr>
+              <td>场景与房间</td>
+              <td>场景配置存在，房间/玩法代码覆盖较广</td>
+              <td>普通房间优先冒烟，不建议一次开放全部特殊房型</td>
+            </tr>
+            <tr>
+              <td>战斗与结算</td>
+              <td>基础玩法具备测试价值</td>
+              <td>节拍、同步、结算、弱网、重进、异常退出</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="modules">
+        <h2>5. 功能模块完成度与开放建议</h2>
+        <p>
+          功能覆盖面很广，但首测不应按“代码存在就开放”决策。更合理的策略是按主链路、可控外围、隐藏/灰度、待确认四档管理入口。
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>档位</th>
+              <th>首测策略</th>
+              <th>模块</th>
+              <th>判断</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag ok">A</span></td>
+              <td>必须开放并重点验收</td>
+              <td>启动热更、登录创角、频道、广场、普通房间、基础战斗、结算</td>
+              <td>这是首次技术测试的价值核心，也是判断版本能否继续推进的底线。</td>
+            </tr>
+            <tr>
+              <td><span class="tag mid">B</span></td>
+              <td>可开放但控制范围</td>
+              <td>基础聊天、背包/换装、好友、商城浏览、邮件、任务、成就、设置</td>
+              <td>可用于补充体验，但必须限制跳转范围和奖励链路，避免引到未稳定模块。</td>
+            </tr>
+            <tr>
+              <td><span class="tag p1">C</span></td>
+              <td>建议隐藏或专项灰度</td>
+              <td>家族、拍照馆、心动房、婚礼、复杂活动抽奖、服装兑换、蓝图、VIP、礼包、首充</td>
+              <td>代码量不等于成熟度。多数不在首测主链路，开放会显著放大问题面。</td>
+            </tr>
+            <tr>
+              <td><span class="tag p0">D</span></td>
+              <td>需要研发和运营明确确认</td>
+              <td>真实支付、分享、相册保存、语音权限、客服/问卷、账号绑定、渠道 SDK</td>
+              <td>涉及外部 SDK、权限、合规、支付和渠道环境，不宜靠普通冒烟带过。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>建议首测公开范围</h3>
+            <ul>
+              <li>安装、启动、热更、登录、创角或选角。</li>
+              <li>进频道、进广场、基础大厅操作。</li>
+              <li>普通房间创建/加入/退出。</li>
+              <li>核心舞蹈玩法一局完整体验与结算。</li>
+              <li>基础聊天、基础背包/换装、基础好友、设置。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>建议首测隐藏范围</h3>
+            <ul>
+              <li>复杂活动、抽奖、首充、礼包、VIP、CP 商城。</li>
+              <li>家族、婚礼、心动房、拍照馆等非主链路场景。</li>
+              <li>真实支付和复杂赠送链路。</li>
+              <li>会跳转到未验收系统的任务与活动入口。</li>
+              <li>测试 UI 和测试配置残留入口。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="risks">
+        <h2>6. 首测风险台账</h2>
+        <p>
+          当前最关键的风险都不是“未来优化项”，而是会直接影响首次技术测试是否可用、是否可定位、是否能得到有效反馈的风险。
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>风险</th>
+              <th>等级</th>
+              <th>影响</th>
+              <th>建议 owner</th>
+              <th>关闭标准</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>R-001</td>
+              <td>热更 DLL / AOT 真包完整性不可直接确认</td>
+              <td><span class="tag p0">P0</span></td>
+              <td>启动失败、黑屏、反射异常、真机崩溃</td>
+              <td>客户端 / 构建</td>
+              <td>首测 Android 包逐项打印 13 个热更 DLL 和 AOT 元数据加载成功</td>
+            </tr>
+            <tr>
+              <td>R-002</td>
+              <td>断线重连逻辑不完整</td>
+              <td><span class="tag p0">P0</span></td>
+              <td>弱网卡死、状态错乱、房间/战斗无法恢复</td>
+              <td>客户端 / 服务端</td>
+              <td>弱网、断网、重连、超时、回登录均有可控表现</td>
+            </tr>
+            <tr>
+              <td>R-003</td>
+              <td>频道加入失败可能卡 loading</td>
+              <td><span class="tag p0">P0</span></td>
+              <td>登录后无法进广场，首测转化漏斗阻断</td>
+              <td>客户端 / 服务端</td>
+              <td>频道加入失败、超时、服务端拒绝时可关闭 loading 并回退</td>
+            </tr>
+            <tr>
+              <td>R-004</td>
+              <td>崩溃采集疑似未启用</td>
+              <td><span class="tag p0">P0</span></td>
+              <td>首测崩溃无法聚合，修复效率低</td>
+              <td>客户端 / 运维</td>
+              <td>Bugly 或等价系统在首测包启用并完成模拟崩溃验证</td>
+            </tr>
+            <tr>
+              <td>R-005</td>
+              <td>UIConfig 存在 22 个缺失或路径不匹配 UI</td>
+              <td><span class="tag p1">P0/P1</span></td>
+              <td>入口打开失败、报错、卡流程</td>
+              <td>客户端 / UI / 配置</td>
+              <td>首测开放 UIFlag 100% 有 Prefab 且能打开</td>
+            </tr>
+            <tr>
+              <td>R-006</td>
+              <td>首测功能入口未收敛</td>
+              <td><span class="tag p1">P0/P1</span></td>
+              <td>玩家进入未完成外围系统，反馈失焦</td>
+              <td>制作 / 策划 / 客户端</td>
+              <td>入口开关表完成，C/D 档默认隐藏</td>
+            </tr>
+            <tr>
+              <td>R-011</td>
+              <td>自动化测试缺失</td>
+              <td><span class="tag p1">P1</span></td>
+              <td>每次出包依赖人工冒烟，回归风险高</td>
+              <td>QA / 客户端</td>
+              <td>至少建立启动、配置、UI 资源、登录主链路的自动或半自动检查</td>
+            </tr>
+            <tr>
+              <td>R-012</td>
+              <td>服务器环境硬编码为 dev 域名</td>
+              <td><span class="tag p1">P1</span></td>
+              <td>环境混乱、数据污染、联调误判</td>
+              <td>服务端 / 客户端 / 运维</td>
+              <td>首测环境域名、端口、版本、数据库隔离明确，并可配置切换</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="readiness">
+        <h2>7. 首次技术测试准入闸门</h2>
+        <p>
+          建议把“能不能发首测包”从主观进度汇报变成一张准入表。P0 未关闭，不建议扩大测试；P1 可带入，但必须有 owner、规避方案和测试范围说明。
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>类别</th>
+              <th>准入条件</th>
+              <th>当前判断</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>包体与热更</td>
+              <td>Android 首测包完成冷启动、更新、资源失败兜底、DLL/AOT 加载日志验证</td>
+              <td><span class="tag p0">必须补证据</span></td>
+            </tr>
+            <tr>
+              <td>主链路</td>
+              <td>安装启动、登录、创角/选角、进频道、进广场、进普通房间、打一局、结算 10 次连续通过</td>
+              <td><span class="tag p0">必须实测</span></td>
+            </tr>
+            <tr>
+              <td>弱网与异常</td>
+              <td>断网、切后台、重连、服务器断开、频道失败、战斗中掉线均有可控体验</td>
+              <td><span class="tag p0">当前高风险</span></td>
+            </tr>
+            <tr>
+              <td>可观测性</td>
+              <td>崩溃、关键错误、登录漏斗、资源加载失败、网络断开可被收集和定位</td>
+              <td><span class="tag p0">需确认启用</span></td>
+            </tr>
+            <tr>
+              <td>入口治理</td>
+              <td>首测入口开关表完成，C/D 档入口隐藏，任务/活动跳转不越界</td>
+              <td><span class="tag p1">需制作决策</span></td>
+            </tr>
+            <tr>
+              <td>UI 与资源</td>
+              <td>首测开放入口 100% Prefab 存在且真机可打开</td>
+              <td><span class="tag p1">需扫描闭环</span></td>
+            </tr>
+            <tr>
+              <td>服务端环境</td>
+              <td>首测环境与开发环境隔离，域名端口、版本、数据库、回滚策略明确</td>
+              <td><span class="tag p1">需确认</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout ok">
+          若上述 P0 闸门全部通过，项目可以进入小规模首次技术测试。若 P0 仍靠 Editor 或口头确认，不建议扩大到外部玩家，因为问题会集中表现为黑屏、卡登录、卡频道、资源缺失、断线后状态错乱和崩溃不可定位。
+        </div>
+      </section>
+
+      <section id="quality">
+        <h2>8. 工程质量与研发流程评价</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>已经具备的工程能力</h3>
+            <ul>
+              <li>Unity Test Framework、Memory Profiler 等包存在，说明具备接入测试和性能分析的基础。</li>
+              <li>资源、配置、Protobuf、AssetBundle、Bugly、依赖分析等编辑器工具已有建设痕迹。</li>
+              <li>SVN 工程资料较完整，适合继续补充出包审计和版本记录。</li>
+              <li>模块结构不是散乱原型，主链路有清楚的启动与管理器体系。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>需要补强的流程能力</h3>
+            <ul>
+              <li>未发现有效 NUnit / UnityTest / Assert 测试，回归质量高度依赖人工。</li>
+              <li>Debug 日志和 TODO/临时方案较多，首测日志需要降噪并保留关键漏斗。</li>
+              <li>UI、配置、资源、热更清单缺少打包前硬性校验，容易把错误带到真包。</li>
+              <li>环境配置疑似偏开发环境，首测域名、端口、数据库和版本管理需要明确。</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>客观评价</h3>
+        <p>
+          从源码状态看，团队已经完成了大量业务实现和内容接入，项目不属于“做不出来”的状态。
+          但当前阶段最该投入的不是继续扩功能，而是建立首测前的稳定性闭环：构建产物可验证、入口范围可控、异常路径有兜底、日志崩溃可定位、配置资源能自动扫描。
+          这些工作看起来不像新功能，但它们决定首测能否产生有效反馈。
+        </p>
+      </section>
+
+      <section id="actions">
+        <h2>9. 建议行动计划</h2>
+        <div class="timeline">
+          <div class="when">未来 3 天</div>
+          <div class="what">
+            <strong>先关 P0 证据口。</strong>
+            输出首测目标包信息、热更 DLL/AOT 真包加载日志、Bugly 启用证明、服务器环境说明、首测入口开关表。
+          </div>
+          <div class="when">未来 7 天</div>
+          <div class="what">
+            <strong>完成主链路真机冒烟。</strong>
+            Android 包按安装、启动、热更、登录、频道、广场、房间、基础战斗、结算、弱网、重连、切后台、崩溃上报逐项跑通。
+          </div>
+          <div class="when">首测前一周</div>
+          <div class="what">
+            <strong>冻结首测范围。</strong>
+            C/D 档入口默认隐藏；活动、VIP、礼包、首充、抽奖、家族、婚礼、拍照馆、心动房不进入普通首测，除非有专项 owner 承担风险。
+          </div>
+          <div class="when">首测期间</div>
+          <div class="what">
+            <strong>按漏斗和风险看数据。</strong>
+            重点看启动成功率、热更成功率、登录成功率、进频道成功率、进房成功率、战斗完成率、崩溃率、断线恢复率，而不是泛泛收集意见。
+          </div>
+        </div>
+
+        <h3>制作人会议追问清单</h3>
+        <ol>
+          <li>首测包实际加载的 13 个热更 DLL 和 4 个 AOT 元数据，能否提供真机日志？</li>
+          <li>Bugly 或等价崩溃系统是否在首测包启用？是否做过模拟崩溃验证？</li>
+          <li>频道加入失败、服务器不回包、断线、弱网情况下，玩家会看到什么？能否回退？</li>
+          <li>UIConfig 的 22 个缺失或路径不匹配项，哪些会在首测开放？对应入口是否已隐藏？</li>
+          <li>首测开放功能列表和隐藏入口列表是否已经由制作、策划、客户端、服务端共同确认？</li>
+          <li>当前硬编码的 dev 域名是否就是首测环境？首测环境是否与开发环境隔离？</li>
+          <li>如果首测当天大量玩家卡 loading，研发如何在 30 分钟内判断是资源、网络、服务端还是 UI？</li>
+        </ol>
+      </section>
+
+      <section id="appendix">
+        <h2>10. 分报告目录</h2>
+        <p>
+          以下 Markdown 分报告保留了更细的源码证据、模块拆解和检查清单，可作为研发排查和评审会议材料。
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>报告</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="./项目分析报告结构.md">项目分析报告结构.md</a></td>
+              <td>定义整体分析框架、报告目录和后续分析维度。</td>
+            </tr>
+            <tr>
+              <td><a href="./首测readiness快评.md">首测readiness快评.md</a></td>
+              <td>首测可行性、主要风险、模块进度初判和准入清单。</td>
+            </tr>
+            <tr>
+              <td><a href="./启动热更登录进服最小闭环分析.md">启动热更登录进服最小闭环分析.md</a></td>
+              <td>启动、热更、登录、频道、场景、房间、战斗最小链路。</td>
+            </tr>
+            <tr>
+              <td><a href="./模块架构全景图.md">模块架构全景图.md</a></td>
+              <td>代码规模、架构分层、asmdef 依赖、运行时通信模型。</td>
+            </tr>
+            <tr>
+              <td><a href="./功能模块完成度评估.md">功能模块完成度评估.md</a></td>
+              <td>按功能模块评估完成度、首测开放建议和验收重点。</td>
+            </tr>
+            <tr>
+              <td><a href="./资源与配置一致性扫描.md">资源与配置一致性扫描.md</a></td>
+              <td>UIConfig、配置 JSON、场景、热更 DLL/AOT、资源体量扫描。</td>
+            </tr>
+            <tr>
+              <td><a href="./首测风险台账.md">首测风险台账.md</a></td>
+              <td>P0/P1/P2 风险、影响、owner、关闭标准和会议问题。</td>
+            </tr>
+            <tr>
+              <td><a href="./现阶段开发进度与客观评价.md">现阶段开发进度与客观评价.md</a></td>
+              <td>当前研发阶段、完成度判断、首测价值和管理评价。</td>
+            </tr>
+            <tr>
+              <td><a href="./工程质量与研发流程评估.md">工程质量与研发流程评估.md</a></td>
+              <td>测试、日志、构建、配置、资源、流程治理能力评估。</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer>
+      本报告由本地源码静态分析生成。结论适用于首测前决策与排查优先级排序；最终发测判断仍需以 Android 真包、真实服务端环境、真实网络条件下的验收结果为准。
+    </footer>
+  </div>
+</body>
+</html>

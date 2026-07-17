@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DanceNew 项目深度分析报告 v3.0 (2026-06-01)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #0f0f11; color: #e0e0e0; line-height: 1.8; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+  .header { text-align: center; padding: 48px 0; border-bottom: 1px solid #2a2a2e; margin-bottom: 40px; }
+  .header h1 { font-size: 2.2em; font-weight: 700; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+  .header .subtitle { color: #888; font-size: 0.95em; margin-top: 12px; }
+  .header .meta { color: #666; font-size: 0.85em; margin-top: 8px; }
+  .card { background: #1a1a1e; border: 1px solid #2a2a2e; border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+  .card h2 { font-size: 1.3em; font-weight: 600; margin-bottom: 16px; color: #f0c0ff; display: flex; align-items: center; gap: 8px; }
+  .card h3 { font-size: 1.05em; font-weight: 600; margin: 16px 0 8px; color: #90c0ff; }
+  .card p, .card li { color: #b0b0b4; font-size: 0.92em; }
+  .progress-bar { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+  .progress-track { flex: 1; height: 20px; background: #2a2a2e; border-radius: 10px; overflow: hidden; position: relative; }
+  .progress-fill { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+  .progress-bar .label { min-width: 48px; text-align: right; font-size: 0.85em; font-weight: 600; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 0.8em; font-weight: 500; }
+  .tag-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .tag-yellow { background: rgba(234,179,8,0.15); color: #eab308; }
+  .tag-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .tag-blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .tag-purple { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+  .tag-pink { background: rgba(244,114,182,0.15); color: #f472b6; }
+  .tag-orange { background: rgba(249,115,22,0.15); color: #f97316; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 12px 0; }
+  .stat-item { background: #222226; border-radius: 10px; padding: 14px; text-align: center; }
+  .stat-item .num { font-size: 1.6em; font-weight: 700; }
+  .stat-item .desc { font-size: 0.78em; color: #888; margin-top: 4px; }
+  .changes-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.88em; }
+  .changes-table th { background: #222226; padding: 8px 12px; text-align: left; font-weight: 600; color: #f0c0ff; border-bottom: 1px solid #333; }
+  .changes-table td { padding: 8px 12px; border-bottom: 1px solid #28282c; }
+  .divider { height: 1px; background: #2a2a2e; margin: 24px 0; }
+  .alert { padding: 14px 18px; border-radius: 10px; margin: 12px 0; font-size: 0.9em; }
+  .alert-warn { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); color: #fbbf24; }
+  .alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; }
+  .alert-danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+  .flow-box { background: #222226; border-radius: 10px; padding: 14px; margin: 8px 0; font-size: 0.88em; text-align: center; }
+  @media (max-width: 768px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } .header h1 { font-size: 1.6em; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>DanceNew 项目深度分析报告 v3.0</h1>
+  <div class="subtitle">Unity 2022.3 LTS · URP · HybridCLR · 手游社交舞蹈项目</div>
+  <div class="meta">分析日期: 2026-06-01 · 周期: 2026-05-08 → 2026-06-01 (三周) · CS 文件总量: 1180</div>
+</div>
+
+<!-- Executive Summary -->
+<div class="card">
+  <h2>📊 三周开发综述</h2>
+  <p>五月的三周中，研发团队在战斗/婚礼/照相馆核心链路已跑通的基础上，进入了 <strong>功能扩展和系统完善阶段</strong>。<strong>312 个 CS 文件</strong>被修改/新增。核心方向转向 <strong>社交玩法丰富化</strong>（心印系统、广场场景、服装抽卡）、<strong>运营系统搭建</strong>（活动中心/抽奖/签到/任务）和<strong>底层优化</strong>（Battle CampRule 策略模式、LBS 定位服务）。</p>
+
+  <div class="stat-grid">
+    <div class="stat-item"><div class="num" style="color:#22c55e">312</div><div class="desc">三周变更 CS 文件</div></div>
+    <div class="stat-item"><div class="num" style="color:#f472b6">1,180</div><div class="desc">项目总 CS 文件</div></div>
+    <div class="stat-item"><div class="num" style="color:#3b82f6">34</div><div class="desc">UI 模块目录</div></div>
+    <div class="stat-item"><div class="num" style="color:#8b5cf6">34</div><div class="desc">新增配置表</div></div>
+    <div class="stat-item"><div class="num" style="color:#f97316">12</div><div class="desc">HybridCLR DLL</div></div>
+  </div>
+</div>
+
+<!-- Module Change Matrix -->
+<div class="card">
+  <h2>🔬 各模块变更深度分析</h2>
+  <table class="changes-table">
+    <thead><tr><th>模块</th><th>文件数</th><th>性质</th><th>核心变更</th></tr></thead>
+    <tbody>
+      <tr><td>Config/cfg/Data</td><td>34</td><td><span class="tag tag-blue">大规模配置扩展</span></td><td>34 个新/改配置表：抽卡(Draw/DrawPity/DrawRedeem)、心印礼物(SoulmateGift)、时装兑换(ClothesChange*)、活动、任务、笔记本</td></tr>
+      <tr><td>UI/ClothingExchange</td><td>17</td><td><span class="tag tag-pink">新增系统</span></td><td>服装/蓝图兑换系统：抽卡界面、兑换商店、蓝图背包、赠送/发送记录、账号绑定</td></tr>
+      <tr><td>DataManager</td><td>17</td><td><span class="tag tag-purple">数据层扩展</span></td><td>新增 ClothingExchangeManager(完整)、RedeemShopManager；扩展 Activity/Chat/Family/Friend/RedDot 等</td></tr>
+      <tr><td>GameCommon</td><td>15</td><td><span class="tag tag-yellow">基础层更新</span></td><td>新增 ActivityDefine、CyclicData、LogManager；BattleDefine/ChatDefine/MainPlayerData 扩展</td></tr>
+      <tr><td>UI/Common</td><td>12</td><td><span class="tag tag-yellow">通用组件</span></td><td>通用 UI 组件库扩展</td></tr>
+      <tr><td>Character</td><td>12</td><td><span class="tag tag-yellow">角色层迭代</span></td><td>BattlePlayer/Actor/RoomPlayer 继续优化</td></tr>
+      <tr><td>Net/ProtoExtensions</td><td>10</td><td><span class="tag tag-yellow">协议扩展</span></td><td>新增 HeartbeatMate 注册、Chat/PhotoStudio 协议更新</td></tr>
+      <tr><td>UI/AcitivityCenter</td><td>9</td><td><span class="tag tag-pink">新增系统</span></td><td>抽奖系统：LotteryDraw、BuyTicket、Conversion、Redeem (池/道具/保底)</td></tr>
+      <tr><td>Proto</td><td>9</td><td><span class="tag tag-yellow">协议定义</span></td><td>S2CActivity/S2CBattle/S2CClothesChange/S2CDraw/S2CGuild/S2CTask 扩展</td></tr>
+      <tr><td>HeartbeatMateDesign</td><td>9</td><td><span class="tag tag-purple">架构完善</span></td><td>HeartbeatMateManager 完整实现 + 4 个 ServialPartial</td></tr>
+      <tr><td>GamePlay</td><td>8</td><td><span class="tag tag-green">功能新增</span></td><td>新增 LocationManager(LBS)；PhotoStudioManager 拆分为 5 个 partial</td></tr>
+      <tr><td>UI/Battle</td><td>8</td><td><span class="tag tag-green">战斗完善</span></td><td>战斗 UI 持续优化</td></tr>
+      <tr><td>Battle/BattleCampRule</td><td>7</td><td><span class="tag tag-green">架构抽象</span></td><td>新增策略模式：ICampRule + Factory + Common/Double/Free/Normal/NullObject 实现</td></tr>
+      <tr><td>UI/PhotoStudio</td><td>6</td><td><span class="tag tag-yellow">照相馆细化</span></td><td>LeftPartial、SplitBlock 等细分功能</td></tr>
+      <tr><td>Scene</td><td>6</td><td><span class="tag tag-green">场景扩展</span></td><td>新增 SquareScene(广场)；HeartbeatMateRoom 拆分 partials；BasketballScene 优化</td></tr>
+      <tr><td>UI/TaskCenter</td><td>5</td><td><span class="tag tag-pink">新增系统</span></td><td>任务中心：等级任务、活动任务、笔记本</td></tr>
+      <tr><td>UI/HeartDraw</td><td>4</td><td><span class="tag tag-pink">新增系统</span></td><td>心动抽卡：抽卡 + 兑换商店</td></tr>
+      <tr><td>UI/AcitivityCenter/SignIn</td><td>4</td><td><span class="tag tag-pink">新增</span></td><td>签到系统：每日签到 + 累积签到</td></tr>
+      <tr><td>HeartbeatMateRoom</td><td>3</td><td><span class="tag tag-green">场景渲染</span></td><td>新增 3D 表演渲染 (3DPerformPartial)、初始化 (InitialPartial)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Battle CampRule Architecture -->
+<div class="card">
+  <h2>⚔️ Battle CampRule — 策略模式驱动多样化玩法</h2>
+  <p>这是一个<strong>架构层面的重要升级</strong>。团队在 Battle 层引入 <strong>策略模式 (Strategy Pattern)</strong>，将"阵营规则"从 BattleManager 中解耦。以接口 <code>ICampRule</code> 为契约，不同房间模式有不同的光环渲染和命中判定规则。</p>
+
+  <table class="changes-table">
+    <thead><tr><th>组件</th><th>职责</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>ICampRule</code></td><td>接口定义</td><td>定义阵营光环(Common/Perfect/FinishMove)、场景根节点、命中判定规则</td></tr>
+      <tr><td><code>CampRuleFactory</code></td><td>工厂</td><td>按 ERoomMode 返回对应规则实例；支持预注册双人模式(Double)，其余默认 Common</td></tr>
+      <tr><td><code>CampRuleCommon</code></td><td>通用规则</td><td>默认光环渲染 (Halo_1/2/3)，红/蓝/绿阵营颜色分化</td></tr>
+      <tr><td><code>CampRuleDouble</code></td><td>双人规则</td><td>继承 Common，覆盖 HitRule：追踪阵营内每个 ArrowIndex 的 Perfect 数，全员完美命中时广播 MN_BATTLE_ALL_HIT_EFFECT</td></tr>
+      <tr><td><code>CampRuleFree</code></td><td>自由模式</td><td>自由式舞步特有规则</td></tr>
+      <tr><td><code>CampRuleNormal</code></td><td>普通模式</td><td>常规舞步规则</td></tr>
+      <tr><td><code>CampRuleNullObject</code></td><td>空对象</td><td>无规则模式（Null Object Pattern）</td></tr>
+  </table>
+
+  <div class="alert alert-info"><strong>技术评价：</strong>策略模式的引入使得未来增加新玩法模式（如团队对抗、闯关）只需新增一个 ICampRule 实现并注册到 Factory，不需要修改 BattleManager 核心代码。这是 <strong>开闭原则 (OCP)</strong> 的良好实践。当前 Factory 中仅预注册了 Double，其余通过 defaultCampRule 兜底，扩展性良好。</div>
+</div>
+
+<!-- HeartbeatMate Deep Dive -->
+<div class="card">
+  <h2>💕 心印系统 (HeartbeatMate) — 从 85% 到完整交付</h2>
+  <p>上月心印系统进度持平在 85%。本月迎来<strong>大规模代码落地</strong>，首次出现完整的 HeartbeatMateManager + Partial 架构。</p>
+
+  <h3>HeartbeatMateManager 架构 (9 文件, Partial 拆分)</h3>
+  <table class="changes-table">
+    <thead><tr><th>Partial 文件</th><th>职责</th><th>关键内容</th></tr></thead>
+    <tbody>
+      <tr><td>HeartbeatMateManager</td><td>核心+配置分析</td><td>AsyncConfigAnalyseInitialize(): 异步分析 SoulmateGift 配置表，构建多重礼物/双人礼物的数据字典 + 座位位置索引</td></tr>
+      <tr><td>DrawPartial</td><td>抽卡</td><td>心印礼物抽卡、兑换奖励、红色点历史记录</td></tr>
+      <tr><td>GiftServerPartial</td><td>送礼服务端</td><td>礼物队列发送、屏幕滚动消息播放</td></tr>
+      <tr><td>PlayerPartial</td><td>玩家管理</td><td>玩家实体管理、异步添加工具包</td></tr>
+      <tr><td>RoomInfoServerPartial</td><td>房间信息服务端</td><td>房间信息同步、Mic 列表、座位分配</td></tr>
+    </tbody>
+  </table>
+
+  <h3>辅助组件</h3>
+  <ul>
+    <li><strong>HeartbeatMateSceneUnit</strong> — 场景单元管理（位置索引 + 表演单元字典）</li>
+    <li><strong>HeartbeatMatePerformUnit</strong> — 表演单元（3D 礼物表现）</li>
+    <li><strong>HeartbeatMateTemplate</strong> — 数据模板</li>
+    <li><strong>PlayableLogicEvent</strong> — 可播放的逻辑事件</li>
+  </ul>
+
+  <div class="alert alert-info"><strong>注意：</strong>HeartbeatMateManager 不在 GamePlay.Init() 中初始化。它的初始化由 HeartbeatMateRoom 场景控制（HeartbeatMateRoomInitialPartial），这符合"按需加载"的架构原则。当前 Manager 内部使用了 LBS 定位服务（StopLocationService），说明心印房间具备基于地理位置匹配的能力。</div>
+</div>
+
+<!-- Square Scene -->
+<div class="card">
+  <h2>🏛️ 广场场景 (SquareScene) — 3D 社交大厅</h2>
+  <p>全新实现的社交中枢场景，玩家可在 6 个建筑物之间点触导航：</p>
+
+  <div class="flow-box">
+    <strong>建筑物导航</strong><br>
+    舞厅 (DancingHall) → 房间列表 | 家族大厅 (FymilyHall) → 家族界面<br>
+    排行榜 (RankingList) → 排行榜界面 | 商城 (ShoppingMall) → 商城选择<br>
+    照相馆 (PhotoStudio) → 创建拍照房 | 花园 (Garden) → 花园界面
+  </div>
+
+  <h3>技术亮点</h3>
+  <ul>
+    <li><strong>触控交互：</strong>SimpleTouch.On_SimpleTap 事件驱动，检测触摸点是否在建筑物触发区</li>
+    <li><strong>相机动画：</strong>CinemachineVirtualCamera + Animation 组件，PoolManager 动态加载相机动画 Clip，进入/退出各 2.2 秒动画</li>
+    <li><strong>高亮系统：</strong>HighlightPlus.HighlightEffect 为 6 个建筑提供边缘高亮（点击时激活，完成动画后关闭）</li>
+    <li><strong>玩家初始化：</strong>复用 ScenePlayerManager.InitAllPlayers()</li>
+    <li><strong>BGM：</strong>进入广场后播放默认背景音乐</li>
+  </ul>
+</div>
+
+<!-- Clothing Exchange System -->
+<div class="card">
+  <h2>👔 服装兑换系统 — 完整的抽卡+交易生态</h2>
+  <p>这是本月<strong>最大的新增业务系统</strong>（17 UI 文件 + 1 DataManager + 多张配置表），实现了"时装箱"玩法的完整闭环。</p>
+
+  <h3>系统架构</h3>
+  <table class="changes-table">
+    <thead><tr><th>层级</th><th>组件</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>数据管理</td><td>ClothingExchangeManager (Singleton)</td><td>本地持久化(PlayerPrefs JSON)：抽卡历史、赠送记录、待处理蓝图；蓝图绑定/解绑 CD 管理；HTTP 轮询绑定状态 (9you.com)</td></tr>
+      <tr><td>配置</td><td>ClothesChangeCommenDraw / BlueprintDraw / GachaType / Redeem</td><td>4 张配置表驱动抽卡池、蓝图池、保底、兑换</td></tr>
+      <tr><td>UI 主入口</td><td>UIClothingExchange</td><td>服装兑换主面板</td></tr>
+      <tr><td>UI 蓝图</td><td>UIBlueprintItem / UIBluePrintBag / UIBluePrintGive / UIBluePrintGiveCard / UIBlueprintCarousel / UIBlueprintPCPage</td><td>蓝图道具展示、背包、赠送、轮播</td></tr>
+      <tr><td>UI 抽卡</td><td>UIClothesActivityItem / UIClothingItem / UICloseBlueItem</td><td>服装活动道具、服装道具、关闭蓝图道具</td></tr>
+      <tr><td>UI 兑换</td><td>UIClothingRedeemShop / UIClothingRedeemShopItem</td><td>时装兑换商店</td></tr>
+      <tr><td>UI 记录</td><td>UIClothesRecord / UIClothesRecordItem / UIBagSendRecordItem</td><td>抽卡/赠送记录展示</td></tr>
+      <tr><td>UI 账号</td><td>UIAccountRemBinding</td><td>账号绑定/解绑管理</td></tr>
+      <tr><td>协议</td><td>S2CClothesChange.cs</td><td>服装兑换相关服务端协议</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert alert-info"><strong>技术细节：</strong>ClothingExchangeManager 用 MD5 对玩家 UIN 进行签名 (HMAC-MD5 + "&" + timestamp)，调用外部 HTTP API (9you.com) 进行蓝图账号绑定轮询。经理器通过 CancellationTokenSource 控制异步轮询生命周期，300 秒超时自动取消。本地数据采用双向备份策略（Key + Key_Backup）防止数据丢失。</div>
+</div>
+
+<!-- Activity & Task Center -->
+<div class="card">
+  <h2>🎯 运营系统 — 活动中心 + 任务中心</h2>
+
+  <h3>活动中心 (UIActivityCenter)</h3>
+  <div class="flow-box">
+    <strong>活动中心</strong> → UIActivityCenter (主面板) → UISubActivityItem (活动列表)<br>
+    ├── <strong>抽奖</strong> → UILotteryCenter → UILotteryDraw → UIMinimumItem (保底) / UIRedeemPool / UIRedeemItem / UIBuyTicketPop / UIConversionPop<br>
+    ├── <strong>签到</strong> → UIActivitySignIn → UISignInItem (每日) / UISignInCumulativeItem (累积) / UISignInRule<br>
+    └── <strong>活动状态</strong> → UIActivityStateLabel / UIActivityType
+  </div>
+
+  <h3>任务中心 (UITaskCenter)</h3>
+  <ul>
+    <li><strong>UITaskCenter</strong> — 主面板</li>
+    <li><strong>UITaskCenterActivityLevel / UITaskCenterActivityLevelGift</strong> — 活动等级 + 等级奖励</li>
+    <li><strong>UITaskCenterItem</strong> — 任务条目</li>
+    <li><strong>UITaskCenterNoteBook</strong> — 笔记本</li>
+  </ul>
+
+  <h3>心动抽卡 (HeartDraw)</h3>
+  <ul>
+    <li><strong>UIHeartDraw</strong> — 心动抽卡面板</li>
+    <li><strong>UIHeartRedeemShop / UIHeartRedeemShopItem</strong> — 心动兑换商店</li>
+    <li><strong>UITabTypeCell</strong> — 通用标签页组件</li>
+  </ul>
+
+  <div class="alert alert-info"><strong>协议层：</strong>新增 S2CActivity.cs、S2CTask.cs、S2CDraw.cs、S2CGuild.cs，覆盖活动/任务/抽卡/公会等新业务协议的解析。</div>
+</div>
+
+<!-- LBS Location Service -->
+<div class="card">
+  <h2>📍 LBS 定位服务 — LocationManager</h2>
+  <p>全新 <code>LocationManager (Singleton)</code> 为项目引入 <strong>地理位置能力</strong>。这是移动端社交游戏的常见刚需，用于附近玩家匹配、同城房间等 LBS 玩法。</p>
+
+  <table class="changes-table">
+    <thead><tr><th>功能</th><th>实现细节</th></tr></thead>
+    <tbody>
+      <tr><td>权限管理</td><td>Android: Permission.FineLocation + PermissionCallbacks (Granted/Denied/DeniedAndDontAskAgain)；iOS/Editor: 直接返回 Granted</td></tr>
+      <tr><td>定位服务</td><td>Input.location.Start()，参数 TimeInterval=120s, DistanceUnit=300m</td></tr>
+      <tr><td>自动刷新</td><td>AsyncTask + CancellationTokenSource，每 20 秒刷新一次，通过 EventManager 广播 MN_LOCATION_REFESH</td></tr>
+      <tr><td>生命周期</td><td>StartLocationService / StopLocationService (Dispose 时自动 Stop + Cancel)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Progress Comparison -->
+<div class="card">
+  <h2>📈 开发进度对比 (三次分析)</h2>
+
+  <table class="changes-table">
+    <thead><tr><th>模块</th><th>4月</th><th>5月</th><th>6月</th><th>5月→6月 Δ</th><th>当前状态</th></tr></thead>
+    <tbody>
+      <tr><td>框架 (Framework)</td><td>95%</td><td>96%</td><td>96%</td><td>-</td><td>稳定</td></tr>
+      <tr><td>角色 (Character)</td><td>90%</td><td>95%</td><td>95%</td><td>-</td><td>稳定</td></tr>
+      <tr><td>网络 (Network)</td><td>90%</td><td>95%</td><td>95%</td><td>-</td><td>协议持续扩展</td></tr>
+      <tr><td>心印 (HeartbeatMate)</td><td>85%</td><td>85%</td><td>95%</td><td><span class="tag tag-green">+10%</span></td><td>Manager+场景+房间+3D表演基本完整</td></tr>
+      <tr><td>战斗 (Battle)</td><td>50%</td><td>85%</td><td>90%</td><td><span class="tag tag-green">+5%</span></td><td>新增 CampRule 策略模式，细化命中规则</td></tr>
+      <tr><td>婚礼 (Wedding)</td><td>40%</td><td>85%</td><td>85%</td><td>-</td><td>稳定，本轮未重点变更</td></tr>
+      <tr><td>照相馆 (Photo)</td><td>40%</td><td>75%</td><td>80%</td><td><span class="tag tag-yellow">+5%</span></td><td>Manager 拆分为 5 partials，UI 细化</td></tr>
+      <tr><td>Timeline</td><td>10%</td><td>75%</td><td>75%</td><td>-</td><td>稳定</td></tr>
+      <tr><td>广场 (Square)</td><td>0%</td><td>0%</td><td>80%</td><td><span class="tag tag-pink">+80% ✨</span></td><td>全新场景，6 建筑社交大厅</td></tr>
+      <tr><td>服装兑换 (Clothing)</td><td>0%</td><td>0%</td><td>75%</td><td><span class="tag tag-pink">+75% ✨</span></td><td>完整抽卡+交易系统</td></tr>
+      <tr><td>活动中心 (Activity)</td><td>0%</td><td>0%</td><td>75%</td><td><span class="tag tag-pink">+75% ✨</span></td><td>抽奖+签到+主面板</td></tr>
+      <tr><td>任务中心 (Task)</td><td>0%</td><td>0%</td><td>65%</td><td><span class="tag tag-pink">+65% ✨</span></td><td>等级任务+活动任务+笔记本</td></tr>
+      <tr><td>心动抽卡 (HeartDraw)</td><td>0%</td><td>0%</td><td>60%</td><td><span class="tag tag-pink">+60% ✨</span></td><td>抽卡+兑换商店</td></tr>
+      <tr><td>社交 (Social)</td><td>80%</td><td>85%</td><td>90%</td><td><span class="tag tag-yellow">+5%</span></td><td>好友/家族 UI 扩展</td></tr>
+      <tr><td>经济 (Economy)</td><td>80%</td><td>85%</td><td>90%</td><td><span class="tag tag-yellow">+5%</span></td><td>新增兑换/抽卡经济系统</td></tr>
+      <tr><td>LBS 定位</td><td>0%</td><td>0%</td><td>90%</td><td><span class="tag tag-pink">+90% ✨</span></td><td>完整定位服务</td></tr>
+    </tbody>
+  </table>
+
+  <div class="divider"></div>
+
+  <h3>🎯 综合进度总览</h3>
+  <div class="progress-bar"><span style="width:100px;">心印</span><div class="progress-track"><div class="progress-fill" style="width:95%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">95%</span></div>
+  <div class="progress-bar"><span style="width:100px;">角色</span><div class="progress-track"><div class="progress-fill" style="width:95%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">95%</span></div>
+  <div class="progress-bar"><span style="width:100px;">网络</span><div class="progress-track"><div class="progress-fill" style="width:95%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">95%</span></div>
+  <div class="progress-bar"><span style="width:100px;">战斗</span><div class="progress-track"><div class="progress-fill" style="width:90%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">90%</span></div>
+  <div class="progress-bar"><span style="width:100px;">LBS</span><div class="progress-track"><div class="progress-fill" style="width:90%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">90%</span></div>
+  <div class="progress-bar"><span style="width:100px;">社交</span><div class="progress-track"><div class="progress-fill" style="width:90%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">90%</span></div>
+  <div class="progress-bar"><span style="width:100px;">经济</span><div class="progress-track"><div class="progress-fill" style="width:90%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div><span class="label">90%</span></div>
+  <div class="progress-bar"><span style="width:100px;">婚礼</span><div class="progress-track"><div class="progress-fill" style="width:85%;background:linear-gradient(90deg,#eab308,#ca8a04);"></div></div><span class="label">85%</span></div>
+  <div class="progress-bar"><span style="width:100px;">照相馆</span><div class="progress-track"><div class="progress-fill" style="width:80%;background:linear-gradient(90deg,#eab308,#ca8a04);"></div></div><span class="label">80%</span></div>
+  <div class="progress-bar"><span style="width:100px;">广场</span><div class="progress-track"><div class="progress-fill" style="width:80%;background:linear-gradient(90deg,#eab308,#ca8a04);"></div></div><span class="label">80%</span></div>
+  <div class="progress-bar"><span style="width:100px;">服装兑换</span><div class="progress-track"><div class="progress-fill" style="width:75%;background:linear-gradient(90deg,#eab308,#ca8a04);"></div></div><span class="label">75%</span></div>
+  <div class="progress-bar"><span style="width:100px;">活动中心</span><div class="progress-track"><div class="progress-fill" style="width:75%;background:linear-gradient(90deg,#eab308,#ca8a04);"></div></div><span class="label">75%</span></div>
+  <div class="progress-bar"><span style="width:100px;">Timeline</span><div class="progress-track"><div class="progress-fill" style="width:75%;background:linear-gradient(90deg,#eab308,#ca8a04);"></div></div><span class="label">75%</span></div>
+
+  <div class="progress-bar" style="margin-top:16px;">
+    <span style="width:100px;">综合进度</span>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:86%;background:linear-gradient(90deg,#f093fb,#f5576c);"></div>
+    </div>
+    <span class="label">86%</span>
+  </div>
+  <p style="color:#888;font-size:0.85em;margin-top:4px;">上月综合进度 82%，提升 4 个百分点。引入多个新系统后框架复杂度上升，需要关注集成质量。</p>
+</div>
+
+<!-- Critical Issues -->
+<div class="card">
+  <h2>🚨 遗留问题与风险项</h2>
+
+  <div class="alert alert-danger">
+    <strong>🔴 P0 — GuideManager 不存在 · RedDotManager 仍被注释</strong>
+    <p style="margin-top:6px;">GuideManager 在整个 Assets 目录下不存在任何文件。RedDotManager 在 GamePlay.Init() 中仍被注释。新手引导和红点系统持续缺失，这是上线前必须解决的核心问题。</p>
+  </div>
+
+  <div class="alert alert-warn">
+    <strong>🟡 P1 — BattleScene #if aa 条件编译未清理</strong>
+    <p style="margin-top:6px;">BattleScene 仍被 <code>#if aa ... #endif</code> 包裹，BasketballScene 继续作为实际战斗入口。</p>
+  </div>
+
+  <div class="alert alert-warn">
+    <strong>🟡 P1 — PhotoStudio 埋点 OnEventTracking 仍注释</strong>
+    <p style="margin-top:6px;">自 5 月发现后未修复。运营数据埋点缺失将影响上线后的数据分析能力。</p>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>🔵 P2 — HeartbeatMateManager 复杂度显著上升</strong>
+    <p style="margin-top:6px;">HeartbeatMateManager 拆分为 5 个 partial 文件，Dispose 涉及 10+ 个数据结构的清理、CancellationTokenSource 控制、事件解绑。需要确保所有分支的内存安全。</p>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>🔵 P2 — ClothingExchangeManager 外部 HTTP 依赖</strong>
+    <p style="margin-top:6px;">蓝图绑定功能依赖外部 9you.com HTTP API + MD5 签名，网络异常/服务不可用时需要有降级方案。</p>
+  </div>
+</div>
+
+<!-- Phase Summary -->
+<div class="card">
+  <h2>📋 总结</h2>
+  <p>五月下旬的三周中，DanceNew 项目从<strong>"核心链路打通"</strong>阶段跨入<strong>"社交生态构建"</strong>阶段：</p>
+
+  <ul>
+    <li>✨ <strong>新增 5 个零到一系统：</strong>心印(95%) → 广场(80%) → 服装兑换(75%) → 活动中心(75%) → 任务中心(65%) → 心动抽卡(60%)</li>
+    <li>✨ <strong>架构升级：</strong>Battle CampRule 策略模式、LBS 定位服务、PhotoStudioManager Partial 拆分</li>
+    <li>✨ <strong>配置表翻倍：</strong>34 张新配置表覆盖抽卡、心印礼物、时装兑换、活动、任务</li>
+    <li>✨ <strong>协议层延伸：</strong>S2CActivity/S2CTask/S2CDraw/S2CClothesChange/S2CGuild 等新协议模块</li>
+  </ul>
+
+  <p style="margin-top:12px; font-weight:600; color:#c0c0c0;">综合进度: 86%（上月 82%）</p>
+  <p style="color:#888;font-size:0.85em;">项目从 17 个核心模块扩展到 22+ 模块，代码总量从 1124 增至 1180 个 CS 文件。新系统的大量引入意味着接下来的重点应是 <strong>集成测试</strong> 和 <strong>P0 遗留项修复</strong>（GuideManager、RedDotManager）。</p>
+</div>
+
+</div>
+</body>
+</html>
