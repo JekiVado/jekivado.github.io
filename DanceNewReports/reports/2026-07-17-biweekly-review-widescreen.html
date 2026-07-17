@@ -280,6 +280,28 @@ Output:
   .portable-metric-card { min-height: 0; }
 }
 </style>
+Exit code: 0
+Wall time: 0.2 seconds
+Output:
+<script data-dancenew-producer-brief-runtime="v1">
+(() => {
+  const keepProducerBriefVisible = () => {
+    const fallback = document.querySelector("[data-portable-fallback]");
+    if (fallback) {
+      fallback.classList.remove("portable-enhanced-hidden");
+      fallback.removeAttribute("aria-hidden");
+    }
+  };
+  document.addEventListener("DOMContentLoaded", () => {
+    keepProducerBriefVisible();
+    new MutationObserver(keepProducerBriefVisible).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "aria-hidden"],
+      subtree: true,
+    });
+  });
+})();
+</script>
 </head>
 <body>
 <main id="data-analytics-portable-fallback" class="portable-fallback" data-portable-fallback="true" data-portable-surface="dashboard"><header class="portable-page-header"><div class="portable-page-heading"><p class="portable-surface-label">Data Analytics dashboard</p><h1>DanceNew 项目两周增量复审报告（2026-07-17，宽屏版）</h1><p class="portable-description">面向制作人的 16:9 宽屏首测复审看板：结论、研发增量、架构健康度、风险、资源与候选包门槛。</p></div><div class="portable-page-meta"><time datetime="2026-07-17T18:00:00+08:00">Jul 17, 2026, 10:00 AM UTC</time></div></header><div class="portable-block-stack">
