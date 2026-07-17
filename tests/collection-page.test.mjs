@@ -2,10 +2,18 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 
 const pagePath = new URL('../collection/index.html', import.meta.url);
+const iconPath = new URL('../collection/favicon.svg', import.meta.url);
 
 assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
 const html = readFileSync(pagePath, 'utf8');
+
+assert.match(html, /rel="icon" href="\.\/favicon\.svg" type="image\/svg\+xml"/);
+assert.ok(existsSync(iconPath), 'Expected collection/favicon.svg to exist');
+const icon = readFileSync(iconPath, 'utf8');
+assert.match(icon, /viewBox="0 0 64 64"/);
+assert.match(icon, /#16777d/);
+assert.match(icon, /#bc5a1a/);
 
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
