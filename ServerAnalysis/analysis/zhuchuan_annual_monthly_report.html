@@ -17,9 +17,10 @@ body { font-size:16px; line-height:1.5; }
 .section { margin-top:38px; }
 .section-title { margin:0 0 16px; padding-left:14px; border-left:4px solid var(--blue); font-size:25px; line-height:32px; letter-spacing:-.01em; }
 .section-kicker { margin:0 0 16px; color:var(--muted); font-size:15px; }
-.kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+	.kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+	.kpis.has-amortization { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .kpi { min-height:142px; padding:20px 22px; border:1px solid var(--line); border-top:4px solid var(--blue); border-radius:14px; background:var(--panel); box-shadow:0 8px 20px rgba(25,67,108,.05); }
-.kpi:nth-child(2) { border-top-color:#38b6a2; }.kpi:nth-child(3) { border-top-color:#f09b49; }.kpi:nth-child(4) { border-top-color:#7d78d9; }
+	.kpi:nth-child(2) { border-top-color:#38b6a2; }.kpi:nth-child(3) { border-top-color:#f09b49; }.kpi:nth-child(4) { border-top-color:#7d78d9; }.kpi:nth-child(5) { border-top-color:#6b8cc7; }.kpi:nth-child(6) { border-top-color:#489783; }
 .kpi-label { color:var(--muted); font-size:15px; font-weight:700; }.kpi-value { margin-top:8px; font-size:30px; font-weight:760; line-height:1.1; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }.kpi-note { margin-top:10px; color:var(--muted); font-size:14px; }
 .panel { border:1px solid var(--line); border-radius:16px; background:var(--panel); padding:28px 30px; box-shadow:0 8px 20px rgba(25,67,108,.045); }
 .panel h2 { margin:0 0 18px; font-size:23px; line-height:30px; }.panel p.note { margin:14px 0 0; color:var(--muted); font-size:14px; }
@@ -37,13 +38,14 @@ table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums;
 </style>
 </head>
 <body>
-<header class="topbar"><div class="topbar-inner"><h1>竹川基础设施实际费用汇报看板｜人民币</h1><span>观察窗口：2025 H2 与 2026 H1 · 现金支付口径</span></div></header>
+<header class="topbar"><div class="topbar-inner"><h1>竹川基础设施实际费用汇报看板｜人民币</h1><span>观察窗口：2025 H2 与 2026 H1 · 实际支付与资源分摊双口径</span></div></header>
 <main class="report">
-  <section class="section"><h2 class="section-title">汇报看板</h2><div class="kpis">
+  <section class="section"><h2 class="section-title">汇报看板</h2><div class="kpis has-amortization">
     <article class="kpi"><div class="kpi-label">2025 H2 实际现金支付</div><div class="kpi-value">1.78 万元</div><div class="kpi-note">覆盖 6 个完整账期</div></article>
     <article class="kpi"><div class="kpi-label">2026 H1 实际现金支付</div><div class="kpi-value">1.80 万元</div><div class="kpi-note">覆盖 6 个完整账期</div></article>
     <article class="kpi"><div class="kpi-label">2026 H1 实际现金支付较 H2</div><div class="kpi-value positive">+1%</div><div class="kpi-note">金额变化 171.14 元</div></article>
     <article class="kpi"><div class="kpi-label">2026 H1 业务支撑服务</div><div class="kpi-value">0.95 万元</div><div class="kpi-note">占本期实际支付 +53%</div></article>
+    <article class="kpi"><div class="kpi-label">2025 H2 资源分摊消耗</div><div class="kpi-value">1.91 万元</div><div class="kpi-note">按资源服务期确认</div></article><article class="kpi"><div class="kpi-label">2026 H1 资源分摊消耗</div><div class="kpi-value">1.98 万元</div><div class="kpi-note">按资源服务期确认</div></article>
   </div></section>
 
   <section class="section panel"><h2>半年度实际费用总览与产品构成（2025 H2 vs 2026 H1，人民币）</h2><div class="matrix-wrap"><table class="matrix"><caption>费用总览与可回加至实际现金支付总额的产品构成</caption><thead><tr><th>项目</th><th>2025 H2</th><th>2026 H1</th><th>增减金额</th><th>增减比例</th></tr></thead><tbody><tr class="matrix-group"><th colspan="5">费用总览</th></tr><tr class="matrix-total"><th scope="row">总实际现金支付</th><td>17,848.29 元</td><td>18,019.43 元</td><td class="positive">171.14 元</td><td class="positive">+1%</td></tr><tr class=""><th scope="row">月均实际现金支付</th><td>2,974.72 元</td><td>3,003.24 元</td><td class="positive">28.52 元</td><td class="positive">+1%</td></tr><tr class="matrix-group"><th colspan="5">现金支出产品构成</th></tr><tr class=""><th scope="row">云服务器 CVM</th><td>5,880.80 元</td><td>4,936.06 元</td><td class="negative">-944.74 元</td><td class="negative">-16%</td></tr><tr class=""><th scope="row">公网 IP</th><td>6,400.77 元</td><td>1,444.07 元</td><td class="negative">-4,956.70 元</td><td class="negative">-77%</td></tr><tr class=""><th scope="row">云硬盘 CBS</th><td>1,289.76 元</td><td>1,284.10 元</td><td class="negative">-5.66 元</td><td class="negative">-0%</td></tr><tr class=""><th scope="row">业务支撑服务（短信、OCR 与云市场）</th><td>3,592.47 元</td><td>9,509.83 元</td><td class="positive">5,917.36 元</td><td class="positive">+165%</td></tr><tr class=""><th scope="row">安全与域名服务</th><td>668.55 元</td><td>419.86 元</td><td class="negative">-248.69 元</td><td class="negative">-37%</td></tr><tr class=""><th scope="row">其他基础设施服务</th><td>15.94 元</td><td>425.51 元</td><td class="positive">409.57 元</td><td class="neutral">基数低</td></tr></tbody></table></div><p class="note">产品构成可分别回加至两个期间的总实际现金支付。所有金额均为人民币现金支付。</p></section>

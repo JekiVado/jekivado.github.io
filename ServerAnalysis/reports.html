@@ -51,9 +51,11 @@
     .figure-label { color: var(--muted); font-size: 14px; font-weight: 700; }
     .figure-value { margin-top: 8px !important; font: 800 clamp(40px, 4vw, 56px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: -.07em; }
     .figure-detail { margin-top: 16px !important; color: #506f8f; font-size: 14px; line-height: 1.6; }
-    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-strong); overflow: hidden; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-strong); overflow: hidden; }
     .metric { min-height: 138px; padding: 24px 28px; border-right: 1px solid var(--line); }
     .metric:last-child { border-right: 0; }
+    .metric:nth-child(3n) { border-right: 0; }
+    .metric:nth-child(-n + 3) { border-bottom: 1px solid var(--line); }
     .metric-label { margin: 0; color: var(--muted); font-size: 13px; font-weight: 700; }
     .metric-value { margin: 12px 0 0; font: 800 27px/1.15 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: -.045em; }
     .metric-hint { margin: 11px 0 0; color: #55708c; font-size: 13px; }
@@ -104,8 +106,8 @@
       .hero { grid-template-columns: 1fr; gap: 28px; padding-top: 54px; }
       .hero-figure { padding-top: 16px; }
       .metrics { grid-template-columns: repeat(2, 1fr); }
-      .metric:nth-child(2) { border-right: 0; }
-      .metric:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+      .metric:nth-child(even) { border-right: 0; }
+      .metric:nth-child(-n + 4) { border-bottom: 1px solid var(--line); }
       .reading-layout { grid-template-columns: 1fr; }
     }
     @media (max-width: 720px) {
@@ -144,7 +146,7 @@
       <div>
         <p class="kicker">2025 H2 至 2026 H1</p>
         <h1 id="page-title">四个项目的费用汇报，一处查看</h1>
-        <p class="hero-copy">按实际支付口径汇总各项目账单，并保留项目级明细报告供会议复核。</p>
+        <p class="hero-copy">实际支付用于复核现金支出，资源分摊消耗用于观察服务期内的月度占用；两种口径均保留在项目明细中。</p>
         <div class="hero-actions">
           <a class="button button-primary" href="#comparison">查看项目汇总</a>
           <a class="button button-secondary" href="#scope">阅读数据口径</a>
@@ -162,6 +164,8 @@
       <div class="metric"><p class="metric-label">覆盖云平台</p><p class="metric-value">2 家</p><p class="metric-hint">腾讯云与阿里云</p></div>
       <div class="metric"><p class="metric-label">2025 H2 实际支付</p><p class="metric-value">21.63 万元</p><p class="metric-hint">六个账期合计</p></div>
       <div class="metric"><p class="metric-label">2026 H1 实际支付</p><p class="metric-value">11.77 万元</p><p class="metric-hint">较 2025 H2 -45.6%</p></div>
+      <div class="metric"><p class="metric-label">2025 H2 资源分摊消耗</p><p class="metric-value">17.00 万元</p><p class="metric-hint">按资源服务期确认</p></div>
+      <div class="metric"><p class="metric-label">2026 H1 资源分摊消耗</p><p class="metric-value">20.61 万元</p><p class="metric-hint">按资源服务期确认</p></div>
     </section>
 
     <section id="comparison" aria-labelledby="comparison-title">
