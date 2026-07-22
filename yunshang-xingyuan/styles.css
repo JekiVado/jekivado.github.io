@@ -1,0 +1,119 @@
+:root {
+  --ink: #eaf7ff;
+  --muted: #b8d3ec;
+  --night: #132957;
+  --navy: #173567;
+  --cloud: #88c7ee;
+  --star: #ffe8a3;
+  --coral: #ffb29f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(140, 209, 246, .22), transparent 28rem),
+    radial-gradient(circle at 80% 90%, rgba(255, 178, 159, .15), transparent 26rem),
+    #0c1e45;
+}
+
+button { font: inherit; }
+
+.sky-card {
+  position: relative;
+  isolation: isolate;
+  width: min(100vw, 480px);
+  min-height: min(100vh, 860px);
+  overflow: hidden;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  background:
+    linear-gradient(164deg, rgba(48, 112, 183, .86), rgba(19, 49, 101, .97) 42%, rgba(18, 34, 80, 1)),
+    var(--navy);
+  box-shadow: 0 35px 90px rgba(0, 8, 35, .48);
+}
+
+.sky-card::before, .sky-card::after {
+  position: absolute;
+  z-index: -1;
+  width: 23rem;
+  height: 8rem;
+  border-radius: 50%;
+  background: rgba(224, 246, 255, .1);
+  filter: blur(1px);
+  content: "";
+}
+
+.sky-card::before { top: 31%; left: -13rem; transform: rotate(-14deg); }
+.sky-card::after { right: -13rem; bottom: 12%; transform: rotate(18deg); }
+
+.atmosphere { position: absolute; z-index: -1; border-radius: 50%; filter: blur(30px); opacity: .55; }
+.atmosphere--one { width: 14rem; height: 14rem; top: -5rem; right: -6rem; background: #74d2ed; }
+.atmosphere--two { width: 12rem; height: 12rem; bottom: -5rem; left: -5rem; background: #f7a7a1; }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; }
+.icon-button, .wish-count {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(232, 250, 255, .25);
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgba(10, 34, 78, .2);
+  backdrop-filter: blur(10px);
+}
+.icon-button { cursor: pointer; font-size: 1.5rem; line-height: 1; }
+.icon-button:hover { background: rgba(255,255,255,.15); }
+.level-label { text-align: center; line-height: 1.1; }
+.level-label span, .eyebrow { display: block; color: var(--muted); font-size: .63rem; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }
+.level-label strong { font-family: Baskerville, "Iowan Old Style", serif; font-size: 1rem; font-weight: 600; letter-spacing: .08em; }
+.wish-count { display: flex; align-items: center; justify-content: center; gap: .2rem; font-size: .94rem; }
+.wish-count__spark { color: var(--star); font-size: 1rem; }
+
+.story { margin: clamp(2.2rem, 7vh, 4rem) .55rem 1.4rem; }
+.story h1 { margin: .55rem 0 .75rem; font-family: Baskerville, "Iowan Old Style", serif; font-size: clamp(2.25rem, 9vw, 3.15rem); font-weight: 500; line-height: 1.08; letter-spacing: -.04em; text-wrap: balance; }
+.hint { margin: 0; max-width: 20rem; color: #d9edff; font-size: .9rem; line-height: 1.7; }
+
+.board-shell { position: relative; width: min(100%, 390px); aspect-ratio: 1; margin: 0 auto; }
+#board { position: relative; z-index: 2; width: 100%; height: 100%; touch-action: none; overflow: visible; }
+.halo { position: absolute; z-index: 1; width: 8rem; height: 8rem; border-radius: 50%; filter: blur(17px); opacity: .42; }
+.halo--left { top: 3rem; left: 1rem; background: #8fd6fa; }
+.halo--right { right: 0; bottom: 2rem; background: #f8b29e; }
+.trail { stroke: rgba(228, 241, 255, .75); stroke-width: .72; stroke-linecap: round; transition: stroke .2s, stroke-width .2s; }
+.trail--clear { stroke: #ffe39a; stroke-width: 1.05; animation: trailBreathe 1.8s ease-in-out infinite; }
+.star-node { cursor: grab; outline: none; }
+.star-node:focus .star-node__aura { stroke: white; stroke-width: .5; }
+.star-node.is-active { cursor: grabbing; }
+.star-node__aura { fill: rgba(255, 235, 168, .15); stroke: rgba(255, 237, 185, .35); stroke-width: .25; transition: r .2s; }
+.star-node.is-active .star-node__aura { r: 7; fill: rgba(255, 245, 204, .25); }
+.star-node__core { fill: #fff1bb; stroke: white; stroke-width: .5; }
+.star-node__label { fill: rgba(230, 244, 255, .7); font-size: 3.3px; text-anchor: middle; pointer-events: none; }
+
+.status-panel { position: relative; display: flex; align-items: end; justify-content: space-between; margin-top: -.5rem; padding: .8rem .55rem; }
+.meter-caption { display: block; margin-bottom: .4rem; color: var(--muted); font-size: .68rem; letter-spacing: .12em; }
+.meter-dots { display: flex; gap: .35rem; margin-bottom: .35rem; }
+.meter-dot { width: .4rem; height: .4rem; border-radius: 50%; background: rgba(238, 248, 255, .2); }
+.meter-dot.is-lit { background: var(--coral); box-shadow: 0 0 10px var(--coral); }
+.crossing-meter strong { font-size: 1rem; font-weight: 600; }
+.microcopy { max-width: 9rem; margin: 0; color: var(--muted); font-size: .73rem; line-height: 1.5; text-align: right; }
+
+.completion { position: absolute; z-index: 4; inset: auto 1.5rem 1.8rem; padding: 1.45rem 1.5rem 1.35rem; border: 1px solid rgba(255, 241, 190, .45); border-radius: 1.5rem; color: #19305a; background: rgba(255, 246, 219, .94); box-shadow: 0 20px 45px rgba(2, 17, 57, .35); opacity: 0; transform: translateY(2rem); transition: opacity .35s ease, transform .35s ease; }
+.completion.is-visible { opacity: 1; transform: translateY(0); }
+.completion .eyebrow { color: #78708b; }
+.completion h2 { margin: .35rem 0; font-family: Baskerville, "Iowan Old Style", serif; font-size: 2rem; font-weight: 500; }
+.completion p:not(.eyebrow) { margin: 0 0 1rem; color: #5c6680; font-size: .88rem; }
+.completion__glow { position: absolute; top: -1.25rem; right: 1.3rem; display: grid; width: 2.6rem; height: 2.6rem; place-items: center; border-radius: 50%; color: #9d6d25; background: #fff0b5; box-shadow: 0 0 25px #ffe18b; font-size: 1.35rem; }
+.next-button { width: 100%; padding: .8rem 1rem; border: 0; border-radius: .8rem; color: #fff9dc; cursor: pointer; background: #385a9d; box-shadow: inset 0 1px rgba(255,255,255,.25); }
+.next-button:hover { background: #2e4e8d; }
+
+@keyframes trailBreathe { 50% { filter: drop-shadow(0 0 2px #ffe29b); opacity: .82; } }
+
+@media (min-width: 700px) {
+  .sky-card { min-height: min(95vh, 800px); border-radius: 2rem; }
+}

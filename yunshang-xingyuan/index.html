@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#173567" />
+    <title>云上星愿 · 星轨初醒</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="sky-card">
+      <div class="atmosphere atmosphere--one"></div>
+      <div class="atmosphere atmosphere--two"></div>
+      <header class="topbar">
+        <button class="icon-button" id="reset-button" aria-label="重新开始本关">↺</button>
+        <div class="level-label">
+          <span>云端星图</span>
+          <strong>初醒 · 01</strong>
+        </div>
+        <div class="wish-count" aria-label="已收集星愿">
+          <span class="wish-count__spark">✦</span>
+          <strong id="wish-count">0</strong>
+        </div>
+      </header>
+
+      <section class="story" aria-labelledby="game-title">
+        <p class="eyebrow">CLOUD ATLAS</p>
+        <h1 id="game-title">把迷路的星光<br />送回它们的轨道</h1>
+        <p id="hint" class="hint">拖动星点，让缠绕的星轨不再相交</p>
+      </section>
+
+      <section class="board-shell" aria-label="星轨解谜区域">
+        <div class="halo halo--left"></div>
+        <div class="halo halo--right"></div>
+        <svg id="board" viewBox="0 0 100 100" role="application" aria-label="拖动星点消除交叉星轨"></svg>
+      </section>
+
+      <section class="status-panel" aria-live="polite">
+        <div class="crossing-meter">
+          <span class="meter-caption">星轨缠结</span>
+          <div class="meter-dots" id="meter-dots" aria-hidden="true"></div>
+          <strong id="crossing-label">3 处交叉</strong>
+        </div>
+        <p class="microcopy">每解开一处，天空就亮一点。</p>
+      </section>
+
+      <div class="completion" id="completion" hidden>
+        <div class="completion__glow">✦</div>
+        <p class="eyebrow">CONSTELLATION RESTORED</p>
+        <h2>星座苏醒了</h2>
+        <p>你收下了 1 颗新的星愿。</p>
+        <button id="next-button" class="next-button">再看一次星光</button>
+      </div>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

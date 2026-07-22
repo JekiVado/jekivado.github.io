@@ -5,6 +5,7 @@ const pagePath = new URL('../collection/index.html', import.meta.url);
 const iconPath = new URL('../collection/favicon.svg', import.meta.url);
 const readmePath = new URL('../README.md', import.meta.url);
 const rootPath = new URL('../index.html', import.meta.url);
+const yunshangPath = new URL('../yunshang-xingyuan/index.html', import.meta.url);
 
 assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
@@ -30,6 +31,7 @@ assert.ok(existsSync(rootPath), 'Expected a root index.html');
 const root = readFileSync(rootPath, 'utf8');
 assert.match(root, /content="0; url=\.\/collection\/"/);
 assert.match(root, /href="\.\/collection\/"/);
+assert.ok(existsSync(yunshangPath), 'Expected the 云上星愿 playable prototype to exist');
 
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
@@ -53,7 +55,7 @@ assert.match(html, /class="category category-card analysis-section"/);
 assert.match(html, /class="category category-card reports-section"/);
 assert.match(html, /DanceNew 报告档案/);
 assert.match(html, /\.\.\/DanceNewReports\//);
-assert.match(html, /03 COLLECTIONS · 03 LINKS/);
+assert.match(html, /03 COLLECTIONS · 04 LINKS/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
 assert.match(html, /\.category-summary\s*\{[^}]*padding:\s*18px 20px/);
@@ -63,9 +65,12 @@ assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1f
 assert.match(html, /class="card-grid prototype-grid"/);
 assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
 assert.match(html, /UPDATED 2026\.07\.22/);
+assert.match(html, /云上星愿/);
+assert.match(html, /02 ITEMS/);
 
 for (const route of [
   '../escape01/',
+  '../yunshang-xingyuan/',
   '../ServerAnalysis/',
   '../DanceNewReports/',
 ]) {
