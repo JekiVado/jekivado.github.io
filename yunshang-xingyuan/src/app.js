@@ -1,5 +1,5 @@
-import { countCrossings, progressFor, repairFor, swapNodeTrails } from './game.js';
-import { levels, nextLevelIndex } from './levels.js';
+import { countCrossings, progressFor, repairFor, swapNodeTrails } from './game.js?v=20260722-8';
+import { levels, nextLevelIndex } from './levels.js?v=20260722-8';
 
 const board = document.querySelector('#board');
 const hint = document.querySelector('#hint');
