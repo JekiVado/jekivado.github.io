@@ -23,7 +23,7 @@
 
 1. 在仓库根目录建立一个新的目录，并在其中放入 `index.html`（或独立的 `.html` 页面）。
 2. 用本地静态服务器打开页面，确认资源路径和移动端布局正常。
-3. 在 `collection/index.html` 增加对应的导航卡片，并按内容性质放到现有模块或新增模块中。
+3. 在 `collection/index.html` 的对应折叠模块中增加导航卡片；新增模块时，同步补齐模块摘要、数量和颜色变量。
 4. 运行 `node --test tests/collection-page.test.mjs`，确认集合页仍覆盖全部入口。
 5. 将变更提交并推送到 `main`；GitHub Pages 会自动构建发布。
 
