@@ -57,6 +57,9 @@ button { font: inherit; }
 .atmosphere { position: absolute; z-index: -1; border-radius: 50%; filter: blur(30px); opacity: .55; }
 .atmosphere--one { width: 14rem; height: 14rem; top: -5rem; right: -6rem; background: #74d2ed; }
 .atmosphere--two { width: 12rem; height: 12rem; bottom: -5rem; left: -5rem; background: #f7a7a1; }
+.sky-decor { position:absolute; top:7rem; right:1.8rem; display:flex; gap:.55rem; color:rgba(255,255,255,.2); font-size:1.25rem; }
+.sky-decor i { font-style:normal; transition:.35s; }
+.sky-decor .is-repaired { color:#ffe29b; text-shadow:0 0 13px #ffe29b; transform:translateY(-3px); }
 
 .topbar { display: flex; align-items: center; justify-content: space-between; }
 .icon-button, .wish-count {

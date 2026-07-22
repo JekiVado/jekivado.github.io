@@ -9,6 +9,7 @@ const meterDots = document.querySelector('#meter-dots');
 const wishCount = document.querySelector('#wish-count');
 const levelTitle = document.querySelector('.level-label strong');
 const repairStatus = document.querySelector('#repair-status');
+const skyDecor = document.querySelectorAll('#sky-decor i');
 let levelIndex = 0;
 let level = structuredClone(levels[levelIndex]);
 let wishes = 0;
@@ -53,6 +54,7 @@ function render() {
   repairStatus.textContent = repair.repaired
     ? `已修复 ${repair.repaired} 处天空装饰 · 下一处还需 ${repair.cost - repair.remainder} 星愿`
     : `收集 ${repair.cost - repair.remainder} 颗星愿，修复一处天空装饰。`;
+  skyDecor.forEach((decor, index) => decor.classList.toggle('is-repaired', index < repair.repaired));
   hint.textContent = isSolved ? '听，星光正在轻轻回应你。' : hintMessage;
 }
 
