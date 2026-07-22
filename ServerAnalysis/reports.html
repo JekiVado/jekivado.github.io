@@ -106,6 +106,37 @@
     .method-note dd { margin: 7px 0 0; padding-bottom: 15px; border-bottom: 1px solid var(--line); color: #254362; font-size: 14px; line-height: 1.65; }
     .method-note dd:last-child { padding-bottom: 0; border-bottom: 0; }
     .scope-note { margin-top: 28px; padding: 21px 24px; border-left: 3px solid var(--accent); background: #e8f2fd; color: #335c84; font-size: 14px; line-height: 1.7; }
+    .optimization-overview { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 22px; align-items: end; margin-bottom: 24px; padding: 24px 26px; border: 1px solid #b9d6f2; border-radius: var(--radius); background: linear-gradient(115deg, #eaf5ff, #f9fcff 62%, #edfbf6); }
+    .optimization-overview p { margin: 0; }
+    .optimization-overview .eyebrow { margin-bottom: 9px; color: var(--accent-deep); }
+    .optimization-overview h3 { margin: 0; font-size: 23px; letter-spacing: -.025em; }
+    .optimization-overview-copy { max-width: 720px; margin-top: 10px !important; color: #476785; font-size: 14px; line-height: 1.65; }
+    .optimization-figure { min-width: 230px; padding-left: 24px; border-left: 1px solid #b9d6f2; }
+    .optimization-figure-label { color: #537492; font-size: 12px; font-weight: 800; }
+    .optimization-figure-value { margin-top: 7px !important; color: #b6482b; font: 800 30px/1.1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: -.06em; white-space: nowrap; }
+    .optimization-figure-hint { margin-top: 7px !important; color: #587492; font-size: 12px; line-height: 1.45; }
+    .optimization-frame { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-strong); }
+    .optimization-table { width: 100%; min-width: 1180px; border-collapse: collapse; }
+    .optimization-table th, .optimization-table td { padding: 17px 18px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .optimization-table thead th { color: #496887; background: #eef5fd; font-size: 13px; font-weight: 800; vertical-align: middle; }
+    .optimization-table .period-head { min-width: 146px; text-align: right; }
+    .optimization-table tbody tr:hover { background: #f8fbff; }
+    .optimization-table tbody tr:last-child > * { border-bottom: 0; }
+    .optimization-table .project-cell { min-width: 154px; font-size: 16px; font-weight: 800; }
+    .optimization-table .project-cell small { display: block; margin-top: 5px; color: #6e89a4; font-size: 12px; font-weight: 700; }
+    .optimization-table .amount { font-size: 15px; }
+    .optimization-table .increase { color: #b6482b; background: #fff7f1; }
+    .optimization-table .reason { min-width: 260px; color: #385775; font-size: 14px; line-height: 1.6; }
+    .optimization-table .plan { min-width: 320px; color: #294964; font-size: 14px; line-height: 1.65; }
+    .plan strong { color: #087f67; }
+    .plan .caution { color: #c54c31; font-weight: 800; }
+    .status-pill { display: inline-flex; width: fit-content; margin-top: 10px; padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .status-necessary { color: #17619e; background: #e7f2ff; }
+    .status-watch { color: #9a6114; background: #fff4df; }
+    .status-action { color: #08745e; background: #e5f7f0; }
+    .optimization-table tfoot { background: #fff0f2; }
+    .optimization-table tfoot th, .optimization-table tfoot td { border-bottom: 0; color: #8b2f3a; font-weight: 800; vertical-align: middle; }
+    .optimization-footnote { margin: 16px 0 0; color: #5e7893; font-size: 13px; line-height: 1.65; }
     footer { border-top: 1px solid var(--line); color: #607d98; font-size: 13px; }
     .footer-inner { min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
     @media (max-width: 960px) {
@@ -115,6 +146,8 @@
       .metric:nth-child(even) { border-right: 0; }
       .metric:nth-child(-n + 4) { border-bottom: 1px solid var(--line); }
       .reading-layout { grid-template-columns: 1fr; }
+      .optimization-overview { grid-template-columns: 1fr; }
+      .optimization-figure { padding: 16px 0 0; border-top: 1px solid #b9d6f2; border-left: 0; }
     }
     @media (max-width: 720px) {
       .page-shell { width: min(calc(100% - 32px), var(--content)); }
@@ -130,6 +163,7 @@
       .metric:last-child { border-bottom: 0; }
       .comparison-frame { overflow-x: auto; }
       .comparison-table th, .comparison-table td { padding: 14px; }
+      .optimization-table th, .optimization-table td { padding: 14px; }
       .report-list { grid-template-columns: 1fr; }
       .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; gap: 5px; padding: 16px 0; }
     }
@@ -141,6 +175,7 @@
       <a class="brand" href="#top">基础设施费用汇报</a>
       <nav class="nav-links" aria-label="页内导航">
         <a href="#comparison">项目对比</a>
+        <a href="#optimization">优化建议</a>
         <a href="#scope">数据口径</a>
       </nav>
     </div>
@@ -232,6 +267,56 @@
         </table>
       </div>
       <div class="scope-note">逸优在 2025 H2 的预付费续订集中确认，因此其实际支付与资源服务期消耗不在同一节奏。资源分摊按服务期确认，适合横向观察资源消耗；实际支付适合复核现金支出。</div>
+    </section>
+
+    <section id="optimization" aria-labelledby="optimization-title">
+      <h2 class="section-title" id="optimization-title">月均资源分摊消耗与优化建议</h2>
+      <p class="section-copy">以资源服务期分摊口径衡量稳定月度消耗，适合识别 2026 H1 的持续投入与可优化项；不替代实际支付口径。</p>
+      <div class="optimization-overview">
+        <div>
+          <p class="eyebrow">2026 H1 · 月均资源分摊消耗</p>
+          <h3>四主体合计 37,349.45 元 / 月</h3>
+          <p class="optimization-overview-copy">较 2025 H2 月均增加 2,330.48 元，主要来自宿木新增测试与数据类机器，以及逸优的监控与数据上报相关资源。优化应优先在不影响线上业务与关键测试的前提下进行。</p>
+        </div>
+        <div class="optimization-figure" aria-label="月均资源分摊消耗变化">
+          <p class="optimization-figure-label">较 2025 H2</p>
+          <p class="optimization-figure-value">+2,330.48 元</p>
+          <p class="optimization-figure-hint">2025 H2 月均：35,018.97 元</p>
+        </div>
+      </div>
+      <div class="optimization-frame">
+        <table class="optimization-table">
+          <thead><tr><th>项目</th><th class="period-head">2025 H2<br>月均资源分摊消耗</th><th class="period-head">2026 H1<br>月均资源分摊消耗</th><th class="period-head">资源分摊增加</th><th>变化说明</th><th>优化方案</th></tr></thead>
+          <tbody>
+            <tr>
+              <th scope="row" class="project-cell">逸优<small>阿里云</small></th>
+              <td class="amount">8,611.02 元</td><td class="amount">9,435.55 元</td><td class="amount increase">+824.54 元</td>
+              <td class="reason">新增总体监控机器；抖音官方新增游戏数据上报要求，带动流量费用提升。<span class="status-pill status-necessary">线上业务必要</span></td>
+              <td class="plan">均为线上业务所需；如需调整配置，需安排停机维护。<strong>当前暂无可确认的优化空间。</strong></td>
+            </tr>
+            <tr>
+              <th scope="row" class="project-cell">林音<small>腾讯云</small></th>
+              <td class="amount">4,601.23 元</td><td class="amount">4,892.33 元</td><td class="amount increase">+291.10 元</td>
+              <td class="reason">整体持平。<span class="status-pill status-watch">持续观察</span></td>
+              <td class="plan">已停止正式服机器，仅保留测试机器；新主体认证完成后，评估适当下调初始配置。<span class="caution">目标：约 -1,000 元 / 月</span>，后续结合用户量调整。</td>
+            </tr>
+            <tr>
+              <th scope="row" class="project-cell">竹川<small>腾讯云（算上海马云按 3,000 计）</small></th>
+              <td class="amount">6,190.49 元</td><td class="amount">6,292.51 元</td><td class="amount increase">+102.02 元</td>
+              <td class="reason">整体稳定，主要受用户量、短信、身份证认证与流量等波动影响。<span class="status-pill status-watch">使用量波动</span></td>
+              <td class="plan">海马云服务器计划由 5 台调整为 2 台。<span class="caution">目标：约 -1,800 元 / 月</span>；其余为线上业务所需，配置已接近最低要求。</td>
+            </tr>
+            <tr>
+              <th scope="row" class="project-cell">宿木<small>腾讯云</small></th>
+              <td class="amount">15,616.25 元</td><td class="amount">16,729.06 元</td><td class="amount increase">+1,112.81 元</td>
+              <td class="reason">新增数数平台、CB4 对外测试机器与 iOS 提审机器。<span class="status-pill status-action">优先排查</span></td>
+              <td class="plan">SDK 服务器月均约 10,500 元，评估可下调 2 台。<span class="caution">目标：约 -1,000 元 / 月</span>；游戏运行侧需进一步验证，CB4 前暂不调整；业务服务器当前已较精简。</td>
+            </tr>
+          </tbody>
+          <tfoot><tr><th scope="row">合计</th><td class="amount">35,018.97 元</td><td class="amount">37,349.45 元</td><td class="amount">+2,330.48 元</td><td colspan="2">当前 2026 年折扣相比 2025 年进一步提升，预计整体仍有约 2% 的节省空间。</td></tr></tfoot>
+        </table>
+      </div>
+      <p class="optimization-footnote">“目标节省额”为待验证的优化假设，不计入当前成本结论；实施前需核对业务影响、测试计划与资源依赖。</p>
     </section>
 
     <section id="scope" aria-labelledby="scope-title">
