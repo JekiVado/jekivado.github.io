@@ -1,4 +1,4 @@
-import { countCrossings, progressFor, swapNodeTrails } from './game.js';
+import { countCrossings, progressFor, repairFor, swapNodeTrails } from './game.js';
 import { levels, nextLevelIndex } from './levels.js';
 
 const board = document.querySelector('#board');
@@ -8,6 +8,7 @@ const crossingLabel = document.querySelector('#crossing-label');
 const meterDots = document.querySelector('#meter-dots');
 const wishCount = document.querySelector('#wish-count');
 const levelTitle = document.querySelector('.level-label strong');
+const repairStatus = document.querySelector('#repair-status');
 let levelIndex = 0;
 let level = structuredClone(levels[levelIndex]);
 let wishes = 0;
@@ -48,6 +49,10 @@ function render() {
   ).join('');
   crossingLabel.textContent = isSolved ? '星轨已归位' : `${crossings} 处交叉`;
   levelTitle.textContent = levels[levelIndex].title;
+  const repair = repairFor(wishes);
+  repairStatus.textContent = repair.repaired
+    ? `已修复 ${repair.repaired} 处天空装饰 · 下一处还需 ${repair.cost - repair.remainder} 星愿`
+    : `收集 ${repair.cost - repair.remainder} 颗星愿，修复一处天空装饰。`;
   hint.textContent = isSolved ? '听，星光正在轻轻回应你。' : hintMessage;
 }
 
@@ -56,6 +61,7 @@ function completeLevel() {
   complete = true;
   wishes += 1;
   wishCount.textContent = wishes;
+  render();
   completion.hidden = false;
   window.setTimeout(() => completion.classList.add('is-visible'), 20);
 }

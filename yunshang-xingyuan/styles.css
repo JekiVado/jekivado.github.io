@@ -101,6 +101,7 @@ button { font: inherit; }
 .meter-dot.is-lit { background: var(--coral); box-shadow: 0 0 10px var(--coral); }
 .crossing-meter strong { font-size: 1rem; font-weight: 600; }
 .microcopy { max-width: 9rem; margin: 0; color: var(--muted); font-size: .73rem; line-height: 1.5; text-align: right; }
+.repair-status { margin: .15rem .55rem 0; color: #ffe7a4; font-size: .76rem; letter-spacing: .03em; }
 
 .completion { position: absolute; z-index: 4; inset: auto 1.5rem 1.8rem; padding: 1.45rem 1.5rem 1.35rem; border: 1px solid rgba(255, 241, 190, .45); border-radius: 1.5rem; color: #19305a; background: rgba(255, 246, 219, .94); box-shadow: 0 20px 45px rgba(2, 17, 57, .35); opacity: 0; transform: translateY(2rem); transition: opacity .35s ease, transform .35s ease; }
 .completion.is-visible { opacity: 1; transform: translateY(0); }

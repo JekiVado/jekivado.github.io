@@ -80,3 +80,7 @@ export function progressFor(level, stars) {
     stars: crossings === 0 ? stars : 0
   };
 }
+
+export function repairFor(wishes, cost = 3) {
+  return { repaired: Math.floor(wishes / cost), remainder: wishes % cost, cost };
+}
