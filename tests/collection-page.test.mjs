@@ -46,7 +46,7 @@ assert.match(html, /class="category analysis-section"/);
 assert.match(html, /class="category reports-section"/);
 assert.match(html, /DanceNew 报告档案/);
 assert.match(html, /\.\.\/DanceNewReports\//);
-assert.match(html, /06 ACTIVE LINKS/);
+assert.match(html, /07 ACTIVE LINKS/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
 assert.match(html, /\.category\s*\{[^}]*padding:\s*20px/);
@@ -55,11 +55,12 @@ assert.match(html, /main\s*\{[^}]*width:\s*min\(1440px/);
 assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1fr\)\)/);
 assert.match(html, /class="card-grid prototype-grid"/);
 assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
-assert.match(html, /UPDATED 2026\.07\.17/);
+assert.match(html, /UPDATED 2026\.07\.22/);
 
 for (const route of [
   '../escape01/',
   '../ServerAnalysis/cloud.html',
+  '../ServerAnalysis/',
   '../ServerAnalysis/hh1.html',
   '../ServerAnalysis/hh2.html',
   '../ServerAnalysis/1688.html',

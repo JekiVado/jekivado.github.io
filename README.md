@@ -13,7 +13,7 @@
 
 - `collection/`：导航集合页及其网页图标。
 - `escape01/`：可试玩的静态原型。
-- `ServerAnalysis/`：云资源复盘页面。
+- `ServerAnalysis/`：云资源盘点与基础设施费用汇报；目录入口为四个主体的汇总页，`analysis/` 存放各主体明细，根目录其余 `.html` 为早期资源盘点快照。
 - `DanceNewReports/`：产品报告档案页面。
 - `index.html`：根目录入口页。
 
