@@ -87,11 +87,10 @@ button { font: inherit; }
 .halo--right { right: 0; bottom: 2rem; background: #f8b29e; }
 .trail { stroke: rgba(228, 241, 255, .75); stroke-width: .72; stroke-linecap: round; transition: stroke .2s, stroke-width .2s; }
 .trail--clear { stroke: #ffe39a; stroke-width: 1.05; animation: trailBreathe 1.8s ease-in-out infinite; }
-.star-node { cursor: grab; outline: none; }
+.star-node { cursor: pointer; outline: none; }
 .star-node:focus .star-node__aura { stroke: white; stroke-width: .5; }
-.star-node.is-active { cursor: grabbing; }
+.star-node.is-selected .star-node__aura { r: 7; fill: rgba(255, 245, 204, .32); stroke: #fff4c6; stroke-width: .6; }
 .star-node__aura { fill: rgba(255, 235, 168, .15); stroke: rgba(255, 237, 185, .35); stroke-width: .25; transition: r .2s; }
-.star-node.is-active .star-node__aura { r: 7; fill: rgba(255, 245, 204, .25); }
 .star-node__core { fill: #fff1bb; stroke: white; stroke-width: .5; }
 .star-node__label { fill: rgba(230, 244, 255, .7); font-size: 3.3px; text-anchor: middle; pointer-events: none; }
 

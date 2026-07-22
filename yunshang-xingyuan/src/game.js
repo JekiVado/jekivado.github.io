@@ -27,6 +27,15 @@ function nodeMap(level) {
   return new Map(level.nodes.map((node) => [node.id, node]));
 }
 
+export function connectionCounts(level) {
+  const counts = new Map(level.nodes.map((node) => [node.id, 0]));
+  for (const [from, to] of level.edges) {
+    counts.set(from, counts.get(from) + 1);
+    counts.set(to, counts.get(to) + 1);
+  }
+  return counts;
+}
+
 export function countCrossings(level) {
   const nodes = nodeMap(level);
   let crossings = 0;
@@ -47,12 +56,19 @@ export function countCrossings(level) {
   return crossings;
 }
 
-export function moveNode(level, nodeId, position) {
+export function swapNodeTrails(level, firstNodeId, secondNodeId) {
+  if (firstNodeId === secondNodeId) return structuredClone(level);
+
+  const swapEndpoint = (nodeId) => {
+    if (nodeId === firstNodeId) return secondNodeId;
+    if (nodeId === secondNodeId) return firstNodeId;
+    return nodeId;
+  };
+
   return {
     ...level,
-    nodes: level.nodes.map((node) =>
-      node.id === nodeId ? { ...node, x: position.x, y: position.y } : { ...node }
-    )
+    nodes: level.nodes.map((node) => ({ ...node })),
+    edges: level.edges.map(([from, to]) => [swapEndpoint(from), swapEndpoint(to)])
   };
 }
 

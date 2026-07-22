@@ -1,14 +1,17 @@
-import { countCrossings, moveNode, progressFor } from './game.js';
+import { countCrossings, progressFor, swapNodeTrails } from './game.js';
 
 const initialLevel = {
   nodes: [
-    { id: 'a', x: 18, y: 25, label: '晨' },
-    { id: 'b', x: 76, y: 77, label: '愿' },
-    { id: 'c', x: 24, y: 75, label: '云' },
-    { id: 'd', x: 80, y: 20, label: '星' },
-    { id: 'e', x: 52, y: 13, label: '光' }
+    { id: 'a', x: 14, y: 70, label: '晨' },
+    { id: 'b', x: 22, y: 26, label: '云' },
+    { id: 'c', x: 42, y: 14, label: '微' },
+    { id: 'd', x: 70, y: 22, label: '光' },
+    { id: 'e', x: 88, y: 48, label: '愿' },
+    { id: 'f', x: 74, y: 78, label: '澜' },
+    { id: 'g', x: 40, y: 84, label: '星' },
+    { id: 'h', x: 50, y: 52, label: '梦' }
   ],
-  edges: [['a', 'b'], ['b', 'e'], ['e', 'c'], ['c', 'd'], ['d', 'a']]
+  edges: [['a', 'f'], ['f', 'c'], ['c', 'g'], ['g', 'e'], ['e', 'b'], ['b', 'd'], ['d', 'h']]
 };
 
 const board = document.querySelector('#board');
@@ -19,26 +22,19 @@ const meterDots = document.querySelector('#meter-dots');
 const wishCount = document.querySelector('#wish-count');
 let level = structuredClone(initialLevel);
 let wishes = 0;
-let activeNode = null;
+let selectedNode = null;
 let complete = false;
+let hintMessage = '依次点击两个星点，交换它们的星轨';
 
 function nodeById(id) {
   return level.nodes.find((node) => node.id === id);
-}
-
-function pointFromEvent(event) {
-  const bounds = board.getBoundingClientRect();
-  return {
-    x: Math.max(8, Math.min(92, ((event.clientX - bounds.left) / bounds.width) * 100)),
-    y: Math.max(8, Math.min(92, ((event.clientY - bounds.top) / bounds.height) * 100))
-  };
 }
 
 function render() {
   const crossings = countCrossings(level);
   const isSolved = crossings === 0;
   const nodeElements = level.nodes.map((node) => `
-    <g class="star-node ${activeNode === node.id ? 'is-active' : ''}" data-node-id="${node.id}" transform="translate(${node.x} ${node.y})" tabindex="0" role="button" aria-label="移动星点 ${node.label}">
+    <g class="star-node ${selectedNode === node.id ? 'is-selected' : ''}" data-node-id="${node.id}" transform="translate(${node.x} ${node.y})" tabindex="0" role="button" aria-label="选择星点 ${node.label}">
       <circle class="star-node__aura" r="5.6"></circle>
       <circle class="star-node__core" r="2.5"></circle>
       <text class="star-node__label" y="9">${node.label}</text>
@@ -62,7 +58,7 @@ function render() {
     `<span class="meter-dot ${index < crossings ? 'is-lit' : ''}"></span>`
   ).join('');
   crossingLabel.textContent = isSolved ? '星轨已归位' : `${crossings} 处交叉`;
-  hint.textContent = isSolved ? '听，星光正在轻轻回应你。' : '拖动星点，让缠绕的星轨不再相交';
+  hint.textContent = isSolved ? '听，星光正在轻轻回应你。' : hintMessage;
 }
 
 function completeLevel() {
@@ -81,37 +77,49 @@ function checkProgress() {
 
 function reset() {
   level = structuredClone(initialLevel);
-  activeNode = null;
+  selectedNode = null;
   complete = false;
+  hintMessage = '依次点击两个星点，交换它们的星轨';
   completion.classList.remove('is-visible');
   completion.hidden = true;
   render();
 }
 
-board.addEventListener('pointerdown', (event) => {
-  const target = event.target.closest('[data-node-id]');
-  if (!target || complete) return;
-  activeNode = target.dataset.nodeId;
-  board.setPointerCapture(event.pointerId);
-  render();
-});
+function selectNode(nodeId) {
+  if (complete) return;
+  if (!selectedNode) {
+    selectedNode = nodeId;
+    hintMessage = `已选「${nodeById(nodeId).label}」；再点击另一颗星来交换星轨`;
+    render();
+    return;
+  }
 
-board.addEventListener('pointermove', (event) => {
-  if (!activeNode || complete) return;
-  level = moveNode(level, activeNode, pointFromEvent(event));
-  render();
-});
+  if (selectedNode === nodeId) {
+    selectedNode = null;
+    hintMessage = '已取消选择；依次点击两个星点，交换它们的星轨';
+    render();
+    return;
+  }
 
-function releaseNode(event) {
-  if (!activeNode) return;
-  activeNode = null;
-  if (board.hasPointerCapture(event.pointerId)) board.releasePointerCapture(event.pointerId);
+  level = swapNodeTrails(level, selectedNode, nodeId);
+  selectedNode = null;
+  hintMessage = '星轨已交换；继续寻找不再相交的轨道';
   render();
   checkProgress();
 }
 
-board.addEventListener('pointerup', releaseNode);
-board.addEventListener('pointercancel', releaseNode);
+board.addEventListener('click', (event) => {
+  const target = event.target.closest('[data-node-id]');
+  if (target) selectNode(target.dataset.nodeId);
+});
+
+board.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  const target = event.target.closest('[data-node-id]');
+  if (!target) return;
+  event.preventDefault();
+  selectNode(target.dataset.nodeId);
+});
 document.querySelector('#reset-button').addEventListener('click', reset);
 document.querySelector('#next-button').addEventListener('click', reset);
 render();
