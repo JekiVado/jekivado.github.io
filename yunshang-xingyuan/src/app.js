@@ -1,18 +1,5 @@
 import { countCrossings, progressFor, swapNodeTrails } from './game.js';
-
-const initialLevel = {
-  nodes: [
-    { id: 'a', x: 14, y: 70, label: '晨' },
-    { id: 'b', x: 22, y: 26, label: '云' },
-    { id: 'c', x: 42, y: 14, label: '微' },
-    { id: 'd', x: 70, y: 22, label: '光' },
-    { id: 'e', x: 88, y: 48, label: '愿' },
-    { id: 'f', x: 74, y: 78, label: '澜' },
-    { id: 'g', x: 40, y: 84, label: '星' },
-    { id: 'h', x: 50, y: 52, label: '梦' }
-  ],
-  edges: [['a', 'f'], ['f', 'c'], ['c', 'g'], ['g', 'e'], ['e', 'b'], ['b', 'd'], ['d', 'h']]
-};
+import { levels, nextLevelIndex } from './levels.js';
 
 const board = document.querySelector('#board');
 const hint = document.querySelector('#hint');
@@ -20,7 +7,9 @@ const completion = document.querySelector('#completion');
 const crossingLabel = document.querySelector('#crossing-label');
 const meterDots = document.querySelector('#meter-dots');
 const wishCount = document.querySelector('#wish-count');
-let level = structuredClone(initialLevel);
+const levelTitle = document.querySelector('.level-label strong');
+let levelIndex = 0;
+let level = structuredClone(levels[levelIndex]);
 let wishes = 0;
 let selectedNode = null;
 let complete = false;
@@ -58,6 +47,7 @@ function render() {
     `<span class="meter-dot ${index < crossings ? 'is-lit' : ''}"></span>`
   ).join('');
   crossingLabel.textContent = isSolved ? '星轨已归位' : `${crossings} 处交叉`;
+  levelTitle.textContent = levels[levelIndex].title;
   hint.textContent = isSolved ? '听，星光正在轻轻回应你。' : hintMessage;
 }
 
@@ -76,13 +66,18 @@ function checkProgress() {
 }
 
 function reset() {
-  level = structuredClone(initialLevel);
+  level = structuredClone(levels[levelIndex]);
   selectedNode = null;
   complete = false;
   hintMessage = '依次点击两个星点，交换它们的星轨';
   completion.classList.remove('is-visible');
   completion.hidden = true;
   render();
+}
+
+function advanceLevel() {
+  levelIndex = nextLevelIndex(levelIndex);
+  reset();
 }
 
 function selectNode(nodeId) {
@@ -121,5 +116,5 @@ board.addEventListener('keydown', (event) => {
   selectNode(target.dataset.nodeId);
 });
 document.querySelector('#reset-button').addEventListener('click', reset);
-document.querySelector('#next-button').addEventListener('click', reset);
+document.querySelector('#next-button').addEventListener('click', advanceLevel);
 render();
