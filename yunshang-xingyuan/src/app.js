@@ -1,5 +1,5 @@
-import { countCrossings, progressFor, repairs, unlockRepair, swapNodeTrails } from './game.js?v=20260723-3';
-import { firstLevelIndexForRepair, levels, nextLevelIndex } from './levels.js?v=20260723-3';
+import { countCrossings, progressFor, repairs, rewardFor, unlockRepair, swapNodeTrails } from './game.js?v=20260723-4';
+import { firstLevelIndexForRepair, levels, nextLevelIndex } from './levels.js?v=20260723-4';
 
 const skyCard = document.querySelector('.sky-card');
 const board = document.querySelector('#board');
@@ -13,9 +13,12 @@ const levelRegion = document.querySelector('.level-label span');
 const repairStatus = document.querySelector('#repair-status');
 const skyDecor = document.querySelectorAll('#sky-decor i');
 const repairOptions = document.querySelector('#repair-options');
+const completionReward = document.querySelector('#completion-reward');
+const nextButton = document.querySelector('#next-button');
 let levelIndex = 0;
 let level = structuredClone(levels[levelIndex]);
 let repairState = { wishes: 0, unlocked: [] };
+let completedLevelIds = [];
 let selectedNode = null;
 let complete = false;
 let hintMessage = '依次点击两个星点，交换它们的星轨';
@@ -77,7 +80,18 @@ function render() {
 function completeLevel() {
   if (complete) return;
   complete = true;
-  repairState = { ...repairState, wishes: repairState.wishes + 1 };
+  const reward = rewardFor(level, completedLevelIds);
+  if (reward.total) {
+    completedLevelIds = [...completedLevelIds, level.id];
+    repairState = { ...repairState, wishes: repairState.wishes + reward.total };
+  }
+  const availableRepair = repairs.find((repair) => !repairState.unlocked.includes(repair.id) && repairState.wishes >= repair.cost);
+  completionReward.textContent = reward.total
+    ? `你收下了 ${reward.base} 点星愿${reward.chapterBonus ? `，并获得 ${reward.chapterBonus} 点章节奖励。` : '。'}`
+    : '这张星图已完成首通，星愿已收下。';
+  nextButton.textContent = availableRepair
+    ? `消耗 ${availableRepair.cost} 点，修复${availableRepair.name}并前往${availableRepair.unlocks}`
+    : '前往下一片星空';
   render();
   completion.hidden = false;
   window.setTimeout(() => completion.classList.add('is-visible'), 20);
@@ -99,8 +113,24 @@ function reset() {
 }
 
 function advanceLevel() {
+  const availableRepair = repairs.find((repair) => !repairState.unlocked.includes(repair.id) && repairState.wishes >= repair.cost);
+  if (availableRepair) {
+    unlockRoute(availableRepair.id);
+    return;
+  }
   levelIndex = nextLevelIndex(levelIndex, repairState.unlocked);
   reset();
+}
+
+function unlockRoute(repairId) {
+  const nextState = unlockRepair(repairState, repairId);
+  if (nextState === repairState) return;
+  repairState = nextState;
+  const repair = repairs.find((candidate) => candidate.id === nextState.unlockedRepair);
+  levelIndex = firstLevelIndexForRepair(nextState.unlockedRepair);
+  reset();
+  hintMessage = `「${repair.unlocks}」已开启；这片天空有新的星轨在等你。`;
+  render();
 }
 
 function selectNode(nodeId) {
@@ -139,17 +169,10 @@ board.addEventListener('keydown', (event) => {
   selectNode(target.dataset.nodeId);
 });
 document.querySelector('#reset-button').addEventListener('click', reset);
-document.querySelector('#next-button').addEventListener('click', advanceLevel);
+nextButton.addEventListener('click', advanceLevel);
 repairOptions.addEventListener('click', (event) => {
   const option = event.target.closest('[data-repair-id]');
   if (!option) return;
-  const nextState = unlockRepair(repairState, option.dataset.repairId);
-  if (nextState === repairState) return;
-  repairState = nextState;
-  const repair = repairs.find((candidate) => candidate.id === nextState.unlockedRepair);
-  levelIndex = firstLevelIndexForRepair(nextState.unlockedRepair);
-  reset();
-  hintMessage = `「${repair.unlocks}」已开启；这片天空有新的星轨在等你。`;
-  render();
+  unlockRoute(option.dataset.repairId);
 });
 render();

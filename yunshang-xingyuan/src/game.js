@@ -81,6 +81,15 @@ export function progressFor(level, stars) {
   };
 }
 
+export function rewardFor(level, completedLevelIds = []) {
+  if (completedLevelIds.includes(level.id)) {
+    return { base: 0, chapterBonus: 0, total: 0 };
+  }
+
+  const chapterBonus = level.chapterBonus ?? 0;
+  return { base: 1, chapterBonus, total: 1 + chapterBonus };
+}
+
 export const repairs = [
   { id: 'cloud-lamp', name: '云灯', cost: 3, symbol: '☁', unlocks: '云灯之径' },
   { id: 'star-bridge', name: '星桥', cost: 6, symbol: '✦', unlocks: '星桥回廊' },

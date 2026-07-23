@@ -68,7 +68,7 @@ assert.match(html, /UPDATED 2026\.07\.23/);
 assert.match(html, /云上星愿/);
 assert.match(html, /02 ITEMS/);
 assert.match(html, /修复天空，开启新的星域关卡/);
-assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260723-3/);
+assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260723-4/);
 
 for (const route of [
   '../escape01/',
