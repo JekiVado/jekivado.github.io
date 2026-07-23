@@ -16,6 +16,7 @@
 - `yunshang-xingyuan/`：《云上星愿》星轨解谜可试玩原型。
 - `ServerAnalysis/`：云资源盘点与基础设施费用汇报；目录入口为四个主体的汇总页，`analysis/` 存放各主体明细，根目录其余 `.html` 为早期资源盘点快照。
 - `DanceNewReports/`：产品报告档案页面。
+- `BackofficeReports/`：1688 业务后台结构、运营支持与治理风险分析；与游戏报告独立归档。
 - `index.html`：根目录入口页。
 
 静态页面应使用相对路径引用同目录资源，确保其能在 `https://jekivado.github.io/<目录>/` 下直接访问。

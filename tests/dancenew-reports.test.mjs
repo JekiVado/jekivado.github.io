@@ -24,15 +24,8 @@ assert.doesNotMatch(html, /data-filter=/, 'Expected a static archive list withou
 assert.doesNotMatch(html, /<script\b/i, 'Expected the archive page to work without JavaScript');
 
 const links = [...html.matchAll(/<a\s+class="report-link"\s+data-date="([^"]+)"\s+href="([^"]+)"/g)];
-assert.equal(links.length, 11, 'Expected exactly eleven report links');
-assert.match(html, /2026-07-23-backoffice-architecture-analysis\.html/, 'Expected the back-office analysis to be indexed');
-
-const backofficeReport = resolve(archiveRoot, 'reports', '2026-07-23-backoffice-architecture-analysis.html');
-assert.ok(existsSync(backofficeReport), 'Expected the back-office analysis report to exist');
-const backofficeHtml = readFileSync(backofficeReport, 'utf8');
-assert.match(backofficeHtml, /<title>1688 业务后台架构与运营支持分析报告<\/title>/);
-assert.match(backofficeHtml, /15 个一级模块/);
-assert.match(backofficeHtml, /风险与提示清单/);
+assert.equal(links.length, 10, 'Expected exactly ten game report links');
+assert.doesNotMatch(html, /1688 业务后台架构与运营支持分析报告/, 'Expected the back-office analysis to be outside the game archive');
 
 const dates = links.map((match) => Date.parse(match[1]));
 assert.ok(dates.every(Number.isFinite), 'Expected every report data-date to be parseable');

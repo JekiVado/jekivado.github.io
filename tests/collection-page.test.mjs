@@ -53,9 +53,12 @@ assert.match(html, /--report-bg:\s*#f0edff/);
 assert.match(html, /class="category category-card prototype-section"/);
 assert.match(html, /class="category category-card analysis-section"/);
 assert.match(html, /class="category category-card reports-section"/);
-assert.match(html, /DanceNew 报告档案/);
+assert.match(html, /报告档案入口/);
 assert.match(html, /\.\.\/DanceNewReports\//);
-assert.match(html, /03 COLLECTIONS · 04 LINKS/);
+assert.match(html, /\.\.\/BackofficeReports\//);
+assert.match(html, /DanceNew（游戏）/);
+assert.match(html, /1688 业务后台/);
+assert.match(html, /03 COLLECTIONS · 05 LINKS/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
 assert.match(html, /\.category-summary\s*\{[^}]*padding:\s*18px 20px/);
@@ -75,6 +78,7 @@ for (const route of [
   '../yunshang-xingyuan/',
   '../ServerAnalysis/',
   '../DanceNewReports/',
+  '../BackofficeReports/',
 ]) {
   assert.match(html, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 }
