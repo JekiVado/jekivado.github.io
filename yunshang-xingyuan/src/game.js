@@ -81,6 +81,19 @@ export function progressFor(level, stars) {
   };
 }
 
-export function repairFor(wishes, cost = 3) {
-  return { repaired: Math.floor(wishes / cost), remainder: wishes % cost, cost };
+export const repairs = [
+  { id: 'cloud-lamp', name: '云灯', cost: 3, symbol: '☁' },
+  { id: 'star-bridge', name: '星桥', cost: 6, symbol: '✦' },
+  { id: 'sky-observatory', name: '观星台', cost: 10, symbol: '☾' }
+];
+
+export function unlockRepair(state, repairId) {
+  const repair = repairs.find((candidate) => candidate.id === repairId);
+  if (!repair || state.unlocked.includes(repairId) || state.wishes < repair.cost) return state;
+
+  return {
+    wishes: state.wishes - repair.cost,
+    unlocked: [...state.unlocked, repairId],
+    unlockedRepair: repairId
+  };
 }

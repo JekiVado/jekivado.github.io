@@ -104,7 +104,21 @@ button { font: inherit; }
 .meter-dot.is-lit { background: var(--coral); box-shadow: 0 0 10px var(--coral); }
 .crossing-meter strong { font-size: 1rem; font-weight: 600; }
 .microcopy { max-width: 9rem; margin: 0; color: var(--muted); font-size: .73rem; line-height: 1.5; text-align: right; }
-.repair-status { margin: .15rem .55rem 0; color: #ffe7a4; font-size: .76rem; letter-spacing: .03em; }
+.repair-panel { margin: -.15rem .55rem 0; padding: .7rem; border: 1px solid rgba(222, 241, 255, .16); border-radius: 1rem; background: rgba(10, 31, 73, .2); backdrop-filter: blur(8px); }
+.repair-panel__title { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: .66rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.repair-panel__title small { color: #ffe7a4; font-size: .62rem; letter-spacing: .04em; text-transform: none; }
+.repair-status { min-height: 1.2rem; margin: .3rem 0 .5rem; color: #dcefff; font-size: .69rem; line-height: 1.35; letter-spacing: .02em; }
+.repair-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem; }
+.repair-option { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "symbol copy" "action action"; align-items: center; gap: .1rem .32rem; min-width: 0; padding: .46rem .35rem; border: 1px solid rgba(235, 246, 255, .17); border-radius: .7rem; color: #d7ebff; text-align: left; cursor: pointer; background: rgba(255, 255, 255, .06); transition: transform .2s, border-color .2s, background .2s; }
+.repair-option:not(:disabled):hover { transform: translateY(-2px); border-color: rgba(255, 232, 163, .7); background: rgba(255, 232, 163, .14); }
+.repair-option:disabled { cursor: default; opacity: .58; }
+.repair-option.is-unlocked { border-color: rgba(255, 228, 145, .65); color: #fff1b9; background: rgba(255, 225, 138, .14); opacity: 1; }
+.repair-option__symbol { grid-area: symbol; color: #ffe5a0; font-size: 1rem; text-shadow: 0 0 10px rgba(255, 226, 147, .7); }
+.repair-option__copy { grid-area: copy; min-width: 0; }
+.repair-option__copy strong, .repair-option__copy small, .repair-option__action { display: block; }
+.repair-option__copy strong { overflow: hidden; font-size: .68rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.repair-option__copy small { margin-top: .08rem; color: var(--muted); font-size: .56rem; }
+.repair-option__action { grid-area: action; margin-top: .15rem; color: #ffe6a6; font-size: .56rem; white-space: nowrap; }
 
 .completion { position: absolute; z-index: 4; inset: auto 1.5rem 1.8rem; padding: 1.45rem 1.5rem 1.35rem; border: 1px solid rgba(255, 241, 190, .45); border-radius: 1.5rem; color: #19305a; background: rgba(255, 246, 219, .94); box-shadow: 0 20px 45px rgba(2, 17, 57, .35); opacity: 0; transform: translateY(2rem); transition: opacity .35s ease, transform .35s ease; }
 .completion.is-visible { opacity: 1; transform: translateY(0); }

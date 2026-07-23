@@ -64,11 +64,11 @@ assert.match(html, /main\s*\{[^}]*width:\s*min\(1440px/);
 assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1fr\)\)/);
 assert.match(html, /class="card-grid prototype-grid"/);
 assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
-assert.match(html, /UPDATED 2026\.07\.22/);
+assert.match(html, /UPDATED 2026\.07\.23/);
 assert.match(html, /云上星愿/);
 assert.match(html, /02 ITEMS/);
-assert.match(html, /点击两个固定星点，交换星轨/);
-assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260722-8/);
+assert.match(html, /交换星轨、收集星愿、主动修复天空/);
+assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260723-1/);
 
 for (const route of [
   '../escape01/',
