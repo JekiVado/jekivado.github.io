@@ -70,8 +70,8 @@ assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
 assert.match(html, /UPDATED 2026\.07\.23/);
 assert.match(html, /云上星愿/);
 assert.match(html, /02 ITEMS/);
-assert.match(html, /结算后自主点亮星域，开启新的关卡/);
-assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260723-5/);
+assert.match(html, /点击两点交换星轨；可体验一场 4–6 分钟的星空远征/);
+assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260723-11/);
 
 for (const route of [
   '../escape01/',

@@ -72,6 +72,22 @@ export function swapNodeTrails(level, firstNodeId, secondNodeId) {
   };
 }
 
+export function bestExchangePair(level) {
+  const before = countCrossings(level);
+  let best = null;
+
+  for (let firstIndex = 0; firstIndex < level.nodes.length; firstIndex += 1) {
+    for (let secondIndex = firstIndex + 1; secondIndex < level.nodes.length; secondIndex += 1) {
+      const nodeIds = [level.nodes[firstIndex].id, level.nodes[secondIndex].id];
+      const removedCrossings = before - countCrossings(swapNodeTrails(level, ...nodeIds));
+      if (removedCrossings <= 0 || (best && removedCrossings <= best.removedCrossings)) continue;
+      best = { nodeIds, removedCrossings };
+    }
+  }
+
+  return best;
+}
+
 export function progressFor(level, stars) {
   const crossings = countCrossings(level);
   return {

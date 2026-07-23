@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#173567" />
     <title>云上星愿 · 星轨初醒</title>
-    <link rel="stylesheet" href="./styles.css?v=20260723-5" />
+    <link rel="stylesheet" href="./styles.css?v=20260723-9" />
   </head>
   <body>
     <main class="sky-card">
@@ -13,7 +13,10 @@
       <div class="atmosphere atmosphere--two"></div>
       <div id="sky-decor" class="sky-decor" aria-label="已修复的天空装饰"><i data-repair="cloud-lamp">☁</i><i data-repair="star-bridge">✦</i><i data-repair="sky-observatory">☾</i></div>
       <header class="topbar">
-        <button class="icon-button" id="reset-button" aria-label="重新开始本关">↺</button>
+        <div class="topbar__left">
+          <button class="icon-button" id="home-button" aria-label="返回星图主页">⌂</button>
+          <button class="icon-button" id="reset-button" aria-label="重新开始本关">↺</button>
+        </div>
         <div class="level-label">
           <span>云端星图</span>
           <strong>初醒 · 01</strong>
@@ -24,16 +27,20 @@
         </button>
       </header>
 
+      <button class="spirit-button" id="spirit-button" hidden>☁ 云鲸指引</button>
+
       <section class="story" aria-labelledby="game-title">
         <p class="eyebrow">CLOUD ATLAS</p>
         <h1 id="game-title">把迷路的星光<br />送回它们的轨道</h1>
         <p id="hint" class="hint">依次点击两个星点，交换它们的星轨</p>
+        <p id="expedition-status" class="expedition-status" hidden></p>
       </section>
 
       <section class="board-shell" aria-label="星轨解谜区域">
         <div class="halo halo--left"></div>
         <div class="halo halo--right"></div>
         <svg id="board" viewBox="0 0 100 100" role="application" aria-label="点击两个星点交换星轨，消除交叉"></svg>
+        <aside id="effect-callout" class="effect-callout" aria-live="polite" hidden></aside>
       </section>
 
       <section class="status-panel" aria-live="polite">
@@ -59,6 +66,40 @@
         </div>
       </div>
 
+      <section class="home-screen" id="home-screen" aria-labelledby="home-title" hidden>
+        <p class="eyebrow">CLOUD ATLAS</p>
+        <h2 id="home-title">今晚，想怎样修复天空？</h2>
+        <p>随时解开一张星图，或带着一组短暂的星座力量完成一次温柔远征。</p>
+        <div class="mode-list">
+          <button class="mode-card mode-card--quick" data-home-action="quick">
+            <span>✦</span><b>轻解星图</b><small>20–45 秒 · 一张独立关卡</small>
+          </button>
+          <button class="mode-card mode-card--expedition" data-home-action="expedition">
+            <span>☾</span><b>星空远征</b><small>4–6 分钟 · 选路与临时星座</small>
+          </button>
+          <button class="mode-card mode-card--atlas" data-home-action="atlas">
+            <span>☁</span><b>点亮星域</b><small>使用星愿修复天空</small>
+          </button>
+        </div>
+        <p class="home-screen__note">远征不会替代单关；它只是把几张短星图串成一次章节旅程。</p>
+      </section>
+
+      <section class="journey-panel" id="journey-panel" aria-live="polite" hidden>
+        <div id="journey-content"></div>
+      </section>
+
+      <section class="leave-dialog" id="leave-dialog" role="dialog" aria-modal="true" aria-labelledby="leave-title" hidden>
+        <div>
+          <p class="eyebrow">RETURN TO ATLAS</p>
+          <h2 id="leave-title">要离开这次远征吗？</h2>
+          <p>本次推进的天琴座进度、完整星座与云鲸能量会消散；已经修好的天空不会受影响。</p>
+          <div class="completion__actions">
+            <button class="map-button" id="stay-expedition-button">继续远征</button>
+            <button class="next-button" id="leave-expedition-button">结束远征</button>
+          </div>
+        </div>
+      </section>
+
       <section class="star-map" id="star-map" aria-labelledby="star-map-title" hidden>
         <div class="star-map__stars" aria-hidden="true"></div>
         <header class="star-map__header">
@@ -75,6 +116,6 @@
         <p class="star-map__note">星愿与天空修复为当前游玩会话进度；此原型暂不保存到本地。</p>
       </section>
     </main>
-    <script type="module" src="./src/app.js?v=20260723-5"></script>
+    <script type="module" src="./src/app.js?v=20260723-11"></script>
   </body>
 </html>

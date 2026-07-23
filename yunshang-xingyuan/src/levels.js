@@ -88,6 +88,44 @@ export const levels = [
   })
 ];
 
+function expeditionPuzzle(id, title, source, extra = {}) {
+  return {
+    ...source,
+    ...extra,
+    id,
+    title,
+    nodes: source.nodes.map((node) => ({ ...node })),
+    edges: source.edges.map(([from, to]) => [from, to])
+  };
+}
+
+export const expeditionChapters = [
+  {
+    id: 'cloud-harp-01',
+    title: '云海天琴座',
+    mapNodes: [
+      { id: 'start', title: '初醒星图', kind: 'puzzle' },
+      { id: 'clear', title: '晴空星路', kind: 'puzzle' },
+      { id: 'mist', title: '迷雾星云', kind: 'puzzle' },
+      { id: 'merge', title: '天琴座汇聚', kind: 'puzzle' },
+      { id: 'spirit', title: '星灵相遇', kind: 'event' },
+      { id: 'finale', title: '污染天琴座', kind: 'finale' }
+    ],
+    puzzles: {
+      starter: expeditionPuzzle('expedition-cloud-harp-starter', '初醒 · 星象之门', levels[0]),
+      clear: expeditionPuzzle('expedition-cloud-harp-clear', '晴空 · 稳定星路', levels[1]),
+      mist: expeditionPuzzle('expedition-cloud-harp-mist', '迷雾 · 隐约星云', levels[1], { mist: true, mistHiddenEdges: [0, 2] }),
+      merge: expeditionPuzzle('expedition-cloud-harp-merge', '汇聚 · 天琴座进度', levels[2]),
+      finaleOuter: expeditionPuzzle('expedition-cloud-harp-finale-outer', '污染天琴座 · 外围乱线', levels[2]),
+      finaleFog: expeditionPuzzle('expedition-cloud-harp-finale-fog', '污染天琴座 · 云雾侵蚀', levels[2], { mist: true, mistHiddenEdges: [1, 4], finale: true })
+    }
+  }
+];
+
+export function expeditionChapterById(chapterId) {
+  return expeditionChapters.find((chapter) => chapter.id === chapterId);
+}
+
 export function firstLevelIndexForRepair(repairId) {
   return levels.findIndex((level) => level.requires === repairId);
 }
