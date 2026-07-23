@@ -1,6 +1,7 @@
-import { countCrossings, progressFor, repairs, unlockRepair, swapNodeTrails } from './game.js?v=20260723-1';
-import { levels, nextLevelIndex } from './levels.js?v=20260723-1';
+import { countCrossings, progressFor, repairs, unlockRepair, swapNodeTrails } from './game.js?v=20260723-3';
+import { firstLevelIndexForRepair, levels, nextLevelIndex } from './levels.js?v=20260723-3';
 
+const skyCard = document.querySelector('.sky-card');
 const board = document.querySelector('#board');
 const hint = document.querySelector('#hint');
 const completion = document.querySelector('#completion');
@@ -8,6 +9,7 @@ const crossingLabel = document.querySelector('#crossing-label');
 const meterDots = document.querySelector('#meter-dots');
 const wishCount = document.querySelector('#wish-count');
 const levelTitle = document.querySelector('.level-label strong');
+const levelRegion = document.querySelector('.level-label span');
 const repairStatus = document.querySelector('#repair-status');
 const skyDecor = document.querySelectorAll('#sky-decor i');
 const repairOptions = document.querySelector('#repair-options');
@@ -51,6 +53,8 @@ function render() {
   ).join('');
   crossingLabel.textContent = isSolved ? '星轨已归位' : `${crossings} 处交叉`;
   levelTitle.textContent = levels[levelIndex].title;
+  levelRegion.textContent = levels[levelIndex].region ?? '云端星图';
+  skyCard.dataset.region = levels[levelIndex].requires ?? 'origin';
   wishCount.textContent = repairState.wishes;
   const unlockedCount = repairState.unlocked.length;
   repairStatus.textContent = unlockedCount
@@ -63,7 +67,7 @@ function render() {
     const action = unlocked ? '已修复' : affordable ? `消耗 ${repair.cost} 点` : `还差 ${repair.cost - repairState.wishes} 点`;
     return `<button class="repair-option ${unlocked ? 'is-unlocked' : ''}" data-repair-id="${repair.id}" ${unlocked || !affordable ? 'disabled' : ''}>
       <span class="repair-option__symbol">${repair.symbol}</span>
-      <span class="repair-option__copy"><strong>${repair.name}</strong><small>${repair.cost} 星愿</small></span>
+      <span class="repair-option__copy"><strong>${repair.name}</strong><small>${repair.cost} 星愿 · 开启${repair.unlocks}</small></span>
       <span class="repair-option__action">${action}</span>
     </button>`;
   }).join('');
@@ -95,7 +99,7 @@ function reset() {
 }
 
 function advanceLevel() {
-  levelIndex = nextLevelIndex(levelIndex);
+  levelIndex = nextLevelIndex(levelIndex, repairState.unlocked);
   reset();
 }
 
@@ -142,7 +146,10 @@ repairOptions.addEventListener('click', (event) => {
   const nextState = unlockRepair(repairState, option.dataset.repairId);
   if (nextState === repairState) return;
   repairState = nextState;
-  hintMessage = `「${repairs.find((repair) => repair.id === nextState.unlockedRepair).name}」已点亮；天空收下了你的星愿。`;
+  const repair = repairs.find((candidate) => candidate.id === nextState.unlockedRepair);
+  levelIndex = firstLevelIndexForRepair(nextState.unlockedRepair);
+  reset();
+  hintMessage = `「${repair.unlocks}」已开启；这片天空有新的星轨在等你。`;
   render();
 });
 render();

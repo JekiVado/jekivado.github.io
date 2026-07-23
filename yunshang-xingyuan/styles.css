@@ -57,6 +57,12 @@ button { font: inherit; }
 .atmosphere { position: absolute; z-index: -1; border-radius: 50%; filter: blur(30px); opacity: .55; }
 .atmosphere--one { width: 14rem; height: 14rem; top: -5rem; right: -6rem; background: #74d2ed; }
 .atmosphere--two { width: 12rem; height: 12rem; bottom: -5rem; left: -5rem; background: #f7a7a1; }
+.sky-card[data-region="cloud-lamp"] { background: linear-gradient(164deg, rgba(87, 133, 192, .9), rgba(34, 75, 129, .98) 42%, rgba(21, 42, 83, 1)); }
+.sky-card[data-region="cloud-lamp"] .atmosphere--one { background: #ffe29b; }
+.sky-card[data-region="star-bridge"] { background: linear-gradient(164deg, rgba(108, 91, 173, .9), rgba(46, 47, 108, .98) 42%, rgba(24, 29, 73, 1)); }
+.sky-card[data-region="star-bridge"] .atmosphere--two { background: #c0a4ef; }
+.sky-card[data-region="sky-observatory"] { background: linear-gradient(164deg, rgba(38, 100, 157, .92), rgba(20, 43, 97, .98) 42%, rgba(10, 24, 62, 1)); }
+.sky-card[data-region="sky-observatory"] .atmosphere--one { background: #d3d7ff; }
 .sky-decor { position:absolute; top:7rem; right:1.8rem; display:flex; gap:.55rem; color:rgba(255,255,255,.2); font-size:1.25rem; }
 .sky-decor i { font-style:normal; transition:.35s; }
 .sky-decor .is-repaired { color:#ffe29b; text-shadow:0 0 13px #ffe29b; transform:translateY(-3px); }

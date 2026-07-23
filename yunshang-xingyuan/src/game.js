@@ -82,9 +82,9 @@ export function progressFor(level, stars) {
 }
 
 export const repairs = [
-  { id: 'cloud-lamp', name: '云灯', cost: 3, symbol: '☁' },
-  { id: 'star-bridge', name: '星桥', cost: 6, symbol: '✦' },
-  { id: 'sky-observatory', name: '观星台', cost: 10, symbol: '☾' }
+  { id: 'cloud-lamp', name: '云灯', cost: 3, symbol: '☁', unlocks: '云灯之径' },
+  { id: 'star-bridge', name: '星桥', cost: 6, symbol: '✦', unlocks: '星桥回廊' },
+  { id: 'sky-observatory', name: '观星台', cost: 10, symbol: '☾', unlocks: '月台观星' }
 ];
 
 export function unlockRepair(state, repairId) {
