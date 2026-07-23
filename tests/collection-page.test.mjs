@@ -67,8 +67,8 @@ assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
 assert.match(html, /UPDATED 2026\.07\.23/);
 assert.match(html, /云上星愿/);
 assert.match(html, /02 ITEMS/);
-assert.match(html, /修复天空，开启新的星域关卡/);
-assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260723-4/);
+assert.match(html, /结算后自主点亮星域，开启新的关卡/);
+assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260723-5/);
 
 for (const route of [
   '../escape01/',

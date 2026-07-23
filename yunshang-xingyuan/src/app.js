@@ -1,5 +1,5 @@
-import { countCrossings, progressFor, repairs, rewardFor, unlockRepair, swapNodeTrails } from './game.js?v=20260723-4';
-import { firstLevelIndexForRepair, levels, nextLevelIndex } from './levels.js?v=20260723-4';
+import { countCrossings, progressFor, repairs, rewardFor, unlockRepair, swapNodeTrails } from './game.js?v=20260723-5';
+import { firstLevelIndexForRepair, levels, nextLevelIndexInRegion } from './levels.js?v=20260723-5';
 
 const skyCard = document.querySelector('.sky-card');
 const board = document.querySelector('#board');
@@ -10,11 +10,17 @@ const meterDots = document.querySelector('#meter-dots');
 const wishCount = document.querySelector('#wish-count');
 const levelTitle = document.querySelector('.level-label strong');
 const levelRegion = document.querySelector('.level-label span');
-const repairStatus = document.querySelector('#repair-status');
 const skyDecor = document.querySelectorAll('#sky-decor i');
-const repairOptions = document.querySelector('#repair-options');
 const completionReward = document.querySelector('#completion-reward');
 const nextButton = document.querySelector('#next-button');
+const starMapButton = document.querySelector('#star-map-button');
+const openStarMapButton = document.querySelector('#open-star-map-button');
+const closeStarMapButton = document.querySelector('#close-star-map-button');
+const starMap = document.querySelector('#star-map');
+const mapWishCount = document.querySelector('#map-wish-count');
+const mapMessage = document.querySelector('#map-message');
+const regionList = document.querySelector('#region-list');
+
 let levelIndex = 0;
 let level = structuredClone(levels[levelIndex]);
 let repairState = { wishes: 0, unlocked: [] };
@@ -22,6 +28,8 @@ let completedLevelIds = [];
 let selectedNode = null;
 let complete = false;
 let hintMessage = '依次点击两个星点，交换它们的星轨';
+let mapMessageText = '先完成云端星图，收集 3 点星愿来点亮第一处天空装饰。';
+let mapHideTimer;
 
 function nodeById(id) {
   return level.nodes.find((node) => node.id === id);
@@ -59,22 +67,57 @@ function render() {
   levelRegion.textContent = levels[levelIndex].region ?? '云端星图';
   skyCard.dataset.region = levels[levelIndex].requires ?? 'origin';
   wishCount.textContent = repairState.wishes;
-  const unlockedCount = repairState.unlocked.length;
-  repairStatus.textContent = unlockedCount
-    ? `已修复 ${unlockedCount} 处天空装饰；星愿余额只在你主动修复时扣除。`
-    : '完成星图获得星愿，再选择想先点亮的天空装饰。';
   skyDecor.forEach((decor) => decor.classList.toggle('is-repaired', repairState.unlocked.includes(decor.dataset.repair)));
-  repairOptions.innerHTML = repairs.map((repair) => {
-    const unlocked = repairState.unlocked.includes(repair.id);
-    const affordable = repairState.wishes >= repair.cost;
-    const action = unlocked ? '已修复' : affordable ? `消耗 ${repair.cost} 点` : `还差 ${repair.cost - repairState.wishes} 点`;
-    return `<button class="repair-option ${unlocked ? 'is-unlocked' : ''}" data-repair-id="${repair.id}" ${unlocked || !affordable ? 'disabled' : ''}>
-      <span class="repair-option__symbol">${repair.symbol}</span>
-      <span class="repair-option__copy"><strong>${repair.name}</strong><small>${repair.cost} 星愿 · 开启${repair.unlocks}</small></span>
-      <span class="repair-option__action">${action}</span>
-    </button>`;
-  }).join('');
   hint.textContent = isSolved ? '听，星光正在轻轻回应你。' : hintMessage;
+}
+
+function regionCard({ repair, isStarter = false }) {
+  const unlocked = isStarter || repairState.unlocked.includes(repair.id);
+  const affordable = !isStarter && repairState.wishes >= repair.cost;
+  const status = isStarter
+    ? '起始星图 · 随时可进入'
+    : unlocked
+      ? '天空已修复 · 可进入'
+      : affordable
+        ? `可消耗 ${repair.cost} 点星愿点亮`
+        : `还差 ${repair.cost - repairState.wishes} 点星愿`;
+  const action = isStarter || unlocked ? '进入星域' : affordable ? `点亮 · ${repair.cost} 点` : '暂未可用';
+  const actionType = isStarter || unlocked ? 'enter' : affordable ? 'unlock' : 'locked';
+  const disabled = actionType === 'locked' ? 'disabled' : '';
+  const regionName = isStarter ? '云端星图' : repair.unlocks;
+  const description = isStarter ? '从最初的三张星图开始，让星轨回到它们的位置。' : `修复「${repair.name}」，开启 ${repair.unlocks} 的三张星图。`;
+  const symbol = isStarter ? '✦' : repair.symbol;
+
+  return `<article class="region-card ${unlocked ? 'is-unlocked' : ''} ${affordable ? 'is-affordable' : ''}">
+    <div class="region-card__symbol">${symbol}</div>
+    <div class="region-card__copy">
+      <p>${status}</p>
+      <h3>${regionName}</h3>
+      <small>${description}</small>
+    </div>
+    <button data-map-action="${actionType}" data-repair-id="${isStarter ? '' : repair.id}" ${disabled}>${action}</button>
+  </article>`;
+}
+
+function renderStarMap() {
+  mapWishCount.textContent = repairState.wishes;
+  mapMessage.textContent = mapMessageText;
+  regionList.innerHTML = [
+    regionCard({ isStarter: true, repair: { id: 'starter' } }),
+    ...repairs.map((repair) => regionCard({ repair }))
+  ].join('');
+}
+
+function openStarMap() {
+  window.clearTimeout(mapHideTimer);
+  renderStarMap();
+  starMap.hidden = false;
+  window.setTimeout(() => starMap.classList.add('is-visible'), 20);
+}
+
+function closeStarMap() {
+  starMap.classList.remove('is-visible');
+  mapHideTimer = window.setTimeout(() => { starMap.hidden = true; }, 250);
 }
 
 function completeLevel() {
@@ -85,13 +128,9 @@ function completeLevel() {
     completedLevelIds = [...completedLevelIds, level.id];
     repairState = { ...repairState, wishes: repairState.wishes + reward.total };
   }
-  const availableRepair = repairs.find((repair) => !repairState.unlocked.includes(repair.id) && repairState.wishes >= repair.cost);
   completionReward.textContent = reward.total
     ? `你收下了 ${reward.base} 点星愿${reward.chapterBonus ? `，并获得 ${reward.chapterBonus} 点章节奖励。` : '。'}`
-    : '这张星图已完成首通，星愿已收下。';
-  nextButton.textContent = availableRepair
-    ? `消耗 ${availableRepair.cost} 点，修复${availableRepair.name}并前往${availableRepair.unlocks}`
-    : '前往下一片星空';
+    : '这张星图已完成首通，星愿已经收下。';
   render();
   completion.hidden = false;
   window.setTimeout(() => completion.classList.add('is-visible'), 20);
@@ -113,24 +152,29 @@ function reset() {
 }
 
 function advanceLevel() {
-  const availableRepair = repairs.find((repair) => !repairState.unlocked.includes(repair.id) && repairState.wishes >= repair.cost);
-  if (availableRepair) {
-    unlockRoute(availableRepair.id);
-    return;
-  }
-  levelIndex = nextLevelIndex(levelIndex, repairState.unlocked);
+  levelIndex = nextLevelIndexInRegion(levelIndex);
   reset();
 }
 
-function unlockRoute(repairId) {
+function enterRegion(repairId) {
+  levelIndex = repairId ? firstLevelIndexForRepair(repairId) : 0;
+  reset();
+  if (repairId) {
+    const repair = repairs.find((candidate) => candidate.id === repairId);
+    hintMessage = `「${repair.unlocks}」已点亮；这里有新的星轨在等你。`;
+    render();
+  }
+  closeStarMap();
+}
+
+function unlockSkyRepair(repairId) {
   const nextState = unlockRepair(repairState, repairId);
   if (nextState === repairState) return;
   repairState = nextState;
-  const repair = repairs.find((candidate) => candidate.id === nextState.unlockedRepair);
-  levelIndex = firstLevelIndexForRepair(nextState.unlockedRepair);
-  reset();
-  hintMessage = `「${repair.unlocks}」已开启；这片天空有新的星轨在等你。`;
+  const repair = repairs.find((candidate) => candidate.id === repairId);
+  mapMessageText = `「${repair.name}」已点亮。你现在可以主动进入「${repair.unlocks}」。`;
   render();
+  renderStarMap();
 }
 
 function selectNode(nodeId) {
@@ -168,11 +212,17 @@ board.addEventListener('keydown', (event) => {
   event.preventDefault();
   selectNode(target.dataset.nodeId);
 });
+
 document.querySelector('#reset-button').addEventListener('click', reset);
 nextButton.addEventListener('click', advanceLevel);
-repairOptions.addEventListener('click', (event) => {
-  const option = event.target.closest('[data-repair-id]');
-  if (!option) return;
-  unlockRoute(option.dataset.repairId);
+starMapButton.addEventListener('click', openStarMap);
+openStarMapButton.addEventListener('click', openStarMap);
+closeStarMapButton.addEventListener('click', closeStarMap);
+regionList.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-map-action]');
+  if (!button || button.disabled) return;
+  if (button.dataset.mapAction === 'unlock') unlockSkyRepair(button.dataset.repairId);
+  if (button.dataset.mapAction === 'enter') enterRegion(button.dataset.repairId || null);
 });
+
 render();

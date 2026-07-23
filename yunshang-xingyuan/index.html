@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#173567" />
     <title>云上星愿 · 星轨初醒</title>
-    <link rel="stylesheet" href="./styles.css?v=20260723-3" />
+    <link rel="stylesheet" href="./styles.css?v=20260723-5" />
   </head>
   <body>
     <main class="sky-card">
@@ -18,10 +18,10 @@
           <span>云端星图</span>
           <strong>初醒 · 01</strong>
         </div>
-        <div class="wish-count" aria-label="可用星愿点数">
+        <button class="wish-count" id="star-map-button" aria-label="打开星域地图，查看可用星愿点数">
           <span class="wish-count__spark">✦</span>
           <strong id="wish-count">0</strong>
-        </div>
+        </button>
       </header>
 
       <section class="story" aria-labelledby="game-title">
@@ -44,20 +44,37 @@
         </div>
         <p class="microcopy">每解开一处，天空就亮一点。</p>
       </section>
-      <section class="repair-panel" aria-label="天空修复">
-        <div class="repair-panel__title"><span>天空修复</span><small>主动消耗星愿</small></div>
-        <p id="repair-status" class="repair-status">完成星图获得星愿，再选择想先点亮的天空装饰。</p>
-        <div id="repair-options" class="repair-options"></div>
-      </section>
-
       <div class="completion" id="completion" hidden>
         <div class="completion__glow">✦</div>
         <p class="eyebrow">CONSTELLATION RESTORED</p>
         <h2>星座苏醒了</h2>
         <p id="completion-reward">你收下了 1 点新的星愿。</p>
-        <button id="next-button" class="next-button">前往下一片星空</button>
+        <div class="reward-slot" aria-label="预留的激励广告入口">
+          <span>✦</span>
+          <p>更多星愿将于后续旅程开放<br /><small>激励广告入口 · 后续开放</small></p>
+        </div>
+        <div class="completion__actions">
+          <button id="next-button" class="next-button">下一关</button>
+          <button id="open-star-map-button" class="map-button">点亮星域</button>
+        </div>
       </div>
+
+      <section class="star-map" id="star-map" aria-labelledby="star-map-title" hidden>
+        <div class="star-map__stars" aria-hidden="true"></div>
+        <header class="star-map__header">
+          <div>
+            <p class="eyebrow">SKY ATLAS</p>
+            <h2 id="star-map-title">点亮星域</h2>
+          </div>
+          <button class="icon-button" id="close-star-map-button" aria-label="返回关卡">×</button>
+        </header>
+        <p class="star-map__intro">星愿只会在这里消耗。修复天空后，再主动选择进入新的星域。</p>
+        <div class="map-wish-bank"><span>可用星愿</span><strong><i>✦</i><b id="map-wish-count">0</b></strong></div>
+        <p class="map-message" id="map-message" aria-live="polite"></p>
+        <div class="region-list" id="region-list"></div>
+        <p class="star-map__note">星愿与天空修复为当前游玩会话进度；此原型暂不保存到本地。</p>
+      </section>
     </main>
-    <script type="module" src="./src/app.js?v=20260723-4"></script>
+    <script type="module" src="./src/app.js?v=20260723-5"></script>
   </body>
 </html>

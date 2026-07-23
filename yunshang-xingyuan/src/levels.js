@@ -102,3 +102,16 @@ export function nextLevelIndex(index, unlocked = []) {
   if (currentPosition === -1) return playableIndexes[0];
   return playableIndexes[(currentPosition + 1) % playableIndexes.length];
 }
+
+export function nextLevelIndexInRegion(index) {
+  const currentLevel = levels[index];
+  const regionKey = currentLevel?.requires ?? 'starter';
+  const regionIndexes = levels
+    .map((level, levelIndex) => ({ level, levelIndex }))
+    .filter(({ level }) => (level.requires ?? 'starter') === regionKey)
+    .map(({ levelIndex }) => levelIndex);
+  const currentPosition = regionIndexes.indexOf(index);
+
+  if (currentPosition === -1) return regionIndexes[0] ?? 0;
+  return regionIndexes[(currentPosition + 1) % regionIndexes.length];
+}
