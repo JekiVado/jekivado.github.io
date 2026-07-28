@@ -6,6 +6,7 @@ const iconPath = new URL('../collection/favicon.svg', import.meta.url);
 const readmePath = new URL('../README.md', import.meta.url);
 const rootPath = new URL('../index.html', import.meta.url);
 const yunshangPath = new URL('../yunshang-xingyuan/index.html', import.meta.url);
+const yunshangAppPath = new URL('../yunshang-xingyuan/app.js', import.meta.url);
 
 assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
@@ -32,6 +33,9 @@ const root = readFileSync(rootPath, 'utf8');
 assert.match(root, /content="0; url=\.\/collection\/"/);
 assert.match(root, /href="\.\/collection\/"/);
 assert.ok(existsSync(yunshangPath), 'Expected the 云上星愿 playable prototype to exist');
+assert.ok(existsSync(yunshangAppPath), 'Expected the current 云上星愿 playable app to exist');
+const yunshang = readFileSync(yunshangPath, 'utf8');
+assert.match(yunshang, /app\.js\?v=9/);
 
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
@@ -67,11 +71,11 @@ assert.match(html, /main\s*\{[^}]*width:\s*min\(1440px/);
 assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1fr\)\)/);
 assert.match(html, /class="card-grid prototype-grid"/);
 assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
-assert.match(html, /UPDATED 2026\.07\.23/);
+assert.match(html, /UPDATED 2026\.07\.28/);
 assert.match(html, /云上星愿/);
 assert.match(html, /02 ITEMS/);
-assert.match(html, /点击两点交换星轨；可体验一场 4–6 分钟的星空远征/);
-assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260723-11/);
+assert.match(html, /固定星点两两交换星轨；完成一片片主题画/);
+assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260728-1/);
 
 for (const route of [
   '../escape01/',

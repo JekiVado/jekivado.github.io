@@ -72,6 +72,20 @@ export function swapNodeTrails(level, firstNodeId, secondNodeId) {
   };
 }
 
+export function exchangeOutcome(level, firstNodeId, secondNodeId) {
+  const before = countCrossings(level);
+  const board = swapNodeTrails(level, firstNodeId, secondNodeId);
+  const after = countCrossings(board);
+
+  return {
+    board,
+    before,
+    after,
+    removed: Math.max(0, before - after),
+    cleared: after === 0
+  };
+}
+
 export function bestExchangePair(level) {
   const before = countCrossings(level);
   let best = null;
@@ -86,39 +100,4 @@ export function bestExchangePair(level) {
   }
 
   return best;
-}
-
-export function progressFor(level, stars) {
-  const crossings = countCrossings(level);
-  return {
-    crossings,
-    cleared: crossings === 0,
-    stars: crossings === 0 ? stars : 0
-  };
-}
-
-export function rewardFor(level, completedLevelIds = []) {
-  if (completedLevelIds.includes(level.id)) {
-    return { base: 0, chapterBonus: 0, total: 0 };
-  }
-
-  const chapterBonus = level.chapterBonus ?? 0;
-  return { base: 1, chapterBonus, total: 1 + chapterBonus };
-}
-
-export const repairs = [
-  { id: 'cloud-lamp', name: '云灯', cost: 3, symbol: '☁', unlocks: '云灯之径' },
-  { id: 'star-bridge', name: '星桥', cost: 6, symbol: '✦', unlocks: '星桥回廊' },
-  { id: 'sky-observatory', name: '观星台', cost: 10, symbol: '☾', unlocks: '月台观星' }
-];
-
-export function unlockRepair(state, repairId) {
-  const repair = repairs.find((candidate) => candidate.id === repairId);
-  if (!repair || state.unlocked.includes(repairId) || state.wishes < repair.cost) return state;
-
-  return {
-    wishes: state.wishes - repair.cost,
-    unlocked: [...state.unlocked, repairId],
-    unlockedRepair: repairId
-  };
 }
