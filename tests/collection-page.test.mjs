@@ -65,7 +65,7 @@ assert.match(html, /\.\.\/DanceNewReports\//);
 assert.match(html, /\.\.\/BackofficeReports\//);
 assert.match(html, /DanceNew（游戏）/);
 assert.match(html, /1688 业务后台/);
-assert.match(html, /DAU &amp; LTV 预测仪/);
+assert.match(html, /DAU \/ LTV 预测/);
 assert.match(html, /\.\.\/dau-ltv-forecast\//);
 assert.match(html, /04 COLLECTIONS · 06 LINKS/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);

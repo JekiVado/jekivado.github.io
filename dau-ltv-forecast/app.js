@@ -1,78 +1,179 @@
-const inputIds = ['dau-input', 'growth-input', 'retention-input', 'arpu-input', 'forecast-days'];
-const inputs = Object.fromEntries(inputIds.map((id) => [id, document.getElementById(id)]));
-const chart = document.getElementById('forecast-chart');
+const DEFAULTS = {
+  days: 60, dau: 30000, dailyNew: 2000, newGrowth: 0, arpu: 5.5, payRate: 3,
+  arpuGrowth: 0, d1: 35, d2: 28, d3: 24, d7: 15, d14: 10, d30: 7,
+};
 
-const formatNumber = new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 0 });
-const formatMoney = new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY', maximumFractionDigits: 0 });
-const formatMoneyPrecise = new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY', maximumFractionDigits: 2 });
+const START_DATE = new Date(2026, 7, 5);
+const nf = new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 0 });
+const df = new Intl.DateTimeFormat('zh-CN', { month: '2-digit', day: '2-digit' });
 
-function valueOf(id, fallback) {
-  const value = Number(inputs[id].value);
-  return Number.isFinite(value) ? value : fallback;
+const inputIds = {
+  days: 'forecast-days', dau: 'dau-input', dailyNew: 'daily-new-input', newGrowth: 'new-growth-input',
+  arpu: 'arpu-input', payRate: 'pay-rate-input', arpuGrowth: 'arpu-growth-input',
+  d1: 'd1-retention-input', d2: 'd2-retention-input', d3: 'd3-retention-input',
+  d7: 'd7-retention-input', d14: 'd14-retention-input', d30: 'd30-retention-input',
+};
+
+function money(value, digits = 0) {
+  return new Intl.NumberFormat('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
 }
 
-function buildForecast({ dau, growth, retention, arpu, days }) {
-  const dailyGrowth = 1 + growth / 100;
-  const dailyRetention = Math.pow(Math.max(retention, 1) / 100, 1 / 7);
-  const safeGrowth = Math.max(dailyGrowth, 0.01);
-  const points = [];
-  let cumulativeRevenue = 0;
+function numberValue(id) { return Number(document.getElementById(id).value); }
 
-  for (let day = 0; day <= days; day += 1) {
-    const activeUsers = Math.max(0, dau * Math.pow(safeGrowth, day));
-    const dailyRevenue = activeUsers * arpu;
-    cumulativeRevenue += day === 0 ? 0 : dailyRevenue;
-    points.push({ day, activeUsers, dailyRevenue, cumulativeRevenue });
+function readModel() {
+  const model = Object.fromEntries(Object.entries(inputIds).map(([key, id]) => [key, numberValue(id)]));
+  model.days = Math.round(model.days);
+  return model;
+}
+
+function updateArppu() {
+  const arpu = numberValue('arpu-input');
+  const rate = numberValue('pay-rate-input');
+  document.getElementById('arppu-input').value = rate > 0 ? (arpu / (rate / 100)).toFixed(4) : '—';
+}
+
+function interpolateRetention(day, model) {
+  const anchors = [[0, 1], [1, model.d1 / 100], [2, model.d2 / 100], [3, model.d3 / 100], [7, model.d7 / 100], [14, model.d14 / 100], [30, model.d30 / 100]];
+  if (day <= 0) return 1;
+  for (let index = 1; index < anchors.length; index += 1) {
+    const [rightDay, rightValue] = anchors[index];
+    if (day <= rightDay) {
+      const [leftDay, leftValue] = anchors[index - 1];
+      const progress = (day - leftDay) / (rightDay - leftDay);
+      return leftValue + (rightValue - leftValue) * progress;
+    }
   }
-
-  const ltv = arpu / Math.max(1 - dailyRetention, 0.005);
-  return { points, cumulativeRevenue, ltv, dailyRetention };
+  return Math.max(0, (model.d30 / 100) * Math.pow(0.992, day - 30));
 }
 
-function linePath(points, field, width, height, padding) {
-  const highest = Math.max(...points.map((point) => point[field]), 1);
-  const innerWidth = width - padding.left - padding.right;
-  const innerHeight = height - padding.top - padding.bottom;
-  return points.map((point, index) => {
-    const x = padding.left + (point.day / Math.max(points.length - 1, 1)) * innerWidth;
-    const y = padding.top + innerHeight - (point[field] / highest) * innerHeight;
-    return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
+function buildDailyForecast(model) {
+  const rows = [];
+  let ltv = 0;
+  for (let day = 0; day <= model.days; day += 1) {
+    const date = new Date(START_DATE);
+    date.setDate(START_DATE.getDate() + day);
+    const arpu = model.arpu * Math.pow(1 + model.arpuGrowth / 100, day);
+    const currentContribution = model.dau * interpolateRetention(day, model);
+    const dailyNew = day === 0 ? 0 : model.dailyNew * Math.pow(1 + model.newGrowth / 100, day - 1);
+    let newContribution = 0;
+    for (let cohortDay = 1; cohortDay <= day; cohortDay += 1) {
+      const cohortSize = model.dailyNew * Math.pow(1 + model.newGrowth / 100, cohortDay - 1);
+      newContribution += cohortSize * interpolateRetention(day - cohortDay, model);
+    }
+    const dau = currentContribution + newContribution;
+    const payingUsers = Math.round(dau * model.payRate / 100);
+    const arppu = model.payRate > 0 ? arpu / (model.payRate / 100) : 0;
+    const revenue = payingUsers * arppu;
+    ltv += interpolateRetention(day, model) * arpu;
+    rows.push({ day, date, dailyNew, dau, currentContribution, newContribution, payingUsers, arpu, arppu, revenue, ltv });
+  }
+  return rows;
+}
+
+function chartFrame(svg, maxValue, xLabels, yLabelFormatter = money) {
+  const width = 1000; const height = Number(svg.getAttribute('data-height')) || 210;
+  const pad = { top: 12, right: 12, bottom: 31, left: 49 };
+  const innerWidth = width - pad.left - pad.right; const innerHeight = height - pad.top - pad.bottom;
+  const yTicks = 5;
+  let markup = '';
+  for (let tick = 0; tick <= yTicks; tick += 1) {
+    const y = pad.top + innerHeight - innerHeight * tick / yTicks;
+    const value = maxValue * tick / yTicks;
+    markup += `<line class="chart-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y}" y2="${y}"/><text class="chart-axis-label" x="${pad.left - 7}" y="${y + 4}" text-anchor="end">${yLabelFormatter(value)}</text>`;
+  }
+  const labelCount = Math.min(12, xLabels.length);
+  for (let step = 0; step < labelCount; step += 1) {
+    const index = Math.round(step * (xLabels.length - 1) / Math.max(1, labelCount - 1));
+    const x = pad.left + innerWidth * index / Math.max(1, xLabels.length - 1);
+    markup += `<line class="chart-grid" x1="${x}" x2="${x}" y1="${pad.top}" y2="${pad.top + innerHeight}"/><text class="chart-axis-label" x="${x}" y="${height - 7}" text-anchor="middle">${xLabels[index]}</text>`;
+  }
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('data-height', height);
+  return { width, height, pad, innerWidth, innerHeight, markup };
+}
+
+function pointPath(values, frame) {
+  return values.map((value, index) => {
+    const x = frame.pad.left + frame.innerWidth * index / Math.max(1, values.length - 1);
+    const y = frame.pad.top + frame.innerHeight * (1 - value / frame.maxValue);
+    return `${index ? 'L' : 'M'} ${x.toFixed(2)} ${y.toFixed(2)}`;
   }).join(' ');
 }
 
+function renderLineChart(svg, datasets, labels, options = {}) {
+  const maxData = Math.max(...datasets.flatMap((set) => set.values), 1);
+  const maxValue = maxData * 1.08;
+  const frame = chartFrame(svg, maxValue, labels, options.yLabelFormatter || money);
+  frame.maxValue = maxValue;
+  const baseline = frame.pad.top + frame.innerHeight;
+  let markup = frame.markup;
+  datasets.forEach((set, index) => {
+    const path = pointPath(set.values, frame);
+    if (set.fill) markup += `<path d="${path} L ${frame.pad.left + frame.innerWidth} ${baseline} L ${frame.pad.left} ${baseline} Z" fill="${set.fill}"/>`;
+    markup += `<path d="${path}" fill="none" stroke="${set.color}" stroke-width="${set.width || 2.4}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if (index > 0 || datasets.length === 1) {
+      set.values.forEach((value, pointIndex) => {
+        const x = frame.pad.left + frame.innerWidth * pointIndex / Math.max(1, set.values.length - 1);
+        const y = frame.pad.top + frame.innerHeight * (1 - value / maxValue);
+        markup += `<circle class="chart-dot" cx="${x}" cy="${y}" r="2.25" stroke="${set.color}"/>`;
+      });
+    }
+  });
+  svg.innerHTML = markup;
+}
+
+function renderBarChart(svg, values, labels) {
+  const maxValue = Math.max(...values, 1) * 1.08;
+  const frame = chartFrame(svg, maxValue, labels, money); frame.maxValue = maxValue;
+  const slot = frame.innerWidth / values.length; const barWidth = Math.max(2, slot * .65);
+  let markup = frame.markup;
+  values.forEach((value, index) => {
+    const x = frame.pad.left + index * slot + (slot - barWidth) / 2;
+    const height = frame.innerHeight * value / maxValue;
+    markup += `<rect x="${x}" y="${frame.pad.top + frame.innerHeight - height}" width="${barWidth}" height="${height}" fill="#d1a263"/>`;
+  });
+  svg.innerHTML = markup;
+}
+
+function renderTable(rows) {
+  document.getElementById('forecast-table-body').innerHTML = rows.map((row) => `<tr><td>${df.format(row.date)}${row.day === 0 ? ' · D0起点' : ''}</td><td>${nf.format(row.dailyNew)}</td><td>${nf.format(row.dau)}</td><td>${nf.format(row.payingUsers)}</td><td>${money(row.payingUsers / Math.max(row.dau, 1) * 100, 1)}%</td><td>${money(row.arpu, 4)}</td><td>${money(row.arppu, 4)}</td><td>${nf.format(row.revenue)}</td></tr>`).join('');
+}
+
+function metric(id, value) { document.getElementById(id).textContent = value; }
+
 function renderForecast() {
-  const dau = Math.max(valueOf('dau-input', 1), 1);
-  const growth = Math.min(Math.max(valueOf('growth-input', 0), -20), 30);
-  const retention = Math.min(Math.max(valueOf('retention-input', 1), 1), 99);
-  const arpu = Math.max(valueOf('arpu-input', 0), 0);
-  const days = Number(inputs['forecast-days'].value);
-  const forecast = buildForecast({ dau, growth, retention, arpu, days });
-  const finalPoint = forecast.points.at(-1);
-
-  document.getElementById('end-dau').textContent = formatNumber.format(finalPoint.activeUsers);
-  document.getElementById('end-dau-note').textContent = `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% 日增长 · DAY ${days}`;
-  document.getElementById('forecast-revenue').textContent = formatMoney.format(forecast.cumulativeRevenue);
-  document.getElementById('forecast-revenue-note').textContent = `${days} 天累计 · 当前 ARPU ${formatMoneyPrecise.format(arpu)}`;
-  document.getElementById('forecast-ltv').textContent = formatMoneyPrecise.format(forecast.ltv);
-  document.getElementById('forecast-ltv-note').textContent = `日留存约 ${(forecast.dailyRetention * 100).toFixed(1)}%`;
-
-  const width = 760;
-  const height = 300;
-  const padding = { left: 20, right: 22, top: 24, bottom: 38 };
-  document.getElementById('dau-line').setAttribute('d', linePath(forecast.points, 'activeUsers', width, height, padding));
-  document.getElementById('revenue-line').setAttribute('d', linePath(forecast.points, 'cumulativeRevenue', width, height, padding));
-  const endX = width - padding.right;
-  const maxDau = Math.max(...forecast.points.map((point) => point.activeUsers), 1);
-  const endY = padding.top + (height - padding.top - padding.bottom) - (finalPoint.activeUsers / maxDau) * (height - padding.top - padding.bottom);
-  document.getElementById('end-dot').setAttribute('cx', endX.toFixed(2));
-  document.getElementById('end-dot').setAttribute('cy', endY.toFixed(2));
-  document.getElementById('chart-end-label').textContent = `DAY ${days}`;
-  chart.setAttribute('aria-label', `${days} 天 DAU 与累计收入预测曲线，期末 DAU ${formatNumber.format(finalPoint.activeUsers)}`);
+  const model = readModel();
+  const validation = document.getElementById('validation-message');
+  const numbers = Object.values(model);
+  if (numbers.some((value) => !Number.isFinite(value)) || model.days < 1 || model.dau < 0 || model.dailyNew < 0 || model.arpu < 0 || model.payRate <= 0 || model.d1 < 0 || model.d2 < 0 || model.d3 < 0 || model.d7 < 0 || model.d14 < 0 || model.d30 < 0) {
+    validation.textContent = '假设检查：请填写有效的非负数值，付费率必须大于 0。'; validation.classList.add('invalid'); return;
+  }
+  validation.textContent = '假设检查：输入有效。'; validation.classList.remove('invalid');
+  updateArppu();
+  const rows = buildDailyForecast(model); const last = rows.at(-1);
+  const revenue = rows.reduce((sum, row) => sum + row.revenue, 0);
+  const averageDau = rows.reduce((sum, row) => sum + row.dau, 0) / rows.length;
+  const peakDau = Math.max(...rows.slice(1).map((row) => row.dau));
+  const newUsers = rows.reduce((sum, row) => sum + row.dailyNew, 0);
+  const ltv30 = rows[Math.min(30, rows.length - 1)].ltv;
+  const averageArppu = rows.reduce((sum, row) => sum + row.arppu, 0) / rows.length;
+  metric('forecast-revenue-value', nf.format(revenue)); metric('end-dau-value', nf.format(last.dau)); metric('avg-dau-value', nf.format(averageDau)); metric('peak-dau-value', nf.format(peakDau)); metric('new-users-value', nf.format(newUsers)); metric('pay-rate-value', `${money(model.payRate, 1)}%`); metric('ltv30-value', money(ltv30, 2)); metric('arppu-avg-value', money(averageArppu, 2));
+  const dateLabels = rows.map((row) => df.format(row.date));
+  document.getElementById('forecast-range').textContent = `${dateLabels[0]} - ${dateLabels.at(-1)}`;
+  document.getElementById('ltv-range').textContent = `D0-D${model.days}`;
+  renderLineChart(document.getElementById('forecast-chart'), [
+    { values: rows.map((row) => row.dau), color: '#6259ee', fill: 'rgba(98, 89, 238, .12)', width: 2.7 },
+    { values: rows.map((row) => row.newContribution), color: '#219653' },
+    { values: rows.map((row) => row.currentContribution), color: '#167d7a' },
+  ], dateLabels);
+  renderBarChart(document.getElementById('revenue-chart'), rows.map((row) => row.revenue), dateLabels);
+  renderLineChart(document.getElementById('ltv-chart'), [{ values: rows.map((row) => row.ltv), color: '#be7b19', fill: 'rgba(190, 123, 25, .12)' }], rows.map((row) => `D${row.day}`), { yLabelFormatter: (value) => money(value, 0) });
+  renderTable(rows);
 }
 
-for (const id of inputIds) {
-  const eventName = id === 'forecast-days' ? 'change' : 'input';
-  inputs[id].addEventListener(eventName, renderForecast);
-}
+document.getElementById('forecast-form').addEventListener('submit', (event) => { event.preventDefault(); renderForecast(); });
+document.getElementById('calculate-button').addEventListener('click', renderForecast);
+document.getElementById('reset-button').addEventListener('click', () => { Object.entries(DEFAULTS).forEach(([key, value]) => { document.getElementById(inputIds[key]).value = value; }); renderForecast(); });
+['arpu-input', 'pay-rate-input'].forEach((id) => document.getElementById(id).addEventListener('input', updateArppu));
 
 renderForecast();

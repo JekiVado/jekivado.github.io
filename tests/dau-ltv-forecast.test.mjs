@@ -10,23 +10,37 @@ assert.ok(existsSync(appPath), 'Expected the DAU/LTV forecast app script to exis
 const html = readFileSync(pagePath, 'utf8');
 const app = readFileSync(appPath, 'utf8');
 
-assert.match(html, /<title>DAU &amp; LTV 预测仪/);
+assert.match(html, /<title>DAU \/ LTV 预测<\/title>/);
 assert.match(html, /id="dau-input"/);
-assert.match(html, /id="growth-input"/);
-assert.match(html, /id="retention-input"/);
+assert.match(html, /id="daily-new-input"/);
+assert.match(html, /id="new-growth-input"/);
 assert.match(html, /id="arpu-input"/);
+assert.match(html, /id="pay-rate-input"/);
+assert.match(html, /id="arppu-input"/);
+assert.match(html, /id="arpu-growth-input"/);
+assert.match(html, /id="d1-retention-input"/);
+assert.match(html, /id="d30-retention-input"/);
 assert.match(html, /id="forecast-chart"/);
+assert.match(html, /id="revenue-chart"/);
+assert.match(html, /id="ltv-chart"/);
 assert.match(html, /id="forecast-days"/);
-assert.match(html, /data-metric="ltv"/);
-assert.match(html, /累计收入（归一化）/);
+assert.match(html, /id="calculate-button"/);
+assert.match(html, /id="reset-button"/);
+assert.match(html, /id="forecast-table-body"/);
+assert.match(html, /data-metric="forecast-revenue"/);
+assert.match(html, /每日预测明细/);
 assert.match(html, /app\.js/);
 
-assert.match(app, /function buildForecast/);
+assert.match(app, /function interpolateRetention/);
+assert.match(app, /function buildDailyForecast/);
 assert.match(app, /function renderForecast/);
+assert.match(app, /function renderTable/);
 assert.match(app, /dau-input/);
+assert.match(app, /daily-new-input/);
 assert.match(app, /forecast-chart/);
-assert.match(app, /cumulativeRevenue/);
-assert.match(app, /'input'/);
-assert.match(app, /addEventListener\(eventName, renderForecast\)/);
+assert.match(app, /revenue-chart/);
+assert.match(app, /ltv-chart/);
+assert.match(app, /calculate-button/);
+assert.match(app, /reset-button/);
 
 console.log('DAU/LTV forecast page checks passed');
