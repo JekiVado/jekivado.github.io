@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0d1618" />
+    <title>DAU &amp; LTV 预测仪</title>
+    <style>
+      :root { --bg: #0d1618; --panel: #132126; --panel-2: #172a30; --line: #2a4249; --ink: #edf4ec; --muted: #9db0ad; --aqua: #76e0c2; --amber: #ffc871; --coral: #fa9879; }
+      * { box-sizing: border-box; }
+      body { min-width: 320px; margin: 0; color: var(--ink); background: radial-gradient(circle at 79% -14%, #1f5551 0, transparent 30rem), linear-gradient(150deg, #0f1c1f 0, var(--bg) 58%); font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif; }
+      button, input, select { font: inherit; }
+      main { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 48px 0 64px; }
+      header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 23px; border-bottom: 1px solid var(--line); }
+      .eyebrow { margin: 0 0 10px; color: var(--aqua); font: 700 11px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .16em; }
+      h1 { margin: 0; font-size: clamp(34px, 5vw, 52px); font-weight: 650; letter-spacing: -.06em; line-height: 1; }
+      .status { color: var(--muted); font: 11px/1.4 "SFMono-Regular", Menlo, monospace; letter-spacing: .07em; text-align: right; }
+      .intro { max-width: 690px; margin: 17px 0 30px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+      .dashboard { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; }
+      .panel { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(145deg, rgba(24, 44, 50, .94), rgba(15, 29, 33, .94)); box-shadow: 0 20px 48px rgba(0, 0, 0, .18); }
+      .controls { padding: 19px; }
+      .panel-label { display: flex; justify-content: space-between; align-items: center; margin: 0 0 18px; color: var(--aqua); font: 700 10px/1 "SFMono-Regular", Menlo, monospace; letter-spacing: .12em; }
+      .panel-label span:last-child { color: var(--muted); letter-spacing: .06em; }
+      .control { display: block; margin-top: 15px; }
+      .control:first-of-type { margin-top: 0; }
+      label { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; color: var(--ink); font-size: 13px; }
+      label span { color: var(--muted); font: 10px/1.5 "SFMono-Regular", Menlo, monospace; }
+      input, select { width: 100%; min-height: 42px; padding: 0 11px; border: 1px solid #355159; border-radius: 8px; color: var(--ink); background: #0d191c; outline: none; transition: border-color .18s ease, box-shadow .18s ease; }
+      input:focus, select:focus { border-color: var(--aqua); box-shadow: 0 0 0 3px rgba(118, 224, 194, .13); }
+      input::-webkit-inner-spin-button { opacity: .65; }
+      .formula { margin: 22px 0 0; padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font: 11px/1.65 "SFMono-Regular", Menlo, monospace; }
+      .formula strong { color: var(--amber); font-weight: 700; }
+      .workspace { display: grid; gap: 16px; }
+      .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .metric { min-height: 122px; padding: 17px; border: 1px solid var(--line); border-radius: 13px; background: rgba(13, 25, 28, .63); }
+      .metric .label { display: block; color: var(--muted); font: 10px/1.2 "SFMono-Regular", Menlo, monospace; letter-spacing: .08em; }
+      .metric output { display: block; margin-top: 20px; color: var(--ink); font-size: clamp(24px, 3vw, 34px); font-weight: 660; letter-spacing: -.05em; }
+      .metric[data-metric="dau"] output { color: var(--aqua); }
+      .metric[data-metric="revenue"] output { color: var(--amber); }
+      .metric[data-metric="ltv"] output { color: var(--coral); }
+      .metric .note { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; }
+      .chart-panel { padding: 18px 19px 16px; }
+      .chart-top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 15px; }
+      h2 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -.02em; }
+      .legend { display: flex; gap: 15px; color: var(--muted); font: 10px/1 "SFMono-Regular", Menlo, monospace; white-space: nowrap; }
+      .legend span::before { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; content: ""; background: var(--aqua); }
+      .legend span:last-child::before { background: var(--amber); }
+      .chart-wrap { position: relative; overflow: hidden; min-height: 300px; border: 1px solid #284147; border-radius: 10px; background: repeating-linear-gradient(0deg, transparent 0 56px, rgba(118, 224, 194, .05) 57px), linear-gradient(115deg, #102025, #0c171a); }
+      svg { display: block; width: 100%; min-height: 300px; }
+      .chart-axis { fill: #73918f; font: 10px "SFMono-Regular", Menlo, monospace; }
+      .chart-line-dau { fill: none; stroke: var(--aqua); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .chart-line-revenue { fill: none; stroke: var(--amber); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 7; }
+      .chart-dot { fill: var(--aqua); stroke: #0c171a; stroke-width: 3; }
+      .footnote { margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+      .footnote strong { color: var(--ink); }
+      footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font: 10px/1.5 "SFMono-Regular", Menlo, monospace; }
+      @media (max-width: 780px) { main { width: min(100% - 28px, 1180px); padding-top: 30px; } header { align-items: flex-start; flex-direction: column; gap: 9px; } .status { text-align: left; } .dashboard { grid-template-columns: 1fr; } .metrics { grid-template-columns: 1fr; } .metric { min-height: 96px; } .metric output { margin-top: 13px; } .chart-top { align-items: flex-start; flex-direction: column; } footer { flex-direction: column; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div><p class="eyebrow">LOCAL FORECAST / V1.0</p><h1>DAU &amp; LTV 预测仪</h1></div>
+        <div class="status">CLIENT-SIDE MODEL<br />NO DATA UPLOAD</div>
+      </header>
+      <p class="intro">输入当前活跃规模、增长、留存与人均日收入，快速查看未来 DAU 轨迹、预测期累计收入与基于留存衰减的 LTV 估算。</p>
+
+      <section class="dashboard" aria-label="DAU 与 LTV 预测面板">
+        <form class="panel controls" onsubmit="return false">
+          <p class="panel-label"><span>MODEL INPUTS</span><span>LIVE</span></p>
+          <div class="control"><label for="dau-input">当前 DAU <span>USERS</span></label><input id="dau-input" type="number" min="1" value="12800" inputmode="numeric" /></div>
+          <div class="control"><label for="growth-input">日增长率 <span>% / DAY</span></label><input id="growth-input" type="number" min="-20" max="30" step="0.1" value="1.8" inputmode="decimal" /></div>
+          <div class="control"><label for="retention-input">D7 留存 <span>%</span></label><input id="retention-input" type="number" min="1" max="99" step="0.1" value="34" inputmode="decimal" /></div>
+          <div class="control"><label for="arpu-input">人均日收入 <span>CNY / USER</span></label><input id="arpu-input" type="number" min="0" step="0.01" value="0.82" inputmode="decimal" /></div>
+          <div class="control"><label for="forecast-days">预测周期 <span>DAYS</span></label><select id="forecast-days"><option value="30" selected>未来 30 天</option><option value="60">未来 60 天</option><option value="90">未来 90 天</option></select></div>
+          <p class="formula"><strong>模型：</strong>DAU 按日增长率复利；LTV 由 D7 留存换算日留存后做稳定状态估算。用于快速情景预演，不替代真实 cohort 分析。</p>
+        </form>
+
+        <div class="workspace">
+          <div class="metrics" aria-live="polite">
+            <article class="metric" data-metric="dau"><span class="label">PERIOD-END DAU</span><output id="end-dau">—</output><span class="note" id="end-dau-note">—</span></article>
+            <article class="metric" data-metric="revenue"><span class="label">FORECAST REVENUE</span><output id="forecast-revenue">—</output><span class="note" id="forecast-revenue-note">—</span></article>
+            <article class="metric" data-metric="ltv"><span class="label">EST. LTV / USER</span><output id="forecast-ltv">—</output><span class="note" id="forecast-ltv-note">—</span></article>
+          </div>
+          <section class="panel chart-panel" aria-labelledby="chart-title">
+            <div class="chart-top"><h2 id="chart-title">DAU 与累计收入轨迹</h2><div class="legend"><span>DAU</span><span>累计收入（归一化）</span></div></div>
+            <div class="chart-wrap"><svg id="forecast-chart" viewBox="0 0 760 300" role="img" aria-label="DAU 与累计收入预测曲线"><text class="chart-axis" id="chart-start-label" x="18" y="280">DAY 0</text><text class="chart-axis" id="chart-end-label" x="685" y="280">DAY 30</text><path id="revenue-line" class="chart-line-revenue"></path><path id="dau-line" class="chart-line-dau"></path><circle id="end-dot" class="chart-dot" r="5"></circle></svg></div>
+            <p class="footnote"><strong>说明：</strong>两条曲线按各自最大值归一化，用于观察趋势；实际金额见上方累计收入。全部输入仅在当前浏览器中计算。</p>
+          </section>
+        </div>
+      </section>
+      <footer><span>DAU &amp; LTV FORECAST · LOCAL TOOL</span><span>MODEL REV. 2026.08</span></footer>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -7,6 +7,7 @@ const readmePath = new URL('../README.md', import.meta.url);
 const rootPath = new URL('../index.html', import.meta.url);
 const yunshangPath = new URL('../yunshang-xingyuan/index.html', import.meta.url);
 const yunshangAppPath = new URL('../yunshang-xingyuan/app.js', import.meta.url);
+const forecastPath = new URL('../dau-ltv-forecast/index.html', import.meta.url);
 
 assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
@@ -36,12 +37,13 @@ assert.ok(existsSync(yunshangPath), 'Expected the 云上星愿 playable prototyp
 assert.ok(existsSync(yunshangAppPath), 'Expected the current 云上星愿 playable app to exist');
 const yunshang = readFileSync(yunshangPath, 'utf8');
 assert.match(yunshang, /app\.js\?v=9/);
+assert.ok(existsSync(forecastPath), 'Expected the DAU/LTV forecast page to exist');
 
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
 assert.match(html, /data-category="analysis"/);
 assert.match(html, /data-category="reports"/);
-assert.equal((html.match(/<details class="category category-card\b/g) ?? []).length, 3, 'Expected three collapsible category cards');
+assert.equal((html.match(/<details class="category category-card\b/g) ?? []).length, 4, 'Expected four collapsible category cards');
 assert.match(html, /<summary class="category-summary">/);
 assert.match(html, /<span class="toggle-label">点击展开<\/span>/);
 assert.match(html, /\.category-card\[open\]/);
@@ -57,12 +59,15 @@ assert.match(html, /--report-bg:\s*#f0edff/);
 assert.match(html, /class="category category-card prototype-section"/);
 assert.match(html, /class="category category-card analysis-section"/);
 assert.match(html, /class="category category-card reports-section"/);
+assert.match(html, /class="category category-card tools-section"/);
 assert.match(html, /报告档案入口/);
 assert.match(html, /\.\.\/DanceNewReports\//);
 assert.match(html, /\.\.\/BackofficeReports\//);
 assert.match(html, /DanceNew（游戏）/);
 assert.match(html, /1688 业务后台/);
-assert.match(html, /03 COLLECTIONS · 05 LINKS/);
+assert.match(html, /DAU &amp; LTV 预测仪/);
+assert.match(html, /\.\.\/dau-ltv-forecast\//);
+assert.match(html, /04 COLLECTIONS · 06 LINKS/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
 assert.match(html, /\.category-summary\s*\{[^}]*padding:\s*18px 20px/);
@@ -71,7 +76,7 @@ assert.match(html, /main\s*\{[^}]*width:\s*min\(1440px/);
 assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1fr\)\)/);
 assert.match(html, /class="card-grid prototype-grid"/);
 assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
-assert.match(html, /UPDATED 2026\.07\.28/);
+assert.match(html, /UPDATED 2026\.08\.05/);
 assert.match(html, /云上星愿/);
 assert.match(html, /02 ITEMS/);
 assert.match(html, /固定星点两两交换星轨；完成一片片主题画/);
@@ -83,6 +88,7 @@ for (const route of [
   '../ServerAnalysis/',
   '../DanceNewReports/',
   '../BackofficeReports/',
+  '../dau-ltv-forecast/',
 ]) {
   assert.match(html, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 }

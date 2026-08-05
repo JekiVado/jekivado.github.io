@@ -25,6 +25,10 @@
         --report-border: #9b8cc9;
         --report-accent: #6351a1;
         --report-ink: #433274;
+        --tool-bg: #e8f3e6;
+        --tool-border: #7cad82;
+        --tool-accent: #347453;
+        --tool-ink: #24553c;
       }
 
       * { box-sizing: border-box; }
@@ -47,6 +51,7 @@
       .category { --module-bg: var(--cool-bg); --module-border: var(--cool-border); --module-accent: var(--cool-accent); --module-ink: var(--cool-ink); overflow: hidden; border: 1px solid var(--module-border); border-radius: 17px; background: #fff; box-shadow: 0 7px 18px rgba(37, 56, 61, .07); transition: box-shadow .22s ease, transform .22s ease; }
       .prototype-section { --module-bg: var(--warm-bg); --module-border: var(--warm-border); --module-accent: var(--warm-accent); --module-ink: var(--warm-ink); }
       .reports-section { --module-bg: var(--report-bg); --module-border: var(--report-border); --module-accent: var(--report-accent); --module-ink: var(--report-ink); }
+      .tools-section { --module-bg: var(--tool-bg); --module-border: var(--tool-border); --module-accent: var(--tool-accent); --module-ink: var(--tool-ink); }
       .category-card[open] { box-shadow: 0 14px 30px rgba(37, 56, 61, .12); }
       .category-summary { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto auto; align-items: center; gap: 16px; min-height: 96px; padding: 18px 20px; cursor: pointer; list-style: none; background: linear-gradient(90deg, var(--module-bg), rgba(255, 255, 255, .92) 68%); transition: background .2s ease; }
       .category-summary::-webkit-details-marker { display: none; }
@@ -116,7 +121,7 @@
           <p class="eyebrow">JEKIVADO / PERSONAL INDEX</p>
           <h1>集合</h1>
         </div>
-        <p class="count">03 COLLECTIONS · 05 LINKS</p>
+        <p class="count">04 COLLECTIONS · 06 LINKS</p>
       </header>
       <p class="intro">按主题折叠的个人入口。先选模块，再展开查看具体页面；新增内容只需归入对应模块。</p>
 
@@ -187,9 +192,28 @@
             </div>
           </div>
         </details>
+
+        <details class="category category-card tools-section">
+          <summary class="category-summary">
+            <span class="category-index">04</span>
+            <div class="category-copy"><h2 id="tools-title">数据工具</h2><p>可在本地浏览器内调整参数的轻量预测与分析工具。</p></div>
+            <span class="category-count">01 TOOL</span>
+            <span class="toggle"><span class="toggle-label">点击展开</span><span class="toggle-mark">+</span></span>
+          </summary>
+          <div class="category-content" aria-labelledby="tools-title">
+            <div class="card-grid prototype-grid">
+              <a class="card" data-category="tools" href="../dau-ltv-forecast/">
+                <span class="card-top"><span class="kind">FORECAST TOOL</span><span class="arrow">↗</span></span>
+                <strong class="card-name">DAU &amp; LTV 预测仪</strong>
+                <p class="card-detail">调节活跃、增长、留存与 ARPU，实时查看预测曲线、累计收入和 LTV。</p>
+                <span class="path">/dau-ltv-forecast/</span>
+              </a>
+            </div>
+          </div>
+        </details>
       </div>
 
-      <footer><span><strong>提示：</strong>本页带有不收录提示，但链接本身不是访问权限控制。</span><span>UPDATED 2026.07.28</span></footer>
+      <footer><span><strong>提示：</strong>本页带有不收录提示，但链接本身不是访问权限控制。</span><span>UPDATED 2026.08.05</span></footer>
     </main>
   </body>
 </html>
