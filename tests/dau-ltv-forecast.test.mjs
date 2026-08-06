@@ -46,6 +46,14 @@ assert.match(html, /app\.js/);
 
 assert.match(app, /function interpolateRetention/);
 assert.match(app, /function buildDailyForecast/);
+assert.match(app, /return leftValue \* Math\.pow\(rightValue \/ leftValue, progress\);/);
+assert.match(app, /Math\.pow\(0\.988, day - 30\)/);
+assert.match(app, /const revenue = dau \* arpu;/);
+assert.match(app, /const arppu = payingUsers > 0 \? revenue \/ payingUsers : 0;/);
+assert.match(app, /const dau = Math\.round\(currentContribution \+ newContribution\);/);
+assert.match(app, /const ltv30 = last\.ltv;/);
+assert.match(app, /const futurePayingUsers = rows\.slice\(1\)\.reduce/);
+assert.match(app, /const averageArppu = revenue \/ Math\.max\(futurePayingUsers, 1\);/);
 assert.match(app, /function renderForecast/);
 assert.match(app, /function renderTable/);
 assert.match(app, /function attachLineTooltip/);

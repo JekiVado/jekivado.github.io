@@ -42,10 +42,11 @@ function interpolateRetention(day, model) {
     if (day <= rightDay) {
       const [leftDay, leftValue] = anchors[index - 1];
       const progress = (day - leftDay) / (rightDay - leftDay);
-      return leftValue + (rightValue - leftValue) * progress;
+      if (leftValue <= 0 || rightValue <= 0) return leftValue + (rightValue - leftValue) * progress;
+      return leftValue * Math.pow(rightValue / leftValue, progress);
     }
   }
-  return Math.max(0, (model.d30 / 100) * Math.pow(0.992, day - 30));
+  return Math.max(0, (model.d30 / 100) * Math.pow(0.988, day - 30));
 }
 
 function buildDailyForecast(model) {
@@ -62,10 +63,10 @@ function buildDailyForecast(model) {
       const cohortSize = model.dailyNew * Math.pow(1 + model.newGrowth / 100, cohortDay - 1);
       newContribution += cohortSize * interpolateRetention(day - cohortDay, model);
     }
-    const dau = currentContribution + newContribution;
+    const dau = Math.round(currentContribution + newContribution);
     const payingUsers = Math.round(dau * model.payRate / 100);
-    const arppu = model.payRate > 0 ? arpu / (model.payRate / 100) : 0;
-    const revenue = payingUsers * arppu;
+    const revenue = dau * arpu;
+    const arppu = payingUsers > 0 ? revenue / payingUsers : 0;
     ltv += interpolateRetention(day, model) * arpu;
     rows.push({ day, date, dailyNew, dau, currentContribution, newContribution, payingUsers, arpu, arppu, revenue, ltv });
   }
@@ -214,11 +215,12 @@ function renderForecast() {
   updateArppu();
   const rows = buildDailyForecast(model); const last = rows.at(-1);
   const revenue = rows.reduce((sum, row) => sum + row.revenue, 0);
-  const averageDau = rows.reduce((sum, row) => sum + row.dau, 0) / rows.length;
+  const averageDau = rows.slice(1).reduce((sum, row) => sum + row.dau, 0) / Math.max(rows.length - 1, 1);
   const peakDau = Math.max(...rows.slice(1).map((row) => row.dau));
   const newUsers = rows.reduce((sum, row) => sum + row.dailyNew, 0);
-  const ltv30 = rows[Math.min(30, rows.length - 1)].ltv;
-  const averageArppu = rows.reduce((sum, row) => sum + row.arppu, 0) / rows.length;
+  const ltv30 = last.ltv;
+  const futurePayingUsers = rows.slice(1).reduce((sum, row) => sum + row.payingUsers, 0);
+  const averageArppu = revenue / Math.max(futurePayingUsers, 1);
   metric('forecast-revenue-value', nf.format(revenue)); metric('end-dau-value', nf.format(last.dau)); metric('avg-dau-value', nf.format(averageDau)); metric('peak-dau-value', nf.format(peakDau)); metric('new-users-value', nf.format(newUsers)); metric('pay-rate-value', `${money(model.payRate, 1)}%`); metric('ltv30-value', money(ltv30, 2)); metric('arppu-avg-value', money(averageArppu, 2));
   const dateLabels = rows.map((row) => df.format(row.date));
   document.getElementById('forecast-range').textContent = `${dateLabels[0]} - ${dateLabels.at(-1)}`;
