@@ -108,22 +108,21 @@ function svgElement(name, attributes) {
   return element;
 }
 
-function tooltipIndex(event, svg, frame, itemCount) {
+function pointerChartX(event, svg, frame) {
   const bounds = svg.getBoundingClientRect();
   const svgX = (event.clientX - bounds.left) / Math.max(bounds.width, 1) * frame.width;
-  const progress = Math.min(1, Math.max(0, (svgX - frame.pad.left) / frame.innerWidth));
+  return Math.min(frame.pad.left + frame.innerWidth, Math.max(frame.pad.left, svgX));
+}
+
+function tooltipIndex(event, svg, frame, itemCount) {
+  const progress = (pointerChartX(event, svg, frame) - frame.pad.left) / frame.innerWidth;
   return Math.round(progress * Math.max(0, itemCount - 1));
 }
 
 function barTooltipIndex(event, svg, frame, itemCount) {
-  const bounds = svg.getBoundingClientRect();
-  const svgX = (event.clientX - bounds.left) / Math.max(bounds.width, 1) * frame.width;
+  const svgX = pointerChartX(event, svg, frame);
   const slot = frame.innerWidth / itemCount;
   return Math.min(itemCount - 1, Math.max(0, Math.floor((svgX - frame.pad.left) / slot)));
-}
-
-function barCenterX(index, frame, itemCount) {
-  return frame.pad.left + frame.innerWidth / itemCount * (index + .5);
 }
 
 function showTooltip(event, title, rows) {
@@ -154,7 +153,7 @@ function attachBarTooltip(svg, values, labels, frame) {
   svg.append(guide, hitArea);
   svg.onpointermove = (event) => {
     const index = barTooltipIndex(event, svg, frame, labels.length);
-    const x = barCenterX(index, frame, labels.length);
+    const x = pointerChartX(event, svg, frame);
     guide.setAttribute('x1', x); guide.setAttribute('x2', x); guide.setAttribute('visibility', 'visible');
     showTooltip(event, labels[index], [{ label: '收入', value: money(values[index]), color: '#d1a263' }]);
   };
