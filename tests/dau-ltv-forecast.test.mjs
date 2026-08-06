@@ -32,6 +32,7 @@ assert.match(html, /id="revenue-chart"/);
 assert.match(html, /id="ltv-chart"/);
 assert.match(html, /id="chart-tooltip"/);
 assert.match(html, /class="chart-grid-layout"/);
+assert.match(html, /\.chart-grid-layout\s*\{\s*display:grid;\s*grid-template-columns:1fr;\s*gap:14px;/);
 assert.match(html, /class="chart-card dau-card"/);
 assert.match(html, /class="chart-card revenue-card"/);
 assert.match(html, /class="chart-card ltv-card"/);
