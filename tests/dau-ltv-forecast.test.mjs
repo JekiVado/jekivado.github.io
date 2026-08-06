@@ -50,6 +50,8 @@ assert.match(app, /function renderForecast/);
 assert.match(app, /function renderTable/);
 assert.match(app, /function attachLineTooltip/);
 assert.match(app, /function attachBarTooltip/);
+assert.match(app, /function barCenterX/);
+assert.match(app, /function barTooltipIndex/);
 assert.match(app, /pointermove/);
 assert.match(app, /chart-tooltip/);
 assert.match(app, /dau-input/);
