@@ -6,6 +6,8 @@ const DEFAULTS = {
 const START_DATE = new Date(2026, 7, 5);
 const nf = new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 0 });
 const df = new Intl.DateTimeFormat('zh-CN', { month: '2-digit', day: '2-digit' });
+const tooltip = document.getElementById('chart-tooltip');
+const svgNs = 'http://www.w3.org/2000/svg';
 
 const inputIds = {
   days: 'forecast-days', dau: 'dau-input', dailyNew: 'daily-new-input', newGrowth: 'new-growth-input',
@@ -100,6 +102,54 @@ function pointPath(values, frame) {
   }).join(' ');
 }
 
+function svgElement(name, attributes) {
+  const element = document.createElementNS(svgNs, name);
+  Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+  return element;
+}
+
+function tooltipIndex(event, svg, frame, itemCount) {
+  const bounds = svg.getBoundingClientRect();
+  const svgX = (event.clientX - bounds.left) / Math.max(bounds.width, 1) * frame.width;
+  const progress = Math.min(1, Math.max(0, (svgX - frame.pad.left) / frame.innerWidth));
+  return Math.round(progress * Math.max(0, itemCount - 1));
+}
+
+function showTooltip(event, title, rows) {
+  tooltip.innerHTML = `<span class="tooltip-title">${title}</span>${rows.map((row) => `<span class="tooltip-row"><span><i class="tooltip-dot" style="background:${row.color}"></i>${row.label}</span><b>${row.value}</b></span>`).join('')}`;
+  tooltip.hidden = false;
+  const tooltipWidth = tooltip.offsetWidth;
+  const tooltipHeight = tooltip.offsetHeight;
+  tooltip.style.left = `${Math.min(event.clientX, window.innerWidth - tooltipWidth - 18)}px`;
+  tooltip.style.top = `${Math.min(event.clientY, window.innerHeight - tooltipHeight - 18)}px`;
+}
+
+function attachLineTooltip(svg, datasets, labels, frame, valueFormatter = money) {
+  const guide = svgElement('line', { class: 'chart-hover-line', y1: frame.pad.top, y2: frame.pad.top + frame.innerHeight, visibility: 'hidden' });
+  const hitArea = svgElement('rect', { class: 'chart-hit-area', x: frame.pad.left, y: frame.pad.top, width: frame.innerWidth, height: frame.innerHeight });
+  svg.append(guide, hitArea);
+  svg.onpointermove = (event) => {
+    const index = tooltipIndex(event, svg, frame, labels.length);
+    const x = frame.pad.left + frame.innerWidth * index / Math.max(1, labels.length - 1);
+    guide.setAttribute('x1', x); guide.setAttribute('x2', x); guide.setAttribute('visibility', 'visible');
+    showTooltip(event, labels[index], datasets.map((set) => ({ label: set.label, value: valueFormatter(set.values[index]), color: set.color })));
+  };
+  svg.onpointerleave = () => { guide.setAttribute('visibility', 'hidden'); tooltip.hidden = true; };
+}
+
+function attachBarTooltip(svg, values, labels, frame) {
+  const guide = svgElement('line', { class: 'chart-hover-line', y1: frame.pad.top, y2: frame.pad.top + frame.innerHeight, visibility: 'hidden' });
+  const hitArea = svgElement('rect', { class: 'chart-hit-area', x: frame.pad.left, y: frame.pad.top, width: frame.innerWidth, height: frame.innerHeight });
+  svg.append(guide, hitArea);
+  svg.onpointermove = (event) => {
+    const index = tooltipIndex(event, svg, frame, labels.length);
+    const x = frame.pad.left + frame.innerWidth * index / Math.max(1, labels.length - 1);
+    guide.setAttribute('x1', x); guide.setAttribute('x2', x); guide.setAttribute('visibility', 'visible');
+    showTooltip(event, labels[index], [{ label: '收入', value: money(values[index]), color: '#d1a263' }]);
+  };
+  svg.onpointerleave = () => { guide.setAttribute('visibility', 'hidden'); tooltip.hidden = true; };
+}
+
 function renderLineChart(svg, datasets, labels, options = {}) {
   const maxData = Math.max(...datasets.flatMap((set) => set.values), 1);
   const maxValue = maxData * 1.08;
@@ -120,6 +170,7 @@ function renderLineChart(svg, datasets, labels, options = {}) {
     }
   });
   svg.innerHTML = markup;
+  attachLineTooltip(svg, datasets, labels, frame, options.valueFormatter || money);
 }
 
 function renderBarChart(svg, values, labels) {
@@ -133,6 +184,7 @@ function renderBarChart(svg, values, labels) {
     markup += `<rect x="${x}" y="${frame.pad.top + frame.innerHeight - height}" width="${barWidth}" height="${height}" fill="#d1a263"/>`;
   });
   svg.innerHTML = markup;
+  attachBarTooltip(svg, values, labels, frame);
 }
 
 function renderTable(rows) {
@@ -162,12 +214,12 @@ function renderForecast() {
   document.getElementById('forecast-range').textContent = `${dateLabels[0]} - ${dateLabels.at(-1)}`;
   document.getElementById('ltv-range').textContent = `D0-D${model.days}`;
   renderLineChart(document.getElementById('forecast-chart'), [
-    { values: rows.map((row) => row.dau), color: '#6259ee', fill: 'rgba(98, 89, 238, .12)', width: 2.7 },
-    { values: rows.map((row) => row.newContribution), color: '#219653' },
-    { values: rows.map((row) => row.currentContribution), color: '#167d7a' },
+    { label: '总 DAU', values: rows.map((row) => row.dau), color: '#6259ee', fill: 'rgba(98, 89, 238, .12)', width: 2.7 },
+    { label: '新增留存贡献', values: rows.map((row) => row.newContribution), color: '#219653' },
+    { label: '当前 DAU 延续', values: rows.map((row) => row.currentContribution), color: '#167d7a' },
   ], dateLabels);
   renderBarChart(document.getElementById('revenue-chart'), rows.map((row) => row.revenue), dateLabels);
-  renderLineChart(document.getElementById('ltv-chart'), [{ values: rows.map((row) => row.ltv), color: '#be7b19', fill: 'rgba(190, 123, 25, .12)' }], rows.map((row) => `D${row.day}`), { yLabelFormatter: (value) => money(value, 0) });
+  renderLineChart(document.getElementById('ltv-chart'), [{ label: '累计 LTV', values: rows.map((row) => row.ltv), color: '#be7b19', fill: 'rgba(190, 123, 25, .12)' }], rows.map((row) => `D${row.day}`), { yLabelFormatter: (value) => money(value, 0), valueFormatter: (value) => money(value, 2) });
   renderTable(rows);
 }
 

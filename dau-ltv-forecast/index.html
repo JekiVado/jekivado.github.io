@@ -10,17 +10,17 @@
       * { box-sizing:border-box; }
       body { margin:0; background:var(--canvas); color:var(--ink); font:14px/1.45 "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
       button, input { font:inherit; }
-      .page { width:min(1440px, calc(100% - 48px)); margin:0 auto; padding:20px 0 34px; }
-      .page-header { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; margin:0 0 16px; }
+      .page { width:min(1600px, calc(100% - 48px)); margin:0 auto; padding:24px 0 38px; }
+      .page-header { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; margin:0 0 20px; }
       h1, h2, p { margin:0; }
       h1 { font-size:23px; line-height:1.2; letter-spacing:-.025em; }
       .lede { color:var(--muted); margin-top:5px; }
       .ghost-button, .primary-button { border-radius:8px; border:1px solid var(--border); cursor:pointer; transition:transform .18s ease, box-shadow .18s ease, background .18s ease; }
       .ghost-button { padding:8px 15px; color:#374259; background:var(--surface); box-shadow:0 1px 2px rgba(38,50,70,.04); }
       .ghost-button:hover { background:#f8faff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(38,50,70,.08); }
-      .layout { display:grid; grid-template-columns:360px minmax(0, 1fr); align-items:start; gap:16px; }
+      .layout { display:grid; grid-template-columns:326px minmax(0, 1fr); align-items:start; gap:20px; }
       .panel, .chart-card, .table-card { background:var(--surface); border:1px solid var(--border); border-radius:9px; box-shadow:0 1px 2px rgba(29,42,65,.07); }
-      .assumptions { padding:16px; }
+      .assumptions { position:sticky; top:16px; padding:16px; }
       .panel-title { font-size:14px; font-weight:700; margin-bottom:12px; }
       .field-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
       label { display:grid; gap:4px; color:#5b6881; font-size:12px; font-weight:600; }
@@ -34,18 +34,19 @@
       .primary-button { width:100%; padding:8px 12px; color:#fff; border-color:var(--primary); background:var(--primary); font-weight:700; box-shadow:0 5px 12px rgba(98,86,232,.18); }
       .primary-button:hover { background:var(--primary-dark); transform:translateY(-1px); }
       .dashboard { min-width:0; }
-      .metric-grid { display:grid; grid-template-columns:repeat(8, minmax(0, 1fr)); gap:8px; margin-bottom:16px; }
+      .metric-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; margin-bottom:14px; }
       .metric { min-width:0; padding:9px 11px; border:1px solid var(--border); border-radius:7px; background:#fff; box-shadow:0 1px 2px rgba(29,42,65,.07); }
       .metric span { display:block; color:#66728a; font-size:12px; white-space:nowrap; }
       .metric strong { display:block; margin-top:2px; color:#263146; font-size:17px; line-height:1.1; letter-spacing:.01em; white-space:nowrap; }
-      .chart-card { padding:15px 16px 12px; margin-bottom:14px; }
+      .chart-grid-layout { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px; }
+      .chart-card { min-width:0; padding:15px 16px 12px; }
+      .dau-card { grid-column:1 / -1; }
       .card-heading { display:flex; align-items:baseline; gap:10px; margin-bottom:9px; }
       .card-heading h2 { font-size:14px; }
       .card-heading span { color:#62708a; font-size:12px; }
       svg { display:block; width:100%; overflow:visible; }
-      #forecast-chart { height:218px; }
-      #revenue-chart { height:248px; }
-      #ltv-chart { height:218px; }
+      #forecast-chart { height:246px; }
+      #revenue-chart, #ltv-chart { height:214px; }
       .legend { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; color:#59667d; font-size:12px; margin-top:4px; }
       .legend i { display:inline-block; width:22px; height:10px; margin-right:5px; border:2px solid currentColor; vertical-align:-1px; }
       .legend .total { color:var(--total); background:rgba(98,89,238,.12); }
@@ -62,8 +63,15 @@
       .chart-grid { stroke:#d9dee7; stroke-width:1; }
       .chart-axis-label { fill:#677187; font-size:10.5px; }
       .chart-dot { fill:#fff; stroke-width:1.75; }
-      @media (max-width:1100px) { .layout { grid-template-columns:310px minmax(0, 1fr); } .metric-grid { grid-template-columns:repeat(4, minmax(130px, 1fr)); overflow:visible; } }
-      @media (max-width:820px) { .page { width:min(100% - 28px, 620px); padding-top:16px; } .layout { grid-template-columns:1fr; } .metric-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } .page-header { align-items:center; } .assumptions { position:static; } }
+      .chart-hit-area { fill:transparent; cursor:crosshair; }
+      .chart-hover-line { stroke:#8692aa; stroke-width:1; stroke-dasharray:3 3; pointer-events:none; }
+      .chart-tooltip { position:fixed; z-index:20; min-width:142px; max-width:240px; padding:9px 11px; color:#edf2ff; background:#202a3a; border:1px solid rgba(255,255,255,.13); border-radius:8px; box-shadow:0 12px 30px rgba(25,35,54,.2); font-size:12px; line-height:1.55; pointer-events:none; transform:translate(12px, 12px); }
+      .chart-tooltip[hidden] { display:none; }
+      .tooltip-title { display:block; margin-bottom:4px; color:#fff; font-weight:700; }
+      .tooltip-row { display:flex; justify-content:space-between; gap:14px; white-space:nowrap; }
+      .tooltip-dot { width:7px; height:7px; margin-right:5px; border-radius:50%; display:inline-block; }
+      @media (max-width:1100px) { .layout { grid-template-columns:290px minmax(0, 1fr); gap:14px; } .metric-grid { grid-template-columns:repeat(4, minmax(130px, 1fr)); overflow:auto hidden; padding-bottom:2px; } .metric { min-width:130px; } }
+      @media (max-width:820px) { .page { width:min(100% - 28px, 620px); padding-top:16px; } .layout { grid-template-columns:1fr; } .metric-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } .chart-grid-layout { grid-template-columns:1fr; } .dau-card { grid-column:auto; } .page-header { align-items:center; } .assumptions { position:static; } }
       @media (max-width:430px) { .page-header { display:block; } .ghost-button { margin-top:12px; } .field-grid { grid-template-columns:1fr; } .metric-grid { gap:6px; } .metric { min-width:0; } }
     </style>
   </head>
@@ -110,14 +118,17 @@
             <div class="metric"><span>ARPPU 均值</span><strong id="arppu-avg-value">—</strong></div>
           </div>
 
-          <section class="chart-card"><div class="card-heading"><h2>DAU 预测</h2><span id="forecast-range">—</span></div><svg id="forecast-chart" role="img" aria-label="DAU 预测曲线"></svg><div class="legend"><span><i class="total"></i>总 DAU</span><span><i class="new"></i>新增用户留存贡献</span><span><i class="current"></i>当前 DAU 延续贡献</span></div></section>
-          <section class="chart-card"><div class="card-heading"><h2>收入预测</h2></div><svg id="revenue-chart" role="img" aria-label="每日收入预测柱状图"></svg><div class="legend"><span><i class="gold"></i>收入</span></div></section>
-          <section class="chart-card"><div class="card-heading"><h2>LTV 累计曲线</h2><span id="ltv-range">D0-D60</span></div><svg id="ltv-chart" role="img" aria-label="累计 LTV 曲线"></svg><div class="legend"><span><i class="gold"></i>累计 LTV</span></div></section>
+          <div class="chart-grid-layout">
+            <section class="chart-card dau-card"><div class="card-heading"><h2>DAU 预测</h2><span id="forecast-range">—</span></div><svg id="forecast-chart" role="img" aria-label="DAU 预测曲线"></svg><div class="legend"><span><i class="total"></i>总 DAU</span><span><i class="new"></i>新增用户留存贡献</span><span><i class="current"></i>当前 DAU 延续贡献</span></div></section>
+            <section class="chart-card revenue-card"><div class="card-heading"><h2>收入预测</h2></div><svg id="revenue-chart" role="img" aria-label="每日收入预测柱状图"></svg><div class="legend"><span><i class="gold"></i>收入</span></div></section>
+            <section class="chart-card ltv-card"><div class="card-heading"><h2>LTV 累计曲线</h2><span id="ltv-range">D0-D60</span></div><svg id="ltv-chart" role="img" aria-label="累计 LTV 曲线"></svg><div class="legend"><span><i class="gold"></i>累计 LTV</span></div></section>
+          </div>
           <section class="table-card"><div class="card-heading"><h2>每日预测明细</h2></div><table><thead><tr><th>日期</th><th>新增</th><th>DAU</th><th>付费人数</th><th>付费率</th><th>ARPU</th><th>ARPPU</th><th>收入</th></tr></thead><tbody id="forecast-table-body"></tbody></table></section>
         </section>
       </main>
       <footer class="site-footer">DAU / LTV 预测工具 · 输入假设后点击「计算预测」更新结果</footer>
     </div>
+    <div class="chart-tooltip" id="chart-tooltip" role="status" aria-live="polite" hidden></div>
     <script src="app.js"></script>
   </body>
 </html>
