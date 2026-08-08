@@ -15,11 +15,15 @@ const field = canvas.parentElement;
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const words = ['PAGE', 'MATERIAL', 'MOTION', 'READING', 'SHAPE', 'FIELD', 'TRACE', 'STILLNESS', 'INDEX'];
 const marks = '01+-·<>/[]{}*'.split('');
+const noiseGlyphs = '0123456789ABCDEF[]{}()<>/\\|+-=;:.,*';
+const fieldFrameInterval = 42;
 let densityBoost = false;
 let frames = 0;
+let lastFieldFrame = -Infinity;
 let pointer = { x: .55, y: .5 };
 let spiralWords = [];
 let flowParticles = [];
+let transitionNoiseGrid = [];
 let transitionStart = 0;
 let transitionActive = false;
 let transitionToDark = true;
@@ -30,18 +34,18 @@ function buildSpiral() {
 }
 
 function buildConcentricRings() {
-  const ringCount = 14;
+  const ringCount = 38;
+  const ringGap = 8;
+  const ringTrack = 'THE CONTENT ARCHITECTURE · ';
   return Array.from({ length: ringCount }, (_, ring) => {
-    const slots = 14 + ring * 9;
-    return Array.from({ length: slots }, (_, slot) => ({
-      angle: (slot / slots) * Math.PI * 2 + ring * .11,
-      radius: .06 + ring * .047,
+    return {
       ring,
-      word: (slot + ring) % 3 === 0 ? words[(slot + ring) % words.length] : marks[(slot + ring) % marks.length],
-      depth: .3 + ring / (ringCount * 1.4),
-      seed: unitNoise((ring + 1) * (slot + 1) * 3.17),
-    }));
-  }).flat();
+      radius: 18 + ring * ringGap,
+      track: ringTrack,
+      phase: ring * .17,
+      isText: ring % 3 === 0 || ring > 31,
+    };
+  });
 }
 
 function unitNoise(value) {
@@ -58,6 +62,17 @@ function buildFlowField(total) {
   }));
 }
 
+function buildAsciiNoiseGrid(width, height) {
+  const cellWidth = 3.3;
+  const rowHeight = 6.3;
+  const columns = Math.ceil(width / cellWidth) + 2;
+  const rows = Math.ceil(height / rowHeight) + 1;
+  return Array.from({ length: rows }, (_, row) => Array.from({ length: columns }, (_, column) => {
+    const value = unitNoise((row + 1) * 81.17 + (column + 1) * 17.71);
+    return noiseGlyphs[Math.floor(value * noiseGlyphs.length)];
+  }).join(''));
+}
+
 function resize() {
   const bounds = field.getBoundingClientRect();
   const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -71,16 +86,22 @@ function resize() {
   transitionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
   spiralWords = buildSpiral();
   flowParticles = buildFlowField(Math.max(1000, Math.min(1900, Math.floor(wholeWidth * wholeHeight / 520))));
+  transitionNoiseGrid = buildAsciiNoiseGrid(wholeWidth, wholeHeight);
 }
 
 function renderFrame(time) {
+  if (!reducedMotion && time - lastFieldFrame < fieldFrameInterval) {
+    requestAnimationFrame(renderFrame);
+    return;
+  }
+  lastFieldFrame = time;
   const bounds = field.getBoundingClientRect();
   const width = bounds.width;
   const height = bounds.height;
   const size = Math.min(width, height);
   const t = reducedMotion ? 0 : time * .0001;
-  const centerX = width * (.54 + (pointer.x - .5) * .045);
-  const centerY = height * (.52 + (pointer.y - .5) * .04);
+  const centerX = width * (.62 + (pointer.x - .5) * .015);
+  const centerY = height * (.51 + (pointer.y - .5) * .015);
   context.clearRect(0, 0, width, height);
   context.fillStyle = '#171716';
   context.fillRect(0, 0, width, height);
@@ -90,27 +111,64 @@ function renderFrame(time) {
   halo.addColorStop(1, 'rgba(23,23,22,0)');
   context.fillStyle = halo;
   context.fillRect(0, 0, width, height);
-  spiralWords.forEach((particle, index) => {
-    const flutter = Math.sin(t * 4 + particle.seed * 16 + particle.angle) * .004;
-    const phase = particle.angle + t * (.22 + particle.ring * .018);
-    const radius = size * (particle.radius + flutter);
-    const x = centerX + Math.cos(phase) * radius;
-    const y = centerY + Math.sin(phase) * radius;
-    const fontSize = (particle.word.length > 2 ? 5.5 + particle.depth * 3.5 : 5.1 + particle.depth * 3.7) + (densityBoost ? .6 : 0);
-    context.save();
-    context.translate(x, y);
-    context.rotate(phase + Math.PI / 2);
-    context.font = `${fontSize}px "SFMono-Regular", "Cascadia Mono", monospace`;
-    context.fillStyle = index % 47 === 0 ? 'rgba(239,93,59,.82)' : `rgba(244,241,232,${.28 + particle.depth * .54})`;
-    context.fillText(particle.word, 0, 0);
-    context.restore();
-  });
+  drawConcentricTextRings(t, size, centerX, centerY);
   frames += 1;
   if (frames % 12 === 0) frameCount.textContent = `${String(frames).padStart(3, '0')} FRAMES`;
   if (!reducedMotion) requestAnimationFrame(renderFrame);
 }
 
+function drawConcentricTextRings(t, size, centerX, centerY) {
+  const visibleRadius = size * .62;
+  spiralWords.forEach((ring) => {
+    if (ring.radius > visibleRadius) return;
+    const depth = ring.ring / (spiralWords.length - 1);
+    const fontSize = 4.6 + depth * 2.25 + (densityBoost ? .35 : 0);
+    const drift = reducedMotion ? 0 : t * (.055 + ring.ring * .0018);
+    context.save();
+    if (ring.isText) {
+      const segmentAdvance = Math.max(18, fontSize * ring.track.length * .56);
+      const segmentCount = Math.ceil((Math.PI * 2 * ring.radius) / segmentAdvance);
+      context.font = `${fontSize}px "SFMono-Regular", "Cascadia Mono", monospace`;
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      for (let segment = 0; segment < segmentCount; segment += 1) {
+        const angle = (segment / segmentCount) * Math.PI * 2 + ring.phase + drift;
+        context.save();
+        context.translate(centerX + Math.cos(angle) * ring.radius, centerY + Math.sin(angle) * ring.radius);
+        context.rotate(angle + Math.PI / 2);
+        context.fillStyle = `rgba(244,241,232,${.34 + depth * .4})`;
+        context.fillText(ring.track, 0, 0);
+        context.restore();
+      }
+    }
+    if (ring.ring < spiralWords.length - 1) {
+      context.beginPath();
+      context.setLineDash([.6, 3.9]);
+      context.arc(centerX, centerY, ring.radius + 3.9, 0, Math.PI * 2);
+      context.strokeStyle = `rgba(244,241,232,${.09 + depth * .13})`;
+      context.lineWidth = .55;
+      context.stroke();
+      context.setLineDash([]);
+    }
+    context.restore();
+  });
+}
+
 function smoothstep(value) { return value * value * (3 - 2 * value); }
+
+function drawAsciiNoiseGrid(cover, width, height) {
+  if (cover < .08 || transitionNoiseGrid.length === 0) return;
+  const alpha = Math.min(.72, Math.max(0, (cover - .08) * .78));
+  transitionContext.save();
+  transitionContext.font = '5px "SFMono-Regular", "Cascadia Mono", monospace';
+  transitionContext.textBaseline = 'top';
+  transitionNoiseGrid.forEach((line, row) => {
+    const shade = .42 + unitNoise((row + 1) * 9.91) * .42;
+    transitionContext.fillStyle = `rgba(239,237,229,${alpha * shade})`;
+    transitionContext.fillText(line, -(row % 3) * 1.6, row * 6.3);
+  });
+  transitionContext.restore();
+}
 
 function renderTransitionFrame(time) {
   if (!transitionActive) return;
@@ -124,6 +182,7 @@ function renderTransitionFrame(time) {
   transitionContext.clearRect(0, 0, width, height);
   transitionContext.fillStyle = `rgba(24,24,23,${Math.min(.99, cover * 1.18)})`;
   transitionContext.fillRect(0, 0, width, height);
+  drawAsciiNoiseGrid(cover, width, height);
   const expansion = smoothstep(Math.min(progress / .52, 1));
   const collapse = smoothstep(Math.max((progress - .5) / .5, 0));
   flowParticles.forEach((particle, index) => {
