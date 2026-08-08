@@ -33,8 +33,8 @@ function buildSpiral() {
 }
 
 function buildConcentricRings() {
-  const ringCount = 38;
-  const ringGap = 8;
+  const ringCount = 46;
+  const ringGap = 12;
   const ringTrack = 'THE CONTENT ARCHITECTURE · ';
   return Array.from({ length: ringCount }, (_, ring) => {
     return {
@@ -42,7 +42,7 @@ function buildConcentricRings() {
       radius: 18 + ring * ringGap,
       track: ringTrack,
       phase: ring * .17,
-      isText: ring % 3 === 0 || ring > 31,
+      isText: ring % 3 === 0 || ring > 37,
     };
   });
 }
@@ -99,7 +99,7 @@ function renderFrame(time) {
   const height = bounds.height;
   const size = Math.min(width, height);
   const t = reducedMotion ? 0 : time * .0001;
-  const centerX = width * (.62 + (pointer.x - .5) * .015);
+  const centerX = width * (.48 + (pointer.x - .5) * .012);
   const centerY = height * (.51 + (pointer.y - .5) * .015);
   context.clearRect(0, 0, width, height);
   context.fillStyle = '#171716';
@@ -117,7 +117,7 @@ function renderFrame(time) {
 }
 
 function drawConcentricTextRings(t, size, centerX, centerY) {
-  const visibleRadius = size * .62;
+  const visibleRadius = size * 1.14;
   spiralWords.forEach((ring) => {
     if (ring.radius > visibleRadius) return;
     const depth = ring.ring / (spiralWords.length - 1);
