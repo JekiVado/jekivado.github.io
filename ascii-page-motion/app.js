@@ -1,6 +1,10 @@
 const canvas = document.getElementById('ascii-field');
 const context = canvas.getContext('2d');
+const transitionCanvas = document.getElementById('transition-field');
+const transitionContext = transitionCanvas.getContext('2d');
+const transitionLayer = document.querySelector('.transition-layer');
 const reassemble = document.getElementById('reassemble');
+const returnLight = document.getElementById('return-light');
 const modeSwitch = document.getElementById('mode-switch');
 const sceneName = document.getElementById('scene-name');
 const orbitState = document.getElementById('orbit-state');
@@ -9,28 +13,43 @@ const motionStatus = document.getElementById('motion-status');
 const field = canvas.parentElement;
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const glyphs = 'THE INTERFACE IS NOT STILL 0123456789 +-*/<>[]{}·'.split('');
-const modes = [
-  { name: 'ORBIT', label: 'THE WORDS BEND', button: '切换：网格模式' },
-  { name: 'GRID', label: 'THE WORDS GATHER', button: '切换：轨道模式' },
-];
-let mode = 0;
-let pulse = 0;
+const words = ['PAGE', 'MATERIAL', 'MOTION', 'READING', 'SHAPE', 'FIELD', 'TRACE', 'STILLNESS', 'INDEX'];
+const marks = '01+-·<>/[]{}*'.split('');
+let densityBoost = false;
 let frames = 0;
-let pointer = { x: 0.55, y: 0.5 };
-let particles = [];
+let pointer = { x: .55, y: .5 };
+let spiralWords = [];
+let flowParticles = [];
+let transitionStart = 0;
+let transitionActive = false;
+let transitionToDark = true;
+let sceneSwapped = false;
 
 function buildSpiral(total) {
   return Array.from({ length: total }, (_, index) => {
     const ratio = index / total;
     return {
-      angle: ratio * Math.PI * 18 + (index % 9) * 0.09,
-      radius: 0.06 + Math.sqrt(ratio) * 0.51,
-      glyph: glyphs[index % glyphs.length],
-      depth: 0.3 + (index % 7) / 10,
-      drift: ((index * 19) % 37) / 37,
+      angle: ratio * Math.PI * 23 + (index % 13) * .045,
+      radius: .055 + Math.pow(ratio, .61) * .66,
+      word: index % 3 === 0 ? words[index % words.length] : marks[index % marks.length],
+      depth: .28 + (index % 9) / 12,
+      seed: ((index * 37) % 101) / 101,
     };
   });
+}
+
+function unitNoise(value) {
+  const sample = Math.sin(value * 12.9898) * 43758.5453;
+  return sample - Math.floor(sample);
+}
+
+function buildFlowField(total) {
+  return Array.from({ length: total }, (_, index) => ({
+    u: unitNoise(index * 17.17),
+    v: unitNoise(index * 29.71),
+    seed: unitNoise(index * 43.37),
+    glyph: index % 5 === 0 ? words[index % words.length] : marks[index % marks.length],
+  }));
 }
 
 function resize() {
@@ -39,7 +58,13 @@ function resize() {
   canvas.width = Math.max(1, Math.floor(bounds.width * ratio));
   canvas.height = Math.max(1, Math.floor(bounds.height * ratio));
   context.setTransform(ratio, 0, 0, ratio, 0, 0);
-  particles = buildSpiral(Math.max(280, Math.min(570, Math.floor(bounds.width * bounds.height / 1550))));
+  const wholeWidth = window.innerWidth;
+  const wholeHeight = window.innerHeight;
+  transitionCanvas.width = Math.max(1, Math.floor(wholeWidth * ratio));
+  transitionCanvas.height = Math.max(1, Math.floor(wholeHeight * ratio));
+  transitionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+  spiralWords = buildSpiral(Math.max(620, Math.min(1150, Math.floor(bounds.width * bounds.height / 760))));
+  flowParticles = buildFlowField(Math.max(1000, Math.min(1900, Math.floor(wholeWidth * wholeHeight / 520))));
 }
 
 function renderFrame(time) {
@@ -47,89 +72,122 @@ function renderFrame(time) {
   const width = bounds.width;
   const height = bounds.height;
   const size = Math.min(width, height);
-  const t = reducedMotion ? 0 : time * 0.00015;
-  const current = modes[mode];
-  const centerX = width * (0.52 + (pointer.x - 0.5) * 0.07);
-  const centerY = height * (0.52 + (pointer.y - 0.5) * 0.07);
-
+  const t = reducedMotion ? 0 : time * .0001;
+  const centerX = width * (.54 + (pointer.x - .5) * .045);
+  const centerY = height * (.52 + (pointer.y - .5) * .04);
   context.clearRect(0, 0, width, height);
-  context.fillStyle = '#10100f';
+  context.fillStyle = '#171716';
   context.fillRect(0, 0, width, height);
-  const glow = context.createRadialGradient(centerX, centerY, 4, centerX, centerY, size * 0.7);
-  glow.addColorStop(0, 'rgba(238, 85, 50, .11)');
-  glow.addColorStop(.3, 'rgba(238, 85, 50, .025)');
-  glow.addColorStop(1, 'rgba(16, 16, 15, 0)');
-  context.fillStyle = glow;
+  const halo = context.createRadialGradient(centerX, centerY, 2, centerX, centerY, size * .76);
+  halo.addColorStop(0, 'rgba(255,255,255,.022)');
+  halo.addColorStop(.65, 'rgba(255,255,255,.009)');
+  halo.addColorStop(1, 'rgba(23,23,22,0)');
+  context.fillStyle = halo;
   context.fillRect(0, 0, width, height);
-
-  particles.forEach((particle, index) => {
-    const wave = Math.sin(t * 5 + particle.angle * 2 + particle.drift * 11) * (reducedMotion ? 0 : 0.012);
-    const phase = particle.angle + t * (0.55 + particle.depth * .9) + pulse * (1 - particle.radius) * 1.7;
-    const radius = size * (particle.radius + wave + pulse * (0.04 + particle.depth * .025));
-    let x;
-    let y;
-    let rotation;
-    if (mode === 0) {
-      x = centerX + Math.cos(phase) * radius * 1.18;
-      y = centerY + Math.sin(phase) * radius * .79;
-      rotation = phase + Math.PI / 2;
-    } else {
-      const columns = 28;
-      const row = Math.floor(index / columns);
-      const column = index % columns;
-      const unit = Math.max(13, size / 32);
-      x = width * .5 + (column - columns / 2) * unit * 1.08 + Math.sin(t * 4 + row) * 5 * particle.depth;
-      y = height * .5 + (row - particles.length / columns / 2) * unit * .92 + Math.cos(t * 3 + column) * 5 * particle.depth;
-      rotation = Math.sin(t * 4 + index) * .16;
-    }
-    const alpha = .24 + particle.depth * .61;
-    const fontSize = Math.max(7, Math.round(8 + particle.depth * 3 + (pulse > .25 ? 1 : 0)));
+  const limit = densityBoost ? spiralWords.length : Math.floor(spiralWords.length * .78);
+  spiralWords.slice(0, limit).forEach((particle, index) => {
+    const flutter = Math.sin(t * 4 + particle.seed * 16 + particle.angle) * .008;
+    const phase = particle.angle + t * (.24 + particle.depth * .28);
+    const radius = size * (particle.radius + flutter);
+    const x = centerX + Math.cos(phase) * radius * 1.13;
+    const y = centerY + Math.sin(phase) * radius * .79;
+    const fontSize = particle.word.length > 2 ? 5.2 + particle.depth * 3.2 : 5 + particle.depth * 4;
     context.save();
     context.translate(x, y);
-    context.rotate(rotation);
+    context.rotate(phase + Math.PI / 2);
     context.font = `${fontSize}px "SFMono-Regular", "Cascadia Mono", monospace`;
-    context.fillStyle = index % 19 === 0 ? `rgba(238, 85, 50, ${alpha})` : `rgba(244, 240, 228, ${alpha})`;
-    context.fillText(particle.glyph, 0, 0);
+    context.fillStyle = index % 47 === 0 ? 'rgba(239,93,59,.82)' : `rgba(244,241,232,${.28 + particle.depth * .54})`;
+    context.fillText(particle.word, 0, 0);
     context.restore();
   });
-
-  context.beginPath();
-  context.arc(centerX, centerY, 2 + Math.sin(t * 8) * .6, 0, Math.PI * 2);
-  context.fillStyle = '#ee5532';
-  context.fill();
   frames += 1;
-  if (frames % 8 === 0) frameCount.textContent = `${String(frames).padStart(3, '0')} FRAMES`;
-  if (pulse > 0.003) pulse *= 0.946;
+  if (frames % 12 === 0) frameCount.textContent = `${String(frames).padStart(3, '0')} FRAMES`;
   if (!reducedMotion) requestAnimationFrame(renderFrame);
 }
 
-function updateMode() {
-  const current = modes[mode];
-  sceneName.textContent = current.name;
-  orbitState.textContent = current.label;
-  modeSwitch.textContent = current.button;
-  modeSwitch.setAttribute('aria-pressed', String(mode === 1));
-  motionStatus.textContent = `字符场已切换为${current.name === 'ORBIT' ? '轨道' : '网格'}模式。`;
+function smoothstep(value) { return value * value * (3 - 2 * value); }
+
+function renderTransitionFrame(time) {
+  if (!transitionActive) return;
+  const elapsed = time - transitionStart;
+  const progress = Math.min(elapsed / 1550, 1);
+  const cover = Math.sin(Math.PI * Math.min(progress * 1.12, 1));
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const originX = transitionToDark ? width * .76 : width * .24;
+  const destinationX = transitionToDark ? width * .24 : width * .76;
+  transitionContext.clearRect(0, 0, width, height);
+  transitionContext.fillStyle = `rgba(24,24,23,${Math.min(.99, cover * 1.18)})`;
+  transitionContext.fillRect(0, 0, width, height);
+  const expansion = smoothstep(Math.min(progress / .52, 1));
+  const collapse = smoothstep(Math.max((progress - .5) / .5, 0));
+  flowParticles.forEach((particle, index) => {
+    const smallX = originX + (particle.u - .5) * width * .36 + Math.sin(particle.seed * 34) * 15;
+    const smallY = height * .5 + (particle.v - .5) * height * .74 + Math.cos(particle.seed * 41) * 14;
+    const fullX = particle.u * width + Math.sin(particle.seed * 51 + progress * 13) * 22;
+    const fullY = particle.v * height + Math.cos(particle.seed * 37 + progress * 11) * 22;
+    const finalX = destinationX + (particle.u - .5) * width * .36 + Math.sin(particle.seed * 34) * 15;
+    const finalY = height * .5 + (particle.v - .5) * height * .74 + Math.cos(particle.seed * 41) * 14;
+    const outwardX = smallX + (fullX - smallX) * expansion;
+    const outwardY = smallY + (fullY - smallY) * expansion;
+    const x = outwardX + (finalX - outwardX) * collapse;
+    const y = outwardY + (finalY - outwardY) * collapse;
+    const alpha = .22 + Math.sin(Math.PI * progress) * .72;
+    transitionContext.save();
+    transitionContext.translate(x, y);
+    transitionContext.rotate((particle.seed - .5) * .7 + progress * .28);
+    transitionContext.font = `${index % 5 === 0 ? 5.4 : 5}px "SFMono-Regular", "Cascadia Mono", monospace`;
+    transitionContext.fillStyle = index % 89 === 0 ? `rgba(239,93,59,${alpha})` : `rgba(239,237,229,${alpha})`;
+    transitionContext.fillText(particle.glyph, 0, 0);
+    transitionContext.restore();
+  });
+  if (progress > .48 && !sceneSwapped) {
+    document.body.classList.toggle('is-dark');
+    sceneSwapped = true;
+    motionStatus.textContent = transitionToDark ? '字符云已展开为深色内容页。' : '字符云已收束回明亮页面。';
+  }
+  if (progress < 1 && !reducedMotion) requestAnimationFrame(renderTransitionFrame);
+  if (progress >= 1) {
+    transitionActive = false;
+    transitionLayer.style.opacity = '0';
+    transitionContext.clearRect(0, 0, width, height);
+  }
 }
 
-reassemble.addEventListener('click', () => {
-  pulse = 1;
-  motionStatus.textContent = '字符场正在重新组合。';
-  if (reducedMotion) renderFrame(0);
-});
+function startTransition() {
+  if (transitionActive) return;
+  transitionToDark = !document.body.classList.contains('is-dark');
+  sceneSwapped = false;
+  transitionActive = true;
+  transitionStart = performance.now();
+  transitionLayer.style.opacity = '1';
+  motionStatus.textContent = '字符云正在扩散并覆盖页面。';
+  if (reducedMotion) {
+    document.body.classList.toggle('is-dark');
+    transitionActive = false;
+    transitionLayer.style.opacity = '0';
+    motionStatus.textContent = transitionToDark ? '已切换为深色内容页。' : '已返回明亮页面。';
+    return;
+  }
+  requestAnimationFrame(renderTransitionFrame);
+}
 
-modeSwitch.addEventListener('click', () => {
-  mode = mode === 0 ? 1 : 0;
-  updateMode();
-  if (reducedMotion) renderFrame(0);
-});
+function updateDensity() {
+  densityBoost = !densityBoost;
+  modeSwitch.textContent = densityBoost ? '密度：高' : '密度：标准';
+  modeSwitch.setAttribute('aria-pressed', String(densityBoost));
+  sceneName.textContent = densityBoost ? 'DENSE SPIRAL' : 'SPIRAL';
+  orbitState.textContent = densityBoost ? 'THE ORBIT GROWS DENSE' : 'WORDS HOLD THEIR ORBIT';
+  motionStatus.textContent = densityBoost ? '字符螺旋已提高密度。' : '字符螺旋已恢复标准密度。';
+}
 
+reassemble.addEventListener('click', startTransition);
+returnLight.addEventListener('click', startTransition);
+modeSwitch.addEventListener('click', updateDensity);
 field.addEventListener('pointermove', (event) => {
   const bounds = field.getBoundingClientRect();
   pointer = { x: (event.clientX - bounds.left) / bounds.width, y: (event.clientY - bounds.top) / bounds.height };
 });
-
-window.addEventListener('resize', () => { resize(); renderFrame(0); });
+window.addEventListener('resize', resize);
 resize();
-updateMode();
 renderFrame(0);
