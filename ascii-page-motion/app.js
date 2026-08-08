@@ -20,7 +20,7 @@ const fieldFrameInterval = 42;
 let frames = 0;
 let lastFieldFrame = -Infinity;
 let pointer = { x: .55, y: .5 };
-let spiralWords = [];
+let glyphBands = [];
 let flowParticles = [];
 let transitionNoiseGrid = [];
 let transitionStart = 0;
@@ -29,22 +29,45 @@ let transitionToDark = true;
 let sceneSwapped = false;
 
 function buildSpiral() {
-  return buildConcentricRings();
+  return buildGlyphBands();
 }
 
-function buildConcentricRings() {
-  const ringCount = 46;
-  const ringGap = 12;
-  const ringTrack = 'THE CONTENT ARCHITECTURE · ';
+function wrapRadians(angle) {
+  return Math.atan2(Math.sin(angle), Math.cos(angle));
+}
+
+function buildGlyphBands() {
+  const ringCount = 30;
+  const characters = 'THE CONTENT ARCHITECTURE.';
+  const baseRadius = .06;
+  const radiusSpan = 1.37;
   return Array.from({ length: ringCount }, (_, ring) => {
+    const progress = ring / (ringCount - 1);
+    const radius = baseRadius + radiusSpan * progress;
+    const letterSize = 5.4 + 6.6 * progress;
+    const charCount = Math.max(9, Math.floor((Math.PI * 2 * radius * 540) / (.64 * letterSize)));
+    const centerChance = unitNoise(ring * 8.23 + 2.1);
+    const widthChance = unitNoise(ring * 13.71 + 7.9);
     return {
       ring,
-      radius: 18 + ring * ringGap,
-      track: ringTrack,
-      phase: ring * .17,
-      isText: ring % 3 === 0 || ring > 37,
+      radius,
+      charCount,
+      letterSize,
+      phase: unitNoise(ring * 29.37 + 4.6) * Math.PI * 2,
+      speed: (ring % 2 === 0 ? 1 : -1) * (.004 + (1 - progress) * .021),
+      bandCenter: centerChance < .16 ? centerChance * Math.PI * 2 : .24 + (centerChance - .5) * Math.PI * .64,
+      bandHalfWidth: Math.min(.98, widthChance < .1 ? .08 + widthChance * .9 : .25 + .34 * progress + widthChance * .28) * Math.PI,
+      bandSoftness: (.075 + unitNoise(ring * 47.3 + 9.1) * .11) * Math.PI,
+      phrase: characters,
     };
   });
+}
+
+function glyphAt(band, index) {
+  const pause = 1 + Math.floor(unitNoise((band.ring + 1) * 19.47 + index * .03) * 3);
+  const cycle = band.phrase.length + pause;
+  const position = index % cycle;
+  return position < band.phrase.length ? band.phrase[position] : '·';
 }
 
 function unitNoise(value) {
@@ -83,7 +106,7 @@ function resize() {
   transitionCanvas.width = Math.max(1, Math.floor(wholeWidth * ratio));
   transitionCanvas.height = Math.max(1, Math.floor(wholeHeight * ratio));
   transitionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
-  spiralWords = buildSpiral();
+  glyphBands = buildSpiral();
   flowParticles = buildFlowField(Math.max(1000, Math.min(1900, Math.floor(wholeWidth * wholeHeight / 520))));
   transitionNoiseGrid = buildAsciiNoiseGrid(wholeWidth, wholeHeight);
 }
@@ -98,9 +121,9 @@ function renderFrame(time) {
   const width = bounds.width;
   const height = bounds.height;
   const size = Math.min(width, height);
-  const t = reducedMotion ? 0 : time * .0001;
-  const centerX = width * (.48 + (pointer.x - .5) * .012);
-  const centerY = height * (.51 + (pointer.y - .5) * .015);
+  const t = reducedMotion ? 0 : time * .001;
+  const centerX = width * .48;
+  const centerY = height * .51;
   context.clearRect(0, 0, width, height);
   context.fillStyle = '#171716';
   context.fillRect(0, 0, width, height);
@@ -110,46 +133,40 @@ function renderFrame(time) {
   halo.addColorStop(1, 'rgba(23,23,22,0)');
   context.fillStyle = halo;
   context.fillRect(0, 0, width, height);
-  drawConcentricTextRings(t, size, centerX, centerY);
+  drawGlyphBands(t, size, centerX, centerY);
   frames += 1;
   if (frames % 12 === 0) frameCount.textContent = `${String(frames).padStart(3, '0')} FRAMES`;
   if (!reducedMotion) requestAnimationFrame(renderFrame);
 }
 
-function drawConcentricTextRings(t, size, centerX, centerY) {
-  const visibleRadius = size * 1.14;
-  spiralWords.forEach((ring) => {
-    if (ring.radius > visibleRadius) return;
-    const depth = ring.ring / (spiralWords.length - 1);
-    const fontSize = 4.6 + depth * 2.25;
-    const drift = reducedMotion ? 0 : t * (.055 + ring.ring * .0018);
-    context.save();
-    if (ring.isText) {
-      const segmentAdvance = Math.max(18, fontSize * ring.track.length * .56);
-      const segmentCount = Math.ceil((Math.PI * 2 * ring.radius) / segmentAdvance);
+function drawGlyphBands(t, size, centerX, centerY) {
+  const designScale = size / 540;
+  const dotSize = 5 * designScale;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  glyphBands.forEach((band) => {
+    const radius = band.radius * 540 * designScale;
+    const drift = reducedMotion ? 0 : t * band.speed;
+    for (let index = 0; index < band.charCount; index += 1) {
+      const angle = band.phase + index / band.charCount * Math.PI * 2 + drift;
+      const distance = Math.abs(wrapRadians(angle - band.bandCenter));
+      const edge = (band.bandHalfWidth + band.bandSoftness - distance) / band.bandSoftness;
+      const density = Math.max(0, Math.min(1, edge));
+      const isLetter = density > .12 && (density > .72 || unitNoise(band.ring * 67.1 + index * 5.3) < density);
+      const fontSize = isLetter ? band.letterSize * designScale : dotSize;
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      if (x < -fontSize || x > canvas.clientWidth + fontSize || y < -fontSize || y > canvas.clientHeight + fontSize) continue;
+      context.save();
+      context.translate(x, y);
+      context.rotate(angle + Math.PI / 2);
       context.font = `${fontSize}px "SFMono-Regular", "Cascadia Mono", monospace`;
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
-      for (let segment = 0; segment < segmentCount; segment += 1) {
-        const angle = (segment / segmentCount) * Math.PI * 2 + ring.phase + drift;
-        context.save();
-        context.translate(centerX + Math.cos(angle) * ring.radius, centerY + Math.sin(angle) * ring.radius);
-        context.rotate(angle + Math.PI / 2);
-        context.fillStyle = `rgba(244,241,232,${.34 + depth * .4})`;
-        context.fillText(ring.track, 0, 0);
-        context.restore();
-      }
+      context.fillStyle = isLetter
+        ? `rgba(244,241,232,${.36 + density * .48})`
+        : `rgba(244,241,232,${.2 + density * .13})`;
+      context.fillText(isLetter ? glyphAt(band, index) : '·', 0, 0);
+      context.restore();
     }
-    if (ring.ring < spiralWords.length - 1) {
-      context.beginPath();
-      context.setLineDash([.6, 3.9]);
-      context.arc(centerX, centerY, ring.radius + 3.9, 0, Math.PI * 2);
-      context.strokeStyle = `rgba(244,241,232,${.09 + depth * .13})`;
-      context.lineWidth = .55;
-      context.stroke();
-      context.setLineDash([]);
-    }
-    context.restore();
   });
 }
 
