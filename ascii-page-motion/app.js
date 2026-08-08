@@ -17,7 +17,6 @@ const words = ['PAGE', 'MATERIAL', 'MOTION', 'READING', 'SHAPE', 'FIELD', 'TRACE
 const marks = '01+-·<>/[]{}*'.split('');
 const noiseGlyphs = '0123456789ABCDEF[]{}()<>/\\|+-=;:.,*';
 const fieldFrameInterval = 42;
-let densityBoost = false;
 let frames = 0;
 let lastFieldFrame = -Infinity;
 let pointer = { x: .55, y: .5 };
@@ -122,7 +121,7 @@ function drawConcentricTextRings(t, size, centerX, centerY) {
   spiralWords.forEach((ring) => {
     if (ring.radius > visibleRadius) return;
     const depth = ring.ring / (spiralWords.length - 1);
-    const fontSize = 4.6 + depth * 2.25 + (densityBoost ? .35 : 0);
+    const fontSize = 4.6 + depth * 2.25;
     const drift = reducedMotion ? 0 : t * (.055 + ring.ring * .0018);
     context.save();
     if (ring.isText) {
@@ -237,12 +236,7 @@ function startTransition() {
 }
 
 function updateDensity() {
-  densityBoost = !densityBoost;
-  modeSwitch.textContent = densityBoost ? '密度：高' : '密度：标准';
-  modeSwitch.setAttribute('aria-pressed', String(densityBoost));
-  sceneName.textContent = densityBoost ? 'DENSE SPIRAL' : 'SPIRAL';
-  orbitState.textContent = densityBoost ? 'THE ORBIT GROWS DENSE' : 'WORDS HOLD THEIR ORBIT';
-  motionStatus.textContent = densityBoost ? '字符螺旋已提高密度。' : '字符螺旋已恢复标准密度。';
+  startTransition();
 }
 
 reassemble.addEventListener('click', startTransition);

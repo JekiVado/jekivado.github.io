@@ -7,46 +7,51 @@
     <meta name="description" content="原创 ASCII 字符粒子转场实验。" />
     <title>ASCII 页面切换 · JekiVado</title>
     <style>
-      :root { --paper: #eeece4; --ink: #171716; --quiet: #77746d; --charcoal: #181817; --white: #f1eee5; --accent: #ef5d3b; }
+      :root { --paper: #f1f0ea; --ink: #20201e; --quiet: #5e5d58; --charcoal: #1c1c1b; --white: #f1eee5; --accent: #ef5d3b; }
       * { box-sizing: border-box; }
       html { min-width: 320px; background: var(--charcoal); }
       body { min-height: 100vh; margin: 0; overflow-x: hidden; color: var(--ink); background: var(--paper); font-family: "Iowan Old Style", "Baskerville", "Songti SC", serif; }
       button { font: inherit; }
-      .page { min-height: 100vh; display: grid; grid-template-columns: minmax(380px, .91fr) minmax(430px, 1.09fr); transition: opacity .35s ease; }
-      .editorial { position: relative; display: flex; min-height: 100vh; flex-direction: column; padding: 28px clamp(30px, 5vw, 74px) 29px; background: radial-gradient(circle at 38% 29%, rgba(255,255,255,.92), transparent 29rem), var(--paper); }
-      .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 17px; border-bottom: 1px solid rgba(23,23,22,.55); font: 700 9px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .09em; }
+      .page { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; transition: opacity .35s ease; }
+      .editorial { position: relative; display: flex; min-height: 100vh; flex-direction: column; padding: clamp(30px, 7vh, 92px) clamp(32px, 4.8vw, 74px) 28px; background: var(--paper); }
+      .reference-nav { position: fixed; z-index: 10; top: 22px; left: 50%; display: flex; align-items: center; gap: 16px; min-height: 34px; padding: 0 11px; border: 1px solid rgba(255,255,255,.22); border-radius: 5px; color: rgba(244,242,235,.66); background: rgba(20,20,19,.92); box-shadow: 0 5px 12px rgba(0,0,0,.26), inset 0 1px rgba(255,255,255,.12); transform: translateX(-50%); font: 8px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .03em; }
+      .reference-nav::before { content: "▧"; color: #e9e5db; font-size: 13px; }
+      .reference-nav a { color: inherit; text-decoration: none; transition: color .18s ease; }
+      .reference-nav a:hover { color: #fff; }
+      .topline { display: none; }
       .brand { color: inherit; text-decoration: none; }
       .meta { color: var(--quiet); text-align: right; }
-      .hero { margin: auto 0; padding: 64px 0 48px; }
-      .overline { margin: 0 0 18px; color: var(--accent); font: 700 10px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .15em; }
-      h1 { max-width: 615px; margin: 0; font-size: clamp(51px, 6.25vw, 94px); font-weight: 500; letter-spacing: -.074em; line-height: .87; }
-      .lede { max-width: 488px; margin: 34px 0 0; font-size: clamp(17px, 1.45vw, 22px); line-height: 1.4; letter-spacing: -.022em; }
-      .lede strong { font-weight: 500; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
-      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 34px; }
-      .action { min-height: 40px; padding: 0 15px; border: 1px solid var(--ink); border-radius: 4px; color: var(--white); background: var(--ink); cursor: pointer; font: 700 10px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .075em; transition: transform .18s ease, background .18s ease, color .18s ease; }
-      .action:hover { transform: translateY(-2px); border-color: var(--accent); background: var(--accent); }
+      .hero { margin: auto 0; padding: 46px 0 38px; }
+      .overline { margin: 0 0 17px; color: #2f2e2b; font: 500 8px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .045em; }
+      h1 { max-width: 460px; margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: clamp(48px, 5.1vw, 76px); font-weight: 500; letter-spacing: -.065em; line-height: .9; }
+      .lede { max-width: 408px; margin: 25px 0 0; color: #4d4c48; font: 11px/1.34 Arial, Helvetica, sans-serif; letter-spacing: -.014em; }
+      .lede strong { font-weight: inherit; text-decoration: none; }
+      .actions { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 27px; }
+      .action { min-height: 25px; padding: 0 12px; border: 1px solid #2c2c2a; border-radius: 4px; color: var(--white); background: #242422; cursor: pointer; font: 700 7px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .04em; transition: transform .18s ease, background .18s ease, color .18s ease; }
+      .action:hover { transform: translateY(-1px); border-color: #111; background: #111; }
       .action.secondary { color: var(--ink); background: transparent; }
       .action.secondary:hover { color: var(--white); border-color: var(--ink); background: var(--ink); }
-      .footer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding-top: 18px; border-top: 1px solid rgba(23,23,22,.55); color: var(--quiet); font: 9px/1.45 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .04em; }
-      .footer strong { display: block; margin-bottom: 4px; color: var(--ink); font-weight: 700; }
+      .footer { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding-top: 18px; border-top: 0; color: #4d4c48; font: 7px/1.5 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .03em; }
+      .footer strong { display: block; margin-bottom: 2px; color: var(--ink); font-weight: 500; }
       .field { position: relative; min-height: 100vh; overflow: hidden; isolation: isolate; background: #171716; }
-      .field::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .27; background-image: linear-gradient(rgba(255,255,255,.026) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.026) 1px, transparent 1px); background-size: 28px 28px; mix-blend-mode: screen; }
+      .field::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .1; background-image: radial-gradient(rgba(255,255,255,.75) .45px, transparent .65px); background-size: 6px 6px; }
       #ascii-field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-      .field-head { position: absolute; z-index: 3; top: 27px; right: clamp(23px, 4vw, 58px); left: clamp(23px, 4vw, 58px); display: flex; justify-content: space-between; align-items: baseline; gap: 18px; color: #dedbd2; font: 9px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .09em; }
+      .field-head { display: none; }
       .field-head span:last-child { color: #74716b; }
-      .orbit-label { position: absolute; z-index: 3; bottom: 29px; left: clamp(23px, 4vw, 58px); display: grid; gap: 5px; color: #a7a39b; font: 9px/1.42 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .08em; }
-      .orbit-label strong { color: #f3f0e8; font-size: 10px; }
-      .cursor-mark { position: absolute; z-index: 3; right: 24px; bottom: 29px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 6px rgba(239,93,59,.13); pointer-events: none; }
-      .dark-scene { position: fixed; inset: 0; z-index: 5; display: grid; grid-template-columns: minmax(220px, .42fr) minmax(0, 1fr); gap: clamp(30px, 7vw, 130px); padding: 34px clamp(30px, 10vw, 160px); color: #e8e5dc; background: #1b1b1a; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-      .dark-side { display: flex; flex-direction: column; gap: 18px; color: #8f8c84; font: 10px/1.5 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .05em; }
+      .orbit-label { position: absolute; z-index: 3; top: 116px; left: 27%; display: grid; gap: 0; padding: 3px 5px; color: #171716; background: #f1f0e9; font: 700 7px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .04em; }
+      .orbit-label strong { display: none; }
+      .cursor-mark { display: none; }
+      .dark-scene { position: fixed; inset: 0; z-index: 5; display: block; padding: 86px clamp(30px, 20.8vw, 268px) 32px; color: #e8e5dc; background: #1d1d1c; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+      .dark-side { display: none; }
       .dark-side strong { color: #f1eee6; font-size: 11px; }
-      .dark-sheet { max-width: 700px; align-self: center; }
-      .dark-sheet p { margin: 0 0 14px; color: #aaa69e; font: 12px/1.55 "SFMono-Regular", "Cascadia Mono", monospace; }
-      .dark-sheet h2 { margin: 0 0 27px; color: #f0ede4; font-size: clamp(34px, 5vw, 73px); font-weight: 500; letter-spacing: -.06em; line-height: .94; }
+      .dark-sheet { max-width: 560px; }
+      .dark-sheet p { margin: 0 0 12px; color: #aaa69e; font: 10px/1.42 Arial, Helvetica, sans-serif; }
+      .dark-sheet h2 { margin: 0 0 12px; color: #f0ede4; font: 500 clamp(26px, 3vw, 34px)/1 Arial, Helvetica, sans-serif; letter-spacing: -.045em; }
+      .dark-sheet .hub-intro { max-width: 555px; margin-bottom: 12px; color: #bab8b1; }
       .dark-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
-      .dark-list li { padding: 18px 0; border-top: 1px solid #3c3a37; color: #e9e6dc; font-size: clamp(16px, 1.8vw, 23px); letter-spacing: -.025em; }
-      .dark-list small { display: block; margin-top: 5px; color: #8f8c84; font: 10px/1.45 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .04em; }
-      .return { width: fit-content; margin-top: auto; padding: 0; border: 0; color: #bbb8af; background: transparent; cursor: pointer; font: 700 10px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .08em; }
+      .dark-list li { padding: 19px 0; border-top: 1px solid #363634; color: #e9e6dc; font: 500 16px/1.18 Arial, Helvetica, sans-serif; letter-spacing: -.025em; }
+      .dark-list small { display: block; margin-top: 7px; color: #8f8c84; font: 8px/1.45 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .04em; }
+      .return { position: fixed; right: 28px; bottom: 25px; width: fit-content; margin-top: auto; padding: 0; border: 0; color: #bbb8af; background: transparent; cursor: pointer; font: 700 8px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .08em; }
       .return:hover { color: var(--accent); }
       .transition-layer { position: fixed; inset: 0; z-index: 20; overflow: hidden; pointer-events: none; opacity: 0; }
       #transition-field { width: 100%; height: 100%; display: block; }
@@ -59,34 +64,35 @@
     </style>
   </head>
   <body>
+    <nav class="reference-nav" aria-label="展示导航"><a href="#features">FEATURES</a><a href="#repo">THE REPO</a><a href="#showcase">SHOWCASE</a><a href="#pricing">PRICING</a><a href="#faq">FAQ</a><a href="#blog">BLOG</a></nav>
     <main class="page">
       <section class="editorial" aria-labelledby="motion-title">
         <div class="topline"><a class="brand" href="../collection/">JEKIVADO / EFFECT STUDY</a><span class="meta">MOTION IS A WAY<br />TO REARRANGE READING</span></div>
         <div class="hero">
-          <p class="overline">01 — PAGE TRANSITION STUDY</p>
-          <h1 id="motion-title">A page can<br /><em>change shape.</em></h1>
-          <p class="lede">字符先沿着轨道收束成文字旋涡，再在一瞬间扩散为覆盖整页的粒子云；<strong>内容切换由运动完成。</strong></p>
+          <p class="overline">BUILT FOR AGENTIC DEVELOPMENT.</p>
+          <h1 id="motion-title">The Sanity<br />setup agents<br />don't reinvent.</h1>
+          <p class="lede">Every run invents a new one, none decided. This Next.js and Sanity kit commits six years of decisions. Your agent builds inside them, and checks its work through MCP and a real Chrome.</p>
           <div class="actions">
-            <button class="action" id="reassemble" type="button">进入字符转场 ↗</button>
-            <button class="action secondary" id="mode-switch" type="button" aria-pressed="false">密度：标准</button>
+            <button class="action" id="reassemble" type="button">GET</button>
+            <button class="action" id="mode-switch" type="button" aria-pressed="false">ACCESS</button>
           </div>
         </div>
-        <div class="footer"><span><strong>FORM</strong>word spiral</span><span><strong>TRANSITION</strong>particle cloud</span><span><strong>STATE</strong>two content worlds</span></div>
+        <div class="footer"><span><strong>NEXT 16.X</strong>AGENTS.MD: LOADED</span><span><strong>SANITY V6</strong>MCP: 2 SERVERS</span><span><strong>TS: STRICT</strong>DRIFT: 0</span><span><strong>RUN READY</strong>REAL CHROME</span></div>
       </section>
       <section class="field" aria-label="动态 ASCII 字符螺旋">
         <canvas id="ascii-field" aria-hidden="true"></canvas>
         <div class="field-head"><span>FIELD / <span id="scene-name">SPIRAL</span></span><span id="frame-count">000 FRAMES</span></div>
-        <div class="orbit-label"><strong id="orbit-state">WORDS HOLD THEIR ORBIT</strong><span>CLICK TO LET THE FIELD OVERTAKE THE PAGE</span></div>
+        <div class="orbit-label"><strong id="orbit-state">WORDS HOLD THEIR ORBIT</strong><span>CLICK &amp; HOLD</span></div>
         <span class="cursor-mark" aria-hidden="true"></span>
       </section>
     </main>
     <section class="dark-scene" aria-label="切换后的深色内容页">
-      <aside class="dark-side"><span><strong>INDEX / 02</strong><br />THE FIELD SETTLES</span><span>SCROLL / READ / RETURN</span></aside>
-      <article class="dark-sheet"><p>THE MATERIAL AFTER MOTION</p><h2>Knowledge,<br />held in a moving field.</h2><ul class="dark-list"><li>Notes that keep their shape<small>Readable after the particles settle.</small></li><li>Ideas with visible connections<small>Each item has a trace and a direction.</small></li><li>Return without losing context<small>The same field carries the page back.</small></li></ul></article>
-      <button class="return" id="return-light" type="button">← RETURN TO THE LIGHT PAGE</button>
+      <aside class="dark-side"><span><strong>KNOWLEDGE HUB</strong><br />PRACTICAL, OPINIONATED WRITING</span><span>CONTENT ARCHITECTURE<br />HEADLESS CMS / NEXT.JS</span></aside>
+      <article class="dark-sheet"><h2>Knowledge Hub</h2><p class="hub-intro">Practical, opinionated writing on <strong>content architecture</strong>, headless CMS, and shipping real products with Sanity and Next.js.</p><p>Every post comes from decisions already baked into this starter: how to model content that scales, query it cleanly, and turn structure into pages search engines and AI assistants can actually read.</p><ul class="dark-list"><li>Your Site Is Invisible to AI Agents (and Your CMS Can Fix It)<small>28 JUN 2026 · 16 MIN READ</small></li><li>Stale Sanity Content in Next.js: The Two Caches and How to Fix Them<small>27 JUN 2026 · 11 MIN READ</small></li></ul></article>
+      <button class="return" id="return-light" type="button">← RETURN</button>
     </section>
     <div class="transition-layer" aria-hidden="true"><canvas id="transition-field"></canvas></div>
     <p class="status" id="motion-status" aria-live="polite">字符螺旋已就绪。</p>
-    <script src="./app.js"></script>
+    <script src="./app.js?v=20260808b"></script>
   </body>
 </html>
