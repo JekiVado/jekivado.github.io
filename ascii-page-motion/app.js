@@ -25,17 +25,23 @@ let transitionActive = false;
 let transitionToDark = true;
 let sceneSwapped = false;
 
-function buildSpiral(total) {
-  return Array.from({ length: total }, (_, index) => {
-    const ratio = index / total;
-    return {
-      angle: ratio * Math.PI * 23 + (index % 13) * .045,
-      radius: .055 + Math.pow(ratio, .61) * .66,
-      word: index % 3 === 0 ? words[index % words.length] : marks[index % marks.length],
-      depth: .28 + (index % 9) / 12,
-      seed: ((index * 37) % 101) / 101,
-    };
-  });
+function buildSpiral() {
+  return buildConcentricRings();
+}
+
+function buildConcentricRings() {
+  const ringCount = 14;
+  return Array.from({ length: ringCount }, (_, ring) => {
+    const slots = 14 + ring * 9;
+    return Array.from({ length: slots }, (_, slot) => ({
+      angle: (slot / slots) * Math.PI * 2 + ring * .11,
+      radius: .06 + ring * .047,
+      ring,
+      word: (slot + ring) % 3 === 0 ? words[(slot + ring) % words.length] : marks[(slot + ring) % marks.length],
+      depth: .3 + ring / (ringCount * 1.4),
+      seed: unitNoise((ring + 1) * (slot + 1) * 3.17),
+    }));
+  }).flat();
 }
 
 function unitNoise(value) {
@@ -63,7 +69,7 @@ function resize() {
   transitionCanvas.width = Math.max(1, Math.floor(wholeWidth * ratio));
   transitionCanvas.height = Math.max(1, Math.floor(wholeHeight * ratio));
   transitionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
-  spiralWords = buildSpiral(Math.max(620, Math.min(1150, Math.floor(bounds.width * bounds.height / 760))));
+  spiralWords = buildSpiral();
   flowParticles = buildFlowField(Math.max(1000, Math.min(1900, Math.floor(wholeWidth * wholeHeight / 520))));
 }
 
@@ -84,14 +90,13 @@ function renderFrame(time) {
   halo.addColorStop(1, 'rgba(23,23,22,0)');
   context.fillStyle = halo;
   context.fillRect(0, 0, width, height);
-  const limit = densityBoost ? spiralWords.length : Math.floor(spiralWords.length * .78);
-  spiralWords.slice(0, limit).forEach((particle, index) => {
-    const flutter = Math.sin(t * 4 + particle.seed * 16 + particle.angle) * .008;
-    const phase = particle.angle + t * (.24 + particle.depth * .28);
+  spiralWords.forEach((particle, index) => {
+    const flutter = Math.sin(t * 4 + particle.seed * 16 + particle.angle) * .004;
+    const phase = particle.angle + t * (.22 + particle.ring * .018);
     const radius = size * (particle.radius + flutter);
-    const x = centerX + Math.cos(phase) * radius * 1.13;
-    const y = centerY + Math.sin(phase) * radius * .79;
-    const fontSize = particle.word.length > 2 ? 5.2 + particle.depth * 3.2 : 5 + particle.depth * 4;
+    const x = centerX + Math.cos(phase) * radius;
+    const y = centerY + Math.sin(phase) * radius;
+    const fontSize = (particle.word.length > 2 ? 5.5 + particle.depth * 3.5 : 5.1 + particle.depth * 3.7) + (densityBoost ? .6 : 0);
     context.save();
     context.translate(x, y);
     context.rotate(phase + Math.PI / 2);
