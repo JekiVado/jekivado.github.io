@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#11110f" />
+    <meta name="description" content="原创 ASCII 字符场页面运动实验。" />
+    <title>ASCII 页面运动 · JekiVado</title>
+    <style>
+      :root { --paper: #ece9df; --ink: #161615; --subtle: #74736e; --edge: #22221f; --signal: #ee5532; }
+      * { box-sizing: border-box; }
+      html { min-width: 320px; background: #11110f; }
+      body { min-height: 100vh; margin: 0; overflow-x: hidden; color: var(--ink); background: var(--paper); font-family: "Iowan Old Style", "Baskerville", "Songti SC", serif; }
+      button { font: inherit; }
+      .page { min-height: 100vh; display: grid; grid-template-columns: minmax(370px, .92fr) minmax(440px, 1.08fr); }
+      .editorial { position: relative; display: flex; min-height: 100vh; flex-direction: column; padding: 30px clamp(28px, 5.2vw, 78px) 31px; background: radial-gradient(circle at 32% 25%, rgba(255,255,255,.8), transparent 27rem), var(--paper); }
+      .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 18px; border-bottom: 1px solid rgba(22,22,21,.45); font: 700 10px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .09em; }
+      .brand { text-decoration: none; color: inherit; }
+      .meta { color: var(--subtle); text-align: right; }
+      .hero { margin: auto 0; padding: 64px 0 46px; }
+      .overline { margin: 0 0 18px; color: var(--signal); font: 700 11px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .16em; }
+      h1 { max-width: 620px; margin: 0; font-size: clamp(52px, 6.1vw, 94px); font-weight: 500; letter-spacing: -.073em; line-height: .87; }
+      .lede { max-width: 480px; margin: 34px 0 0; font-size: clamp(18px, 1.5vw, 23px); line-height: 1.38; letter-spacing: -.02em; }
+      .lede strong { font-weight: 500; text-decoration: underline; text-decoration-color: var(--signal); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 34px; }
+      .action { min-height: 40px; padding: 0 15px; border: 1px solid var(--edge); border-radius: 5px; color: #f8f6ef; background: var(--edge); cursor: pointer; font: 700 10px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .08em; transition: transform .18s ease, background .18s ease, color .18s ease; }
+      .action:hover { transform: translateY(-2px); background: var(--signal); border-color: var(--signal); }
+      .action.secondary { color: var(--ink); background: transparent; }
+      .action.secondary:hover { color: var(--paper); background: var(--edge); border-color: var(--edge); }
+      .footer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding-top: 19px; border-top: 1px solid rgba(22,22,21,.45); color: var(--subtle); font: 10px/1.45 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .04em; }
+      .footer strong { display: block; margin-bottom: 4px; color: var(--ink); font-weight: 700; }
+      .field { position: relative; min-height: 100vh; overflow: hidden; isolation: isolate; background: #10100f; color: #f3efe5; }
+      .field::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .34; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 26px 26px; mix-blend-mode: screen; }
+      #ascii-field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .field-head { position: absolute; z-index: 3; top: 27px; right: clamp(24px, 4vw, 60px); left: clamp(24px, 4vw, 60px); display: flex; justify-content: space-between; align-items: baseline; gap: 18px; color: #dbd8cf; font: 10px/1 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .09em; }
+      .field-head span:last-child { color: #7f7d78; }
+      .orbit-label { position: absolute; z-index: 3; bottom: 30px; left: clamp(24px, 4vw, 60px); display: grid; gap: 5px; color: #a9a69f; font: 10px/1.4 "SFMono-Regular", "Cascadia Mono", monospace; letter-spacing: .08em; }
+      .orbit-label strong { color: #f3efe5; font-size: 11px; }
+      .cursor-dot { position: absolute; z-index: 4; right: 24px; bottom: 28px; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 6px rgba(238,85,50,.13); pointer-events: none; }
+      .status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      @media (max-width: 840px) { .page { grid-template-columns: 1fr; } .editorial, .field { min-height: min(720px, 100svh); } .editorial { min-height: auto; } .hero { margin: 0; padding: 106px 0 82px; } .field { min-height: 82svh; } }
+      @media (max-width: 460px) { .editorial { padding: 23px 22px 25px; } .meta { display: none; } .hero { padding: 76px 0 64px; } .overline { font-size: 10px; letter-spacing: .11em; } h1 { max-width: 100%; font-size: clamp(46px, 14.5vw, 56px); overflow-wrap: anywhere; } .lede { font-size: 18px; } .actions { flex-direction: column; } .action { width: 100%; } .footer { grid-template-columns: 1fr 1fr; } .footer > :last-child { grid-column: span 2; } .field-head { top: 22px; left: 22px; right: 22px; } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="editorial" aria-labelledby="motion-title">
+        <div class="topline"><a class="brand" href="../collection/">JEKIVADO / EFFECT STUDY</a><span class="meta">A SMALL STUDY IN<br />MOTION &amp; LANGUAGE</span></div>
+        <div class="hero">
+          <p class="overline">01 — PAGE AS MATERIAL</p>
+          <h1 id="motion-title">A quiet page<br />can still <em>move.</em></h1>
+          <p class="lede">让字符从阅读中离开，在边缘、轨道与空白之间重排；<strong>界面不是静态的纸面。</strong></p>
+          <div class="actions">
+            <button class="action" id="reassemble" type="button">重组字符场 ↗</button>
+            <button class="action secondary" id="mode-switch" type="button" aria-pressed="false">切换：轨道模式</button>
+          </div>
+        </div>
+        <div class="footer"><span><strong>FORM</strong>editorial split</span><span><strong>MEDIUM</strong>live ASCII field</span><span><strong>INPUT</strong>pointer + time</span></div>
+      </section>
+      <section class="field" aria-label="动态 ASCII 字符场">
+        <canvas id="ascii-field" aria-hidden="true"></canvas>
+        <div class="field-head"><span>FIELD / <span id="scene-name">ORBIT</span></span><span id="frame-count">000 FRAMES</span></div>
+        <div class="orbit-label"><strong id="orbit-state">THE WORDS BEND</strong><span>MOVE THE POINTER / PRESS REASSEMBLE</span></div>
+        <span class="cursor-dot" aria-hidden="true"></span>
+      </section>
+    </main>
+    <p class="status" id="motion-status" aria-live="polite">字符场已就绪。</p>
+    <script src="./app.js"></script>
+  </body>
+</html>

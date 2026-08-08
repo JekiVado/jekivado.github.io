@@ -29,6 +29,10 @@
         --tool-border: #7cad82;
         --tool-accent: #347453;
         --tool-ink: #24553c;
+        --showcase-bg: #f5ebd8;
+        --showcase-border: #b88559;
+        --showcase-accent: #b54428;
+        --showcase-ink: #6f2c20;
       }
 
       * { box-sizing: border-box; }
@@ -52,6 +56,7 @@
       .prototype-section { --module-bg: var(--warm-bg); --module-border: var(--warm-border); --module-accent: var(--warm-accent); --module-ink: var(--warm-ink); }
       .reports-section { --module-bg: var(--report-bg); --module-border: var(--report-border); --module-accent: var(--report-accent); --module-ink: var(--report-ink); }
       .tools-section { --module-bg: var(--tool-bg); --module-border: var(--tool-border); --module-accent: var(--tool-accent); --module-ink: var(--tool-ink); }
+      .showcase-section { --module-bg: var(--showcase-bg); --module-border: var(--showcase-border); --module-accent: var(--showcase-accent); --module-ink: var(--showcase-ink); }
       .category-card[open] { box-shadow: 0 14px 30px rgba(37, 56, 61, .12); }
       .category-summary { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto auto; align-items: center; gap: 16px; min-height: 96px; padding: 18px 20px; cursor: pointer; list-style: none; background: linear-gradient(90deg, var(--module-bg), rgba(255, 255, 255, .92) 68%); transition: background .2s ease; }
       .category-summary::-webkit-details-marker { display: none; }
@@ -121,7 +126,7 @@
           <p class="eyebrow">JEKIVADO / PERSONAL INDEX</p>
           <h1>集合</h1>
         </div>
-        <p class="count">04 COLLECTIONS · 06 LINKS</p>
+        <p class="count">05 COLLECTIONS · 07 LINKS</p>
       </header>
       <p class="intro">按主题折叠的个人入口。先选模块，再展开查看具体页面；新增内容只需归入对应模块。</p>
 
@@ -211,9 +216,28 @@
             </div>
           </div>
         </details>
+
+        <details class="category category-card showcase-section">
+          <summary class="category-summary">
+            <span class="category-index">05</span>
+            <div class="category-copy"><h2 id="showcase-title">网站效果展示</h2><p>用独立页面试验排版、动态与交互的呈现方式。</p></div>
+            <span class="category-count">01 STUDY</span>
+            <span class="toggle"><span class="toggle-label">点击展开</span><span class="toggle-mark">+</span></span>
+          </summary>
+          <div class="category-content" aria-labelledby="showcase-title">
+            <div class="card-grid">
+              <a class="card" data-category="showcase" href="../ascii-page-motion/">
+                <span class="card-top"><span class="kind">MOTION STUDY</span><span class="arrow">↗</span></span>
+                <strong class="card-name">ASCII 页面运动</strong>
+                <p class="card-detail">原创字符场动画：在编辑式版面与实时重组的 ASCII 轨道之间切换。</p>
+                <span class="path">/ascii-page-motion/</span>
+              </a>
+            </div>
+          </div>
+        </details>
       </div>
 
-      <footer><span><strong>提示：</strong>本页带有不收录提示，但链接本身不是访问权限控制。</span><span>UPDATED 2026.08.05</span></footer>
+      <footer><span><strong>提示：</strong>本页带有不收录提示，但链接本身不是访问权限控制。</span><span>UPDATED 2026.08.08</span></footer>
     </main>
   </body>
 </html>
