@@ -15,8 +15,8 @@
 - `escape01/`：可试玩的静态原型。
 - `yunshang-xingyuan/`：《云上星愿》星轨解谜可试玩原型。
 - `ServerAnalysis/`：云资源盘点与基础设施费用汇报；目录入口为四个主体的汇总页，`analysis/` 存放各主体明细，根目录其余 `.html` 为早期资源盘点快照。
-- `DanceNewReports/`：产品报告档案页面。
-- `BackofficeReports/`：1688 业务后台结构、运营支持与治理风险分析；与游戏报告独立归档。
+- `DanceNewReports/`：DanceNew 与 1688 共用的项目报告档案；1688 的业务后台分析与数据日报位于 `reports/`。
+- `BackofficeReports/`：1688 旧入口，保留跳转以兼容已有链接。
 - `dau-ltv-forecast/`：本地可调参数的 DAU 与 LTV 预测工具。
 - `index.html`：根目录入口页。
 

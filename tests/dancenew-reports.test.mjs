@@ -11,8 +11,8 @@ assert.ok(existsSync(indexPath), 'Expected DanceNewReports/index.html to exist')
 
 const html = readFileSync(indexPath, 'utf8');
 assert.match(html, /^<!doctype html>/i, 'Expected the archive file to start directly with its HTML document');
-assert.match(html, /<title>DanceNew 报告档案<\/title>/);
-assert.match(html, /DanceNew 报告档案/);
+assert.match(html, /<title>项目报告档案<\/title>/);
+assert.match(html, /DanceNew 与 1688/);
 assert.match(html, /\.codex/);
 assert.match(html, /\.workbuddy\/reports/);
 assert.match(html, /class="archive-list"/);
@@ -24,8 +24,11 @@ assert.doesNotMatch(html, /data-filter=/, 'Expected a static archive list withou
 assert.doesNotMatch(html, /<script\b/i, 'Expected the archive page to work without JavaScript');
 
 const links = [...html.matchAll(/<a\s+class="report-link"\s+data-date="([^"]+)"\s+href="([^"]+)"/g)];
-assert.equal(links.length, 10, 'Expected exactly ten game report links');
-assert.doesNotMatch(html, /1688 业务后台架构与运营支持分析报告/, 'Expected the back-office analysis to be outside the game archive');
+assert.equal(links.length, 12, 'Expected ten DanceNew reports plus two 1688 reports');
+assert.match(html, /1688 数据日报/);
+assert.match(html, /1688 业务后台架构与运营支持分析报告/);
+assert.match(html, /2026-08-10-1688-data-daily\.html/);
+assert.match(html, /2026-08-10-1688-backoffice-analysis\.html/);
 
 const dates = links.map((match) => Date.parse(match[1]));
 assert.ok(dates.every(Number.isFinite), 'Expected every report data-date to be parseable');

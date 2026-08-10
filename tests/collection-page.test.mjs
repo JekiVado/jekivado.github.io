@@ -65,12 +65,11 @@ assert.match(html, /class="category category-card tools-section"/);
 assert.match(html, /class="category category-card showcase-section"/);
 assert.match(html, /报告档案入口/);
 assert.match(html, /\.\.\/DanceNewReports\//);
-assert.match(html, /\.\.\/BackofficeReports\//);
-assert.match(html, /DanceNew（游戏）/);
-assert.match(html, /1688 业务后台/);
+assert.match(html, /DanceNew \/ 1688 项目报告合集/);
+assert.doesNotMatch(html, /href="\.\.\/BackofficeReports\//);
 assert.match(html, /DAU \/ LTV 预测/);
 assert.match(html, /\.\.\/dau-ltv-forecast\//);
-assert.match(html, /05 COLLECTIONS · 07 LINKS/);
+assert.match(html, /05 COLLECTIONS · 06 LINKS/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
 assert.match(html, /\.category-summary\s*\{[^}]*padding:\s*18px 20px/);
@@ -79,7 +78,7 @@ assert.match(html, /main\s*\{[^}]*width:\s*min\(1440px/);
 assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1fr\)\)/);
 assert.match(html, /class="card-grid prototype-grid"/);
 assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
-assert.match(html, /UPDATED 2026\.08\.08/);
+assert.match(html, /UPDATED 2026\.08\.10/);
 assert.match(html, /云上星愿/);
 assert.match(html, /02 ITEMS/);
 assert.match(html, /固定星点两两交换星轨；完成一片片主题画/);
@@ -93,7 +92,6 @@ for (const route of [
   '../yunshang-xingyuan/',
   '../ServerAnalysis/',
   '../DanceNewReports/',
-  '../BackofficeReports/',
   '../dau-ltv-forecast/',
   '../ascii-page-motion/',
 ]) {
