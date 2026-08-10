@@ -1,14 +1,10 @@
 const canvas = document.getElementById('ascii-field');
-const context = canvas.getContext('2d');
 const transitionCanvas = document.getElementById('transition-field');
 const transitionContext = transitionCanvas.getContext('2d');
 const transitionLayer = document.querySelector('.transition-layer');
 const reassemble = document.getElementById('reassemble');
 const returnLight = document.getElementById('return-light');
 const modeSwitch = document.getElementById('mode-switch');
-const sceneName = document.getElementById('scene-name');
-const orbitState = document.getElementById('orbit-state');
-const frameCount = document.getElementById('frame-count');
 const motionStatus = document.getElementById('motion-status');
 const field = canvas.parentElement;
 
@@ -16,17 +12,19 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 const words = ['PAGE', 'MATERIAL', 'MOTION', 'READING', 'SHAPE', 'FIELD', 'TRACE', 'STILLNESS', 'INDEX'];
 const marks = '01+-·<>/[]{}*'.split('');
 const noiseGlyphs = '0123456789ABCDEF[]{}()<>/\\|+-=;:.,*';
-const fieldFrameInterval = 42;
-let frames = 0;
-let lastFieldFrame = -Infinity;
-let pointer = { x: .55, y: .5 };
-let glyphBands = [];
+let pointer = { x: .55, y: .5, hovering: false };
 let flowParticles = [];
 let transitionNoiseGrid = [];
 let transitionStart = 0;
 let transitionActive = false;
 let transitionToDark = true;
 let sceneSwapped = false;
+let spiralRenderer = null;
+
+function unitNoise(value) {
+  const sample = Math.sin(value * 12.9898) * 43758.5453;
+  return sample - Math.floor(sample);
+}
 
 function buildSpiral() {
   return buildGlyphBands();
@@ -67,12 +65,238 @@ function glyphAt(band, index) {
   const pause = 1 + Math.floor(unitNoise((band.ring + 1) * 19.47 + index * .03) * 3);
   const cycle = band.phrase.length + pause;
   const position = index % cycle;
-  return position < band.phrase.length ? band.phrase[position] : '·';
+  return position < band.phrase.length ? band.phrase[position] : '.';
 }
 
-function unitNoise(value) {
-  const sample = Math.sin(value * 12.9898) * 43758.5453;
-  return sample - Math.floor(sample);
+function createGlyphAtlas() {
+  const glyphs = [...new Set('THE CONTENT ARCHITECTURE.'.split(''))];
+  const cell = 64;
+  const columns = 8;
+  const rows = Math.ceil(glyphs.length / columns);
+  const sheet = document.createElement('canvas');
+  sheet.width = columns * cell;
+  sheet.height = rows * cell;
+  const paint = sheet.getContext('2d');
+  paint.clearRect(0, 0, sheet.width, sheet.height);
+  paint.fillStyle = '#ffffff';
+  paint.textAlign = 'center';
+  paint.textBaseline = 'middle';
+  paint.font = '56px "SFMono-Regular", "Cascadia Mono", monospace';
+  glyphs.forEach((glyph, index) => {
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    paint.fillText(glyph, column * cell + cell / 2, row * cell + cell * .54);
+  });
+  return { sheet, glyphs, columns, rows, lookup: new Map(glyphs.map((glyph, index) => [glyph, index])) };
+}
+
+function compileShader(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    const message = gl.getShaderInfoLog(shader);
+    gl.deleteShader(shader);
+    throw new Error(message || 'WebGL shader compilation failed');
+  }
+  return shader;
+}
+
+function createProgram(gl, vertexSource, fragmentSource) {
+  const program = gl.createProgram();
+  gl.attachShader(program, compileShader(gl, gl.VERTEX_SHADER, vertexSource));
+  gl.attachShader(program, compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    const message = gl.getProgramInfoLog(program);
+    gl.deleteProgram(program);
+    throw new Error(message || 'WebGL program link failed');
+  }
+  return program;
+}
+
+const vertexShaderSource = `#version 300 es
+precision highp float;
+layout(location = 0) in vec2 aCorner;
+layout(location = 1) in float aRadius;
+layout(location = 2) in float aAngle;
+layout(location = 3) in float aSpeed;
+layout(location = 4) in float aSize;
+layout(location = 5) in float aGlyph;
+layout(location = 6) in float aAlpha;
+uniform vec2 uViewport;
+uniform vec2 uMouse;
+uniform float uTime;
+uniform float uScale;
+uniform float uHold;
+uniform float uRippleStart;
+uniform float uHover;
+uniform float uColumns;
+uniform float uRows;
+out vec2 vUv;
+out float vAlpha;
+void main() {
+  float angle = aAngle + uTime * aSpeed;
+  vec2 radial = vec2(cos(angle), sin(angle));
+  float elapsed = max(0.0, uTime - uRippleStart);
+  float rippleRadius = elapsed * 310.0;
+  float ripple = elapsed > 0.0 && elapsed < 1.8 ? (1.0 - smoothstep(0.0, 42.0, abs(aRadius * uScale - rippleRadius))) : 0.0;
+  float orbit = aRadius * uScale * (1.0 - uHold * 0.22) + ripple * 28.0;
+  vec2 center = vec2(uViewport.x * 0.48, uViewport.y * 0.51);
+  vec2 point = center + radial * orbit;
+  float mouseDistance = distance(point, uMouse);
+  float mouseField = uHover * (1.0 - smoothstep(0.0, 120.0, mouseDistance));
+  point += radial * mouseField * 14.0;
+  vec2 tangent = vec2(-sin(angle), cos(angle));
+  vec2 glyphSize = vec2(aSize * uScale * .44, aSize * uScale * .64);
+  point += tangent * aCorner.x * glyphSize.x + radial * aCorner.y * glyphSize.y;
+  vec2 clip = point / uViewport * 2.0 - 1.0;
+  gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
+  float column = mod(aGlyph, uColumns);
+  float row = floor(aGlyph / uColumns);
+  vUv = (vec2(column, row) + aCorner * 0.5 + 0.5) / vec2(uColumns, uRows);
+  vAlpha = aAlpha * (1.0 - mouseField * 0.38);
+}`;
+
+const fragmentShaderSource = `#version 300 es
+precision highp float;
+uniform sampler2D uAtlas;
+in vec2 vUv;
+in float vAlpha;
+out vec4 outColor;
+void main() {
+  float glyph = texture(uAtlas, vUv).a;
+  if (glyph < 0.02) discard;
+  outColor = vec4(vec3(0.96), glyph * vAlpha);
+}`;
+
+class SpiralRenderer {
+  constructor(target) {
+    this.canvas = target;
+    this.gl = target.getContext('webgl2', { alpha: false, antialias: true, depth: false, stencil: false, powerPreference: 'high-performance' });
+    this.ready = false;
+    this.hold = 0;
+    this.holding = false;
+    this.rippleStart = -10;
+    if (!this.gl) return;
+    try {
+      this.setup();
+      this.ready = true;
+    } catch (error) {
+      console.warn('ASCII WebGL renderer unavailable', error);
+    }
+  }
+
+  setup() {
+    const gl = this.gl;
+    this.atlas = createGlyphAtlas();
+    this.program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
+    this.uniforms = Object.fromEntries(['uViewport', 'uMouse', 'uTime', 'uScale', 'uHold', 'uRippleStart', 'uHover', 'uColumns', 'uRows', 'uAtlas'].map((name) => [name, gl.getUniformLocation(this.program, name)]));
+    this.vao = gl.createVertexArray();
+    gl.bindVertexArray(this.vao);
+    const corners = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, corners);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    this.instanceBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.instanceBuffer);
+    const instances = this.buildInstances();
+    this.instanceCount = instances.length / 6;
+    gl.bufferData(gl.ARRAY_BUFFER, instances, gl.STATIC_DRAW);
+    const stride = 6 * Float32Array.BYTES_PER_ELEMENT;
+    for (let attribute = 0; attribute < 6; attribute += 1) {
+      gl.enableVertexAttribArray(attribute + 1);
+      gl.vertexAttribPointer(attribute + 1, 1, gl.FLOAT, false, stride, attribute * Float32Array.BYTES_PER_ELEMENT);
+      gl.vertexAttribDivisor(attribute + 1, 1);
+    }
+    this.texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.atlas.sheet);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.useProgram(this.program);
+    gl.uniform1f(this.uniforms.uColumns, this.atlas.columns);
+    gl.uniform1f(this.uniforms.uRows, this.atlas.rows);
+    gl.uniform1i(this.uniforms.uAtlas, 0);
+    this.resize();
+  }
+
+  buildInstances() {
+    const data = [];
+    const dotGlyph = this.atlas.lookup.get('.');
+    buildSpiral().forEach((band) => {
+      for (let index = 0; index < band.charCount; index += 1) {
+        const angle = band.phase + index / band.charCount * Math.PI * 2;
+        const distance = Math.abs(wrapRadians(angle - band.bandCenter));
+        const edge = (band.bandHalfWidth + band.bandSoftness - distance) / band.bandSoftness;
+        const density = Math.max(0, Math.min(1, edge));
+        const isLetter = density > .12 && (density > .72 || unitNoise(band.ring * 67.1 + index * 5.3) < density);
+        const glyph = isLetter ? glyphAt(band, index) : '.';
+        data.push(band.radius * 540, angle, band.speed, isLetter ? band.letterSize : 4.2, this.atlas.lookup.get(glyph) ?? dotGlyph, isLetter ? .4 + density * .48 : .2 + density * .14);
+      }
+    });
+    return new Float32Array(data);
+  }
+
+  resize() {
+    if (!this.ready && !this.program) return;
+    const bounds = this.canvas.getBoundingClientRect();
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    this.canvas.width = Math.max(1, Math.floor(bounds.width * ratio));
+    this.canvas.height = Math.max(1, Math.floor(bounds.height * ratio));
+    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  render(time) {
+    if (!this.ready) return;
+    const gl = this.gl;
+    gl.clearColor(.09, .09, .086, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(this.program);
+    gl.bindVertexArray(this.vao);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.uniform2f(this.uniforms.uViewport, this.canvas.width, this.canvas.height);
+    gl.uniform2f(this.uniforms.uMouse, pointer.x * this.canvas.width, pointer.y * this.canvas.height);
+    gl.uniform1f(this.uniforms.uTime, reducedMotion ? 0 : time * .001);
+    gl.uniform1f(this.uniforms.uScale, Math.min(this.canvas.width, this.canvas.height) / 540);
+    gl.uniform1f(this.uniforms.uHold, this.hold);
+    gl.uniform1f(this.uniforms.uRippleStart, this.rippleStart);
+    gl.uniform1f(this.uniforms.uHover, pointer.hovering ? 1 : 0);
+    gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, this.instanceCount);
+  }
+
+  setHolding(active) {
+    this.holding = active;
+    if (!active && this.hold > .08) this.rippleStart = performance.now() * .001;
+  }
+
+  animate(time) {
+    if (!this.ready) return;
+    const target = this.holding ? 1 : 0;
+    this.hold += (target - this.hold) * .12;
+    this.render(time);
+    if (!reducedMotion) requestAnimationFrame((next) => this.animate(next));
+  }
+}
+
+function createSpiralRenderer() {
+  const renderer = new SpiralRenderer(canvas);
+  if (!renderer.ready) {
+    field.classList.add('webgl-unavailable');
+    motionStatus.textContent = '当前浏览器不支持 WebGL 字符场。';
+    return null;
+  }
+  field.classList.add('webgl-ready');
+  motionStatus.textContent = 'WebGL 字符场已就绪。';
+  return renderer;
 }
 
 function buildFlowField(total) {
@@ -96,78 +320,15 @@ function buildAsciiNoiseGrid(width, height) {
 }
 
 function resize() {
-  const bounds = field.getBoundingClientRect();
+  spiralRenderer?.resize();
   const ratio = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.max(1, Math.floor(bounds.width * ratio));
-  canvas.height = Math.max(1, Math.floor(bounds.height * ratio));
-  context.setTransform(ratio, 0, 0, ratio, 0, 0);
   const wholeWidth = window.innerWidth;
   const wholeHeight = window.innerHeight;
   transitionCanvas.width = Math.max(1, Math.floor(wholeWidth * ratio));
   transitionCanvas.height = Math.max(1, Math.floor(wholeHeight * ratio));
   transitionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
-  glyphBands = buildSpiral();
   flowParticles = buildFlowField(Math.max(1000, Math.min(1900, Math.floor(wholeWidth * wholeHeight / 520))));
   transitionNoiseGrid = buildAsciiNoiseGrid(wholeWidth, wholeHeight);
-}
-
-function renderFrame(time) {
-  if (!reducedMotion && time - lastFieldFrame < fieldFrameInterval) {
-    requestAnimationFrame(renderFrame);
-    return;
-  }
-  lastFieldFrame = time;
-  const bounds = field.getBoundingClientRect();
-  const width = bounds.width;
-  const height = bounds.height;
-  const size = Math.min(width, height);
-  const t = reducedMotion ? 0 : time * .001;
-  const centerX = width * .48;
-  const centerY = height * .51;
-  context.clearRect(0, 0, width, height);
-  context.fillStyle = '#171716';
-  context.fillRect(0, 0, width, height);
-  const halo = context.createRadialGradient(centerX, centerY, 2, centerX, centerY, size * .76);
-  halo.addColorStop(0, 'rgba(255,255,255,.022)');
-  halo.addColorStop(.65, 'rgba(255,255,255,.009)');
-  halo.addColorStop(1, 'rgba(23,23,22,0)');
-  context.fillStyle = halo;
-  context.fillRect(0, 0, width, height);
-  drawGlyphBands(t, size, centerX, centerY);
-  frames += 1;
-  if (frames % 12 === 0) frameCount.textContent = `${String(frames).padStart(3, '0')} FRAMES`;
-  if (!reducedMotion) requestAnimationFrame(renderFrame);
-}
-
-function drawGlyphBands(t, size, centerX, centerY) {
-  const designScale = size / 540;
-  const dotSize = 5 * designScale;
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  glyphBands.forEach((band) => {
-    const radius = band.radius * 540 * designScale;
-    const drift = reducedMotion ? 0 : t * band.speed;
-    for (let index = 0; index < band.charCount; index += 1) {
-      const angle = band.phase + index / band.charCount * Math.PI * 2 + drift;
-      const distance = Math.abs(wrapRadians(angle - band.bandCenter));
-      const edge = (band.bandHalfWidth + band.bandSoftness - distance) / band.bandSoftness;
-      const density = Math.max(0, Math.min(1, edge));
-      const isLetter = density > .12 && (density > .72 || unitNoise(band.ring * 67.1 + index * 5.3) < density);
-      const fontSize = isLetter ? band.letterSize * designScale : dotSize;
-      const x = centerX + Math.cos(angle) * radius;
-      const y = centerY + Math.sin(angle) * radius;
-      if (x < -fontSize || x > canvas.clientWidth + fontSize || y < -fontSize || y > canvas.clientHeight + fontSize) continue;
-      context.save();
-      context.translate(x, y);
-      context.rotate(angle + Math.PI / 2);
-      context.font = `${fontSize}px "SFMono-Regular", "Cascadia Mono", monospace`;
-      context.fillStyle = isLetter
-        ? `rgba(244,241,232,${.36 + density * .48})`
-        : `rgba(244,241,232,${.2 + density * .13})`;
-      context.fillText(isLetter ? glyphAt(band, index) : '·', 0, 0);
-      context.restore();
-    }
-  });
 }
 
 function smoothstep(value) { return value * value * (3 - 2 * value); }
@@ -261,8 +422,16 @@ returnLight.addEventListener('click', startTransition);
 modeSwitch.addEventListener('click', updateDensity);
 field.addEventListener('pointermove', (event) => {
   const bounds = field.getBoundingClientRect();
-  pointer = { x: (event.clientX - bounds.left) / bounds.width, y: (event.clientY - bounds.top) / bounds.height };
+  pointer = { x: (event.clientX - bounds.left) / bounds.width, y: (event.clientY - bounds.top) / bounds.height, hovering: true };
 });
+field.addEventListener('pointerenter', () => { pointer.hovering = true; });
+field.addEventListener('pointerleave', () => {
+  pointer.hovering = false;
+  spiralRenderer?.setHolding(false);
+});
+field.addEventListener('pointerdown', () => spiralRenderer?.setHolding(true));
+field.addEventListener('pointerup', () => spiralRenderer?.setHolding(false));
 window.addEventListener('resize', resize);
+spiralRenderer = createSpiralRenderer();
 resize();
-renderFrame(0);
+spiralRenderer?.animate(0);
