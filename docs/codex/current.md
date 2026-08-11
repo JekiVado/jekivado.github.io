@@ -1,8 +1,8 @@
 # 当前状态
 
-- 目标：将 1688 项目的分析页与 8 月 10 日数据日报并入 `/DanceNewReports/` 项目报告合集。
-- 已确认：日报源文件为独立的 UTF-8 HTML；其 SHA-256 与归档副本一致。
-- 范围：保留日报原内容不改写；旧 `/BackofficeReports/` 路径只保留跳转以兼容已有链接。
-- 当前阶段：已发布。
-- 最新验证：`node --test tests/dancenew-reports.test.mjs tests/backoffice-reports.test.mjs tests/collection-page.test.mjs` 与 `git diff --check` 均通过；归档日报副本与用户原文件 SHA-256 一致。GitHub Pages 工作流 `31394740296` 成功，线上已核对项目合集、两份 1688 报告和旧入口跳转。
-- 下一步：归档新的项目材料时，继续按项目报告合集维护。
+- 目标：将用户提供的《知识的利息—人人都有成为百万年薪策划的机会》归档为独立静态页面，并接入 `/collection/`。
+- 已确认：原 HTML 仅依赖一份 `unified.js`；正文与脚本已归档，目录链接已本地化为页内锚点。
+- 范围：保留原始正文与交互；仅替换本地脚本路径及目录链接，不改写课程内容。
+- 当前阶段：待发布。
+- 最新验证：`node tests/collection-page.test.mjs`、`node --check knowledge-interest/assets/unified.js` 与 `git diff --check` 均通过；真实浏览器已核对 8 个模块、学习进度与第 8 节目录锚点，控制台无页面错误。
+- 下一步：提交、发布至 GitHub Pages，并核对线上页面和集合入口。

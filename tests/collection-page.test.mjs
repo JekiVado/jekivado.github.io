@@ -9,6 +9,8 @@ const yunshangPath = new URL('../yunshang-xingyuan/index.html', import.meta.url)
 const yunshangAppPath = new URL('../yunshang-xingyuan/app.js', import.meta.url);
 const forecastPath = new URL('../dau-ltv-forecast/index.html', import.meta.url);
 const asciiMotionPath = new URL('../ascii-page-motion/index.html', import.meta.url);
+const knowledgeInterestPath = new URL('../knowledge-interest/index.html', import.meta.url);
+const knowledgeInterestScriptPath = new URL('../knowledge-interest/assets/unified.js', import.meta.url);
 
 assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
@@ -40,12 +42,19 @@ const yunshang = readFileSync(yunshangPath, 'utf8');
 assert.match(yunshang, /app\.js\?v=9/);
 assert.ok(existsSync(forecastPath), 'Expected the DAU/LTV forecast page to exist');
 assert.ok(existsSync(asciiMotionPath), 'Expected the ASCII motion showcase page to exist');
+assert.ok(existsSync(knowledgeInterestPath), 'Expected the knowledge-interest training page to exist');
+assert.ok(existsSync(knowledgeInterestScriptPath), 'Expected the training page interaction script to be archived locally');
+const knowledgeInterest = readFileSync(knowledgeInterestPath, 'utf8');
+assert.match(knowledgeInterest, /<title>知识的利息—人人都有成为百万年薪策划的机会<\/title>/);
+assert.match(knowledgeInterest, /\.\/assets\/unified\.js/);
+assert.match(knowledgeInterest, /href="#module-01"/);
+assert.doesNotMatch(knowledgeInterest, /href="https:\/\/compound-bayes-lesson-r7ozlrfg\.edgeone\.cool/);
 
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
 assert.match(html, /data-category="analysis"/);
 assert.match(html, /data-category="reports"/);
-assert.equal((html.match(/<details class="category category-card\b/g) ?? []).length, 5, 'Expected five collapsible category cards');
+assert.equal((html.match(/<details class="category category-card\b/g) ?? []).length, 6, 'Expected six collapsible category cards');
 assert.match(html, /<summary class="category-summary">/);
 assert.match(html, /<span class="toggle-label">点击展开<\/span>/);
 assert.match(html, /\.category-card\[open\]/);
@@ -63,13 +72,14 @@ assert.match(html, /class="category category-card analysis-section"/);
 assert.match(html, /class="category category-card reports-section"/);
 assert.match(html, /class="category category-card tools-section"/);
 assert.match(html, /class="category category-card showcase-section"/);
+assert.match(html, /class="category category-card learning-section"/);
 assert.match(html, /报告档案入口/);
 assert.match(html, /\.\.\/DanceNewReports\//);
 assert.match(html, /DanceNew \/ 1688 项目报告合集/);
 assert.doesNotMatch(html, /href="\.\.\/BackofficeReports\//);
 assert.match(html, /DAU \/ LTV 预测/);
 assert.match(html, /\.\.\/dau-ltv-forecast\//);
-assert.match(html, /05 COLLECTIONS · 06 LINKS/);
+assert.match(html, /06 COLLECTIONS · 07 LINKS/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
 assert.match(html, /\.category-summary\s*\{[^}]*padding:\s*18px 20px/);
@@ -78,7 +88,7 @@ assert.match(html, /main\s*\{[^}]*width:\s*min\(1440px/);
 assert.match(html, /grid-template-columns:\s*repeat\(auto-fit, minmax\(240px, 1fr\)\)/);
 assert.match(html, /class="card-grid prototype-grid"/);
 assert.match(html, /\.prototype-grid\s+\.card\s*\{[^}]*grid-column:\s*span 2/);
-assert.match(html, /UPDATED 2026\.08\.10/);
+assert.match(html, /UPDATED 2026\.08\.11/);
 assert.match(html, /云上星愿/);
 assert.match(html, /02 ITEMS/);
 assert.match(html, /固定星点两两交换星轨；完成一片片主题画/);
@@ -86,6 +96,9 @@ assert.match(html, /\.\.\/yunshang-xingyuan\/\?v=20260728-1/);
 assert.match(html, /网站效果展示/);
 assert.match(html, /ASCII 页面运动/);
 assert.match(html, /\.\.\/ascii-page-motion\//);
+assert.match(html, /学习资料/);
+assert.match(html, /知识的利息/);
+assert.match(html, /\.\.\/knowledge-interest\//);
 
 for (const route of [
   '../escape01/',
@@ -94,6 +107,7 @@ for (const route of [
   '../DanceNewReports/',
   '../dau-ltv-forecast/',
   '../ascii-page-motion/',
+  '../knowledge-interest/',
 ]) {
   assert.match(html, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 }

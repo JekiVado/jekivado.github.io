@@ -18,6 +18,7 @@
 - `DanceNewReports/`：DanceNew 与 1688 共用的项目报告档案；1688 的业务后台分析与数据日报位于 `reports/`。
 - `BackofficeReports/`：1688 旧入口，保留跳转以兼容已有链接。
 - `dau-ltv-forecast/`：本地可调参数的 DAU 与 LTV 预测工具。
+- `knowledge-interest/`：策划认知与知识复利培训教材，含八个可记录学习进度的模块。
 - `index.html`：根目录入口页。
 
 静态页面应使用相对路径引用同目录资源，确保其能在 `https://jekivado.github.io/<目录>/` 下直接访问。

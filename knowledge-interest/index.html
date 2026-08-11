@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)https://compound-bayes-lesson-r7ozlrfg.edgeone.cool/ -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="知识的利息—人人都有成为百万年薪策划的机会：培训教材版">
+  <title>知识的利息—人人都有成为百万年薪策划的机会</title>
+  <style>
+    :root { --ink:#17231f; --muted:#68736d; --paper:#f5f1e8; --card:#fffdf8; --line:#d8d3c7; --red:#c95735; --red-soft:#fff0e8; --blue:#2f5d95; --blue-soft:#edf3fb; --violet:#67548d; --shadow:0 18px 50px rgba(42,41,34,.08); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:"Noto Serif SC","Songti SC",STSong,serif; line-height:1.65; overflow-x:hidden; }
+    body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.22; background-image:radial-gradient(#9d998d .5px,transparent .65px); background-size:5px 5px; mix-blend-mode:multiply; }
+    .wrap { width:min(1180px,calc(100% - 38px)); margin:0 auto; position:relative; }
+    .hero { padding:52px 0 38px; border-bottom:1px solid var(--ink); }
+    .eyebrow { margin:0 0 10px; color:var(--muted); font:700 12px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.14em; text-transform:uppercase; }
+    .hero h1 { max-width:900px; margin:0 0 14px; font-size:clamp(38px,7vw,76px); line-height:1.08; letter-spacing:-.06em; overflow-wrap:anywhere; }
+    .hero p { max-width:760px; margin:0; color:#43514b; font-size:18px; }
+    .meta-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; }
+    .meta { padding:5px 11px; color:var(--blue); background:var(--blue-soft); border:1px solid #c5d5ef; border-radius:100px; font:700 12px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .shell { display:grid; grid-template-columns:220px minmax(0,1fr); gap:30px; align-items:start; padding:38px 0 70px; }
+    .toc { position:sticky; top:22px; }
+    .toc-title { margin:0 0 12px; color:var(--muted); font:700 11px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.12em; text-transform:uppercase; }
+    .toc a { display:block; padding:8px 10px; color:#53615a; text-decoration:none; border-left:2px solid transparent; font-size:13px; line-height:1.35; }
+    .toc a:hover,.toc a.active { color:var(--red); border-left-color:var(--red); background:var(--red-soft); }
+    .progress { margin-top:20px; padding:14px; background:#fffaf0; border:1px solid #e5d7bb; font-size:12px; }
+    .progress-label { display:flex; justify-content:space-between; gap:10px; margin-bottom:9px; color:var(--muted); }
+    .progress-bar { height:6px; background:#e7e0d2; border-radius:10px; overflow:hidden; }
+    .progress-bar span { display:block; width:0; height:100%; background:var(--red); transition:width .25s ease; }
+    .progress button { width:100%; margin-top:11px; padding:7px 9px; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:3px; cursor:pointer; font:600 12px inherit; }
+    .intro { margin-bottom:24px; padding:26px; background:var(--ink); color:#fff; border-radius:6px; box-shadow:var(--shadow); }
+    .intro h2 { margin:0 0 10px; color:#f2c14e; font-size:28px; line-height:1.2; }
+    .intro p { margin:0; color:#e3e9e5; }
+    .learning-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:11px; margin-top:20px; }
+    .learning-card { padding:16px; background:var(--card); border:1px solid var(--line); border-radius:5px; box-shadow:4px 5px 0 rgba(23,35,31,.045); }
+    .learning-card b { display:block; color:var(--blue); font-size:15px; }
+    .learning-card span { display:block; margin-top:5px; color:var(--muted); font-size:13px; line-height:1.5; }
+    .module { scroll-margin-top:22px; margin-top:26px; padding:25px; background:var(--card); border:1px solid var(--line); border-radius:6px; box-shadow:4px 5px 0 rgba(23,35,31,.045); }
+    .module.done { border-color:#9fc9be; box-shadow:4px 5px 0 rgba(23,35,31,.03); }
+    .module-head { display:flex; justify-content:space-between; gap:18px; align-items:start; padding-bottom:18px; border-bottom:1px solid var(--line); }
+    .module-no { margin:0 0 7px; color:var(--red); font:700 12px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.1em; }
+    .module h2 { margin:0; font-size:clamp(26px,4vw,42px); line-height:1.18; letter-spacing:-.04em; }
+    .question { max-width:300px; margin:0; padding:11px 13px; color:#314e75; background:var(--blue-soft); border-left:3px solid var(--blue); font-size:14px; }
+    .module-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:14px; margin-top:18px; }
+    .module-card { padding:18px; border:1px solid var(--line); border-radius:4px; background:#fff; }
+    .module-card.red { background:var(--red-soft); border-color:#f0c7b8; }
+    .module-card.blue { background:var(--blue-soft); border-color:#c5d5ef; }
+    .module-card h3 { margin:0 0 9px; font-size:18px; line-height:1.25; }
+    .module-card p { margin:0; color:#46544d; font-size:14px; line-height:1.65; }
+    .module-card ul { margin:0; padding-left:19px; }
+    .module-card li { margin:6px 0; color:#46544d; font-size:14px; line-height:1.6; }
+    .goal { margin-top:18px; padding:14px 16px; border-left:4px solid var(--violet); background:#f2eef9; color:#4c416d; font-size:14px; }
+    .formula { margin:0 0 13px; padding:14px; color:var(--blue); background:#fff; border:1px dashed #9fb9de; font:700 21px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace; overflow-x:auto; white-space:nowrap; }
+    details { margin-top:16px; border-top:1px dashed var(--line); }
+    summary { padding:14px 0 0; color:var(--red); cursor:pointer; font-weight:700; }
+    .check { display:flex; gap:9px; align-items:start; margin-top:18px; padding-top:15px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; }
+    .check input { margin-top:4px; accent-color:var(--red); }
+    .footer { padding:0 0 32px; color:var(--muted); font-size:12px; }
+    @media (max-width:900px) { .shell { grid-template-columns:1fr; gap:16px; } .toc { position:static; } .toc-list { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; } .toc a { min-width:max-content; border:1px solid var(--line); border-radius:100px; } .learning-grid { grid-template-columns:1fr 1fr; } }
+    @media (max-width:620px) { .wrap { width:calc(100% - 24px); } .hero { padding-top:34px; } .hero h1 { font-size:40px; letter-spacing:-.04em; } .learning-grid,.module-grid { grid-template-columns:1fr; } .module { padding:17px 15px; } .module-head { display:block; } .question { max-width:none; margin-top:14px; } }
+</style>
+<script defer="" src="./assets/unified.js" data-set=""></script></head>
+<body>
+  <header class="wrap hero">
+    <p class="eyebrow">Training textbook · planner cognition</p>
+    <h1>知识的利息—人人都有成为百万年薪策划的机会</h1>
+    <p>培训教材版：保留原文的总标题与八个章节标题，将正文整理为学习目标、核心观点、案例和练习，方便给实习生讲课。</p>
+    <div class="meta-row"><span class="meta">8 个模块</span><span class="meta">概念 → 验证 → 迁移 → 复利</span><span class="meta">适合 30—45 分钟培训</span></div>
+  </header>
+  <main class="wrap shell">
+    <aside class="toc">
+      <p class="toc-title">课程目录</p>
+      <nav class="toc-list"><a href="#module-01" data-link="01" class="active">一、摆脱“负利息”的困扰</a><a href="#module-02" data-link="02" class="">二、复利的基石</a><a href="#module-03" data-link="03" class="">三、策划的核心能力</a><a href="#module-04" data-link="04" class="">四、科学的验证迭代</a><a href="#module-05" data-link="05">五、贝叶斯定理</a><a href="#module-06" data-link="06">六、思维能力的迁移</a><a href="#module-07" data-link="07">七、超越环境的成长</a><a href="#module-08" data-link="08">八、好饭不怕晚</a></nav>
+      <div class="progress"><div class="progress-label"><span>学习进度</span><b id="progress-text">0 / 8</b></div><div class="progress-bar"><span id="progress-bar"></span></div><button id="reset">重置本次进度</button></div>
+    </aside>
+    <div class="content">
+      <section class="intro">
+        <h2>这堂课要建立什么</h2>
+        <p>策划的成长不是简单累积项目年限，而是让正确的概念、有效的验证和可迁移的经验不断叠加。先避免“负利息”，再建立知识复利，最后把局部能力扩展成全局判断。</p>
+        <div class="learning-grid"><div class="learning-card"><b>概念校准</b><span>先把词说清楚，避免在错误定义上做设计。</span></div><div class="learning-card"><b>科学验证</b><span>把“我觉得”变成可检验的假设。</span></div><div class="learning-card"><b>能力迁移</b><span>从单点模块走向系统、战略和全局体验。</span></div></div>
+      </section>
+
+      <section class="module" id="module-01" data-module="01">
+        <div class="module-head">
+          <div><p class="module-no">MODULE 01</p><h2>一、摆脱“负利息”的困扰</h2></div>
+          <p class="question">经验为什么有时会越积越值钱，有时却会拖住一个策划？</p>
+        </div>
+        <div class="goal"><b>学习目标：</b>识别经验中的正资产与负资产，避免在错误概念上继续堆积。</div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>核心观点</h3>
+            
+            <ul><li>入行早、资历深、经历项目多，不自动等于优秀策划。</li><li>只围绕自己负责的模块积累，可能形成路径依赖，经验反而变成“负资产”。</li><li>知识体系建立在已有概念之上；概念模糊，后续学习和决策都会一起偏移。</li></ul>
+          </article>
+          <article class="module-card red">
+            <h3>原文里的典型误区</h3>
+            <p>只关注养成系统，却忽视战斗系统和社交需求的关联；或者用打折、充返等熟悉手段，直接去挽救 ARPU。问题不一定是动作不够快，而可能是对问题的定义本身就错了。</p>
+          </article>
+        </div>
+        <details>
+          <summary>展开课堂练习</summary>
+          <div class="module-card blue"><h3>请现在写下来</h3><p>画出你负责模块与战斗、社交、商业化、内容之间的关系。找出一个“只看局部就会误判”的地方。</p></div>
+        </details>
+        <label class="check"><input type="checkbox" data-check="01"><span><b>课后检查：</b>我能说出：自己现在积累的哪条经验，可能在什么条件下失效？</span></label>
+      </section>
+    
+      <section class="module" id="module-02" data-module="02">
+        <div class="module-head">
+          <div><p class="module-no">MODULE 02</p><h2>二、复利的基石</h2></div>
+          <p class="question">为什么策划团队容易“鸡同鸭讲”？</p>
+        </div>
+        <div class="goal"><b>学习目标：</b>理解清晰概念、统一标准和共同语言，是知识能够产生复利的前提。</div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>核心观点</h3>
+            
+            <ul><li>同一个词在不同团队里可能有不同名称和理解；名称相同，也不代表概念相同。</li><li>“竞品”“横向卡牌”“纵向养成”等词，只有定义清楚、边界明确，才有设计价值。</li><li>能把复杂专业的东西用简单、少歧义的语言说清楚，是策划的重要能力。</li></ul>
+          </article>
+          <article class="module-card red">
+            <h3>把术语变成可工作的定义</h3>
+            <p>讨论“竞品”时，先说清楚比较的是目标用户、玩法结构，还是系统框架；讨论“横向/纵向”时，说明它究竟改变的是数值追求、角色收集、搭配策略，还是其他体验。</p>
+          </article>
+        </div>
+        <details>
+          <summary>展开课堂练习</summary>
+          <div class="module-card blue"><h3>请现在写下来</h3><p>挑一个团队常用词，写下三件事：它是什么、它不是什么、用它可以指导哪一种设计决策。</p></div>
+        </details>
+        <label class="check"><input type="checkbox" data-check="02"><span><b>课后检查：</b>团队里的其他人看到这个词，能否复述出和我相同的意思？</span></label>
+      </section>
+    
+      <section class="module" id="module-03" data-module="03">
+        <div class="module-head">
+          <div><p class="module-no">MODULE 03</p><h2>三、策划的核心能力</h2></div>
+          <p class="question">技能能力和认知能力，分别解决什么问题？</p>
+        </div>
+        <div class="goal"><b>学习目标：</b>区分“把事情做出来”的技能，和“判断该做什么”的认知。</div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>核心观点</h3>
+            
+            <ul><li>技能能力包括代码、美术、文档、工具链、关卡引擎等，有较明确的训练和衡量方式。</li><li>技能让策划更理解实现逻辑、减少错误，但技术能力本身并不会自动带来好的设计。</li><li>认知能力包括思维、理解、判断、洞察和创造力，决定能否看见用户需求与全局框架。</li></ul>
+          </article>
+          <article class="module-card red">
+            <h3>从执行者到决策者</h3>
+            <p>同样一份用户反馈，不同的人可能得出不同结论。认知能力强的策划，会继续追问现象背后的原因、系统之间的关系，以及什么才是更好的方案。</p>
+          </article>
+        </div>
+        <details>
+          <summary>展开课堂练习</summary>
+          <div class="module-card blue"><h3>请现在写下来</h3><p>把当前能力问题分成两列：一列是“我不会做”，另一列是“我还没想清楚为什么做”。分别写一个下一步行动。</p></div>
+        </details>
+        <label class="check"><input type="checkbox" data-check="03"><span><b>课后检查：</b>我是在补工具技能，还是在补对用户、系统和因果关系的理解？</span></label>
+      </section>
+    
+      <section class="module" id="module-04" data-module="04">
+        <div class="module-head">
+          <div><p class="module-no">MODULE 04</p><h2>四、科学的验证迭代</h2></div>
+          <p class="question">如何避免把一次成功误认为一套方法？</p>
+        </div>
+        <div class="goal"><b>学习目标：</b>建立从假设到方法论的验证路径，并认识游戏行业的因果不确定性。</div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>核心观点</h3>
+            
+            <ul><li>完整路径是：提出假设 → 设定目标 → 验证结果 → 反复实验 → 提炼方法论。</li><li>游戏是混沌系统，表现会同时受到 bug、美术、玩法、易用性、IP、商业化等因素影响。</li><li>盲目套用历史成功经验、只看成功数据、回避证伪，都会制造虚假的确定感。</li></ul>
+          </article>
+          <article class="module-card red">
+            <h3>把“我觉得会更好”改成可验证假设</h3>
+            <p>不要只写“这个礼包会提升付费”。应写成：对某类用户，在某个触发时机提供某种礼包，预期改变哪项行为；上线后用什么指标、对照什么基线，判断假设是否成立。</p>
+          </article>
+        </div>
+        <details>
+          <summary>展开课堂练习</summary>
+          <div class="module-card blue"><h3>请现在写下来</h3><p>为一个正在讨论的功能写出“假设、目标、证据、可能推翻它的结果”四行内容。</p></div>
+        </details>
+        <label class="check"><input type="checkbox" data-check="04"><span><b>课后检查：</b>如果结果不如预期，我是否提前写过哪些情况会说明假设不成立？</span></label>
+      </section>
+    
+      <section class="module" id="module-05" data-module="05">
+        <div class="module-head">
+          <div><p class="module-no">MODULE 05</p><h2>五、贝叶斯定理</h2></div>
+          <p class="question">新信息来了，我应该坚持原判断，还是更新判断？</p>
+        </div>
+        <div class="goal"><b>学习目标：</b>用先验、证据和后验理解“开放心态”，让判断随着信息变化而校准。</div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>核心观点</h3>
+            <div class="formula">P(A｜B) = P(B｜A) × P(A) / P(B)</div>
+            <ul><li>P(A) 是看到新证据前，对假设 A 的原先判断，也就是先验。</li><li>P(B｜A) 是假设 A 成立时，看到证据 B 的可能性；P(B) 是证据本身出现的概率。</li><li>P(A｜B) 是看到证据 B 后，对假设 A 的更新判断，也就是后验。</li></ul>
+          </article>
+          <article class="module-card red">
+            <h3>策划如何使用贝叶斯思维</h3>
+            <p>玩家反馈、数据波动和一次测试结果都是证据，不是自动成立的结论。先问：我原来相信什么？这条证据在不同原因下是否同样常见？再决定应该把判断调高、调低，还是暂时保持不确定。</p>
+          </article>
+        </div>
+        <details>
+          <summary>展开课堂练习</summary>
+          <div class="module-card blue"><h3>请现在写下来</h3><p>写下一个你最近很确信的判断，再补一行：什么新证据出现时，我愿意改变它？</p></div>
+        </details>
+        <label class="check"><input type="checkbox" data-check="05"><span><b>课后检查：</b>我有没有把“有人说了/数据涨了”直接当成因果，而没有比较先验和替代解释？</span></label>
+      </section>
+    
+      <section class="module" id="module-06" data-module="06">
+        <div class="module-head">
+          <div><p class="module-no">MODULE 06</p><h2>六、思维能力的迁移</h2></div>
+          <p class="question">怎样从一个模块的熟练，走向全局策划？</p>
+        </div>
+        <div class="goal"><b>学习目标：</b>把局部经验迁移到相邻系统，逐步形成全局框架和战略视角。</div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>核心观点</h3>
+            
+            <ul><li>常见路径是：小功能 → 中型系统 → 玩法模块 → 核心玩法 → 全局规划。</li><li>成长通常经历：单点突破（细节到框架）→ 全局视角（框架到战略）→ 知识与经验叠加。</li><li>每一次学习和实践，都应该成为下一次突破可以调用的“复利资产”。</li></ul>
+          </article>
+          <article class="module-card red">
+            <h3>A 同学的能力迁移</h3>
+            <p>从角色设计出发，进入战斗验证，再负责玩法投放与全局规划，最后扩展到商业化和数值调优。关键不是岗位名称变化，而是逐步理解角色、战斗、内容投放和商业结果之间的关联。</p>
+          </article>
+        </div>
+        <details>
+          <summary>展开课堂练习</summary>
+          <div class="module-card blue"><h3>请现在写下来</h3><p>在自己的工作地图上标出：当前模块、一个上游输入、一个下游结果、一个最值得主动学习的相邻模块。</p></div>
+        </details>
+        <label class="check"><input type="checkbox" data-check="06"><span><b>课后检查：</b>我能否解释自己的决策，会如何改变别的系统或用户体验？</span></label>
+      </section>
+    
+      <section class="module" id="module-07" data-module="07">
+        <div class="module-head">
+          <div><p class="module-no">MODULE 07</p><h2>七、超越环境的成长</h2></div>
+          <p class="question">项目环境有限时，怎样继续提升认知？</p>
+        </div>
+        <div class="goal"><b>学习目标：</b>把成长从单一项目中拆出来，建立分析、记录、模型和交流的个人系统。</div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>核心观点</h3>
+            
+            <ul><li>环境会限制成长，也可能奖励短期有效但长期错误的做法；不能把偶然有效当成正确方法。</li><li>选择 1—3 款相关产品，持续做竞品分析、个人体验和工作记录。</li><li>建立模型、预测变化、对比实际结果，再通过复盘和跨界交流修正认知。</li></ul>
+          </article>
+          <article class="module-card red">
+            <h3>短期 KPI 与长期判断</h3>
+            <p>一个打折礼包可能暂时修复数据，但如果每次问题都只用打折解决，就会把偶然有效固化成错误习惯。真正的成长，是记录当时为什么这样做、结果是什么、代价是什么。</p>
+          </article>
+        </div>
+        <details>
+          <summary>展开课堂练习</summary>
+          <div class="module-card blue"><h3>请现在写下来</h3><p>建立一页周记录：本周观察、我的解释、我的预测、实际结果、下周修正。</p></div>
+        </details>
+        <label class="check"><input type="checkbox" data-check="07"><span><b>课后检查：</b>如果离开当前项目，我还能带走哪些可解释、可验证、可迁移的经验？</span></label>
+      </section>
+    
+      <section class="module" id="module-08" data-module="08">
+        <div class="module-head">
+          <div><p class="module-no">MODULE 08</p><h2>八、好饭不怕晚</h2></div>
+          <p class="question">知识的“利率”由谁决定？</p>
+        </div>
+        <div class="goal"><b>学习目标：</b>把成长理解为概念校准与验证效率共同作用的长期复利。</div>
+        <div class="module-grid">
+          <article class="module-card">
+            <h3>核心观点</h3>
+            
+            <ul><li>知识的利率 = 概念校准 × 验证效率。底层概念错了，时间越长，错误可能越大。</li><li>比起“早”，更重要的是“对”：正确的开始，比过早的开始更重要。</li><li>未来的你，是今天持续选择、记录、验证和修正的复利结果。</li></ul>
+          </article>
+          <article class="module-card red">
+            <h3>把成长变成一个可执行的循环</h3>
+            <p>每天不只是完成任务，还要留下一个被校准的概念、一个被验证的假设，或一条能帮助下一次决策的记录。积累不是耗时间，而是优化时间。</p>
+          </article>
+        </div>
+        <details>
+          <summary>展开课堂练习</summary>
+          <div class="module-card blue"><h3>请现在写下来</h3><p>给自己定一个 7 天循环：每天记录一个判断；第 3 天找证据；第 7 天复盘，决定保留、修正还是放弃。</p></div>
+        </details>
+        <label class="check"><input type="checkbox" data-check="08"><span><b>课后检查：</b>我今天做的事情，给未来的自己留下了什么可以继续使用的资产？</span></label>
+      </section>
+    
+    </div>
+  </main>
+  <footer class="wrap footer">教材结构基于用户提供的原文整理；章节标题保留，正文在此版本中转换为培训讲义式表达。</footer>
+  <script>
+    (function () {
+      const boxes = Array.from(document.querySelectorAll('[data-check]'));
+      const text = document.getElementById('progress-text');
+      const bar = document.getElementById('progress-bar');
+      const reset = document.getElementById('reset');
+      function update() {
+        const done = boxes.filter((box) => box.checked).length;
+        text.textContent = done + ' / ' + boxes.length;
+        bar.style.width = (done / boxes.length * 100) + '%';
+        boxes.forEach((box) => box.closest('.module').classList.toggle('done', box.checked));
+      }
+      boxes.forEach((box) => box.addEventListener('change', update));
+      reset.addEventListener('click', () => { boxes.forEach((box) => box.checked = false); update(); });
+      const links = Array.from(document.querySelectorAll('[data-link]'));
+      const modules = links.map((link) => document.getElementById('module-' + link.dataset.link));
+      const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+        if (entry.isIntersecting) links.forEach((link) => link.classList.toggle('active', link.dataset.link === entry.target.dataset.module));
+      }), { rootMargin: '-18% 0px -70% 0px' });
+      modules.forEach((module) => observer.observe(module));
+    }());
+  </script>
+
+
+<div>
+        <div id="edgeone-watermark" style="position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; display: flex; justify-content: center; align-items: flex-end; padding: 50px 15px 15px 15px; box-sizing: border-box; background-image: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0)); pointer-events: none;">
+          <div style="display: flex; align-items: center; pointer-events: auto;">
+            <span style="font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, Roboto, &#39;Helvetica Neue&#39;, Arial, sans-serif; line-height: 1.5; color: rgba(255, 255, 255, 0.85); text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">
+              For demonstration and testing purposes only. Please do not enter any sensitive data.
+            </span>
+            <span id="edgeone-watermark-close" style="display: inline-block; width: 12px; height: 12px; margin-left: 8px; cursor: pointer; position: relative;">
+              <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; display: block;" aria-label="close">
+                <line x1="2" y1="10" x2="10" y2="2" stroke="rgba(255, 255, 255, 0.85)" stroke-width="2" stroke-linecap="round"></line>
+                <line x1="2" y1="2" x2="10" y2="10" stroke="rgba(255, 255, 255, 0.85)" stroke-width="2" stroke-linecap="round"></line>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div></body></html>
