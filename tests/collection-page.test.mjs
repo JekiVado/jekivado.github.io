@@ -11,6 +11,9 @@ const forecastPath = new URL('../dau-ltv-forecast/index.html', import.meta.url);
 const asciiMotionPath = new URL('../ascii-page-motion/index.html', import.meta.url);
 const knowledgeInterestPath = new URL('../knowledge-interest/index.html', import.meta.url);
 const knowledgeInterestScriptPath = new URL('../knowledge-interest/assets/unified.js', import.meta.url);
+const gardenWorldPath = new URL('../garden-world/index.html', import.meta.url);
+const gardenWorldThemePath = new URL('../garden-world/assets/garden-world-dark.css', import.meta.url);
+const gardenWorldImagePath = new URL('../garden-world/assets/player-garden.png', import.meta.url);
 
 assert.ok(existsSync(pagePath), 'Expected collection/index.html to exist');
 
@@ -44,11 +47,19 @@ assert.ok(existsSync(forecastPath), 'Expected the DAU/LTV forecast page to exist
 assert.ok(existsSync(asciiMotionPath), 'Expected the ASCII motion showcase page to exist');
 assert.ok(existsSync(knowledgeInterestPath), 'Expected the knowledge-interest training page to exist');
 assert.ok(existsSync(knowledgeInterestScriptPath), 'Expected the training page interaction script to be archived locally');
+assert.ok(existsSync(gardenWorldPath), 'Expected the garden-world visual report page to exist');
+assert.ok(existsSync(gardenWorldThemePath), 'Expected the garden-world theme stylesheet to be archived locally');
+assert.ok(existsSync(gardenWorldImagePath), 'Expected the garden-world visual evidence image to be archived locally');
 const knowledgeInterest = readFileSync(knowledgeInterestPath, 'utf8');
+const gardenWorld = readFileSync(gardenWorldPath, 'utf8');
 assert.match(knowledgeInterest, /<title>知识的利息—人人都有成为百万年薪策划的机会<\/title>/);
 assert.match(knowledgeInterest, /\.\/assets\/unified\.js/);
 assert.match(knowledgeInterest, /href="#module-01"/);
 assert.doesNotMatch(knowledgeInterest, /href="https:\/\/compound-bayes-lesson-r7ozlrfg\.edgeone\.cool/);
+assert.match(gardenWorld, /<title>《我的花园世界》视觉模板<\/title>/);
+assert.match(gardenWorld, /\.\/assets\/garden-world-dark\.css/);
+assert.match(gardenWorld, /\.\/assets\/player-garden\.png/);
+assert.doesNotMatch(gardenWorld, /《我的花园世界》视觉模板_files/);
 
 assert.match(html, /<h1>集合<\/h1>/);
 assert.match(html, /data-category="prototype"/);
@@ -76,10 +87,12 @@ assert.match(html, /class="category category-card learning-section"/);
 assert.match(html, /报告档案入口/);
 assert.match(html, /\.\.\/DanceNewReports\//);
 assert.match(html, /DanceNew \/ 1688 项目报告合集/);
+assert.match(html, /我的花园世界体验报告/);
+assert.match(html, /\.\.\/garden-world\//);
 assert.doesNotMatch(html, /href="\.\.\/BackofficeReports\//);
 assert.match(html, /DAU \/ LTV 预测/);
 assert.match(html, /\.\.\/dau-ltv-forecast\//);
-assert.match(html, /06 COLLECTIONS · 07 LINKS/);
+assert.match(html, /06 COLLECTIONS · 08 LINKS/);
 assert.match(html, /\.card-detail[^}]*font-size:\s*14px/);
 assert.match(html, /\.path[^}]*font:\s*11px\/1\.2/);
 assert.match(html, /\.category-summary\s*\{[^}]*padding:\s*18px 20px/);
@@ -108,6 +121,7 @@ for (const route of [
   '../dau-ltv-forecast/',
   '../ascii-page-motion/',
   '../knowledge-interest/',
+  '../garden-world/',
 ]) {
   assert.match(html, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 }

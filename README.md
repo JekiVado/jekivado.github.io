@@ -19,6 +19,7 @@
 - `BackofficeReports/`：1688 旧入口，保留跳转以兼容已有链接。
 - `dau-ltv-forecast/`：本地可调参数的 DAU 与 LTV 预测工具。
 - `knowledge-interest/`：策划认知与知识复利培训教材，含八个可记录学习进度的模块。
+- `garden-world/`：《我的花园世界》游戏体验视觉报告，含 31 页演示与随附图片、样式和交互脚本。
 - `index.html`：根目录入口页。
 
 静态页面应使用相对路径引用同目录资源，确保其能在 `https://jekivado.github.io/<目录>/` 下直接访问。
