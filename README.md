@@ -5,9 +5,10 @@
 ## 访问入口
 
 - 集合导航页：https://jekivado.github.io/collection/
-- 站点根目录：https://jekivado.github.io/
 
-`collection/` 是全部已发布内容的统一入口；访问根目录会自动跳转到该页面。
+根目录 `https://jekivado.github.io/` 保持为空白页，不提供任何导航或跳转。
+
+`collection/` 是个人导航页；需直接访问其地址，不从根目录公开导流。
 
 ## 目录约定
 
@@ -20,7 +21,7 @@
 - `dau-ltv-forecast/`：本地可调参数的 DAU 与 LTV 预测工具。
 - `knowledge-interest/`：策划认知与知识复利培训教材，含八个可记录学习进度的模块。
 - `garden-world/`：《我的花园世界》游戏体验视觉报告，含 31 页演示与随附图片、样式和交互脚本。
-- `index.html`：根目录入口页。
+- `index.html`：根目录空白页，不提供站点导航。
 
 静态页面应使用相对路径引用同目录资源，确保其能在 `https://jekivado.github.io/<目录>/` 下直接访问。
 

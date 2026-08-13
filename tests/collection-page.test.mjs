@@ -37,8 +37,9 @@ assert.match(readme, /折叠/);
 
 assert.ok(existsSync(rootPath), 'Expected a root index.html');
 const root = readFileSync(rootPath, 'utf8');
-assert.match(root, /content="0; url=\.\/collection\/"/);
-assert.match(root, /href="\.\/collection\/"/);
+assert.doesNotMatch(root, /collection\//, 'Root page must not expose the collection route');
+assert.doesNotMatch(root, /http-equiv="refresh"/i, 'Root page must not redirect to another route');
+assert.doesNotMatch(root, /<a\b/i, 'Root page must not contain navigation links');
 assert.ok(existsSync(yunshangPath), 'Expected the 云上星愿 playable prototype to exist');
 assert.ok(existsSync(yunshangAppPath), 'Expected the current 云上星愿 playable app to exist');
 const yunshang = readFileSync(yunshangPath, 'utf8');
