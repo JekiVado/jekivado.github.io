@@ -1,13 +1,94 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
-    <title></title>
+    <title>404</title>
     <style>
-      html, body { width: 100%; height: 100%; margin: 0; background: #fff; }
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body { min-height: 100%; margin: 0; }
+      body {
+        overflow: hidden;
+        background: #101317;
+        color: #d7dad6;
+        font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+      }
+      .error-page {
+        position: relative;
+        display: grid;
+        min-height: 100svh;
+        place-items: center;
+        padding: 32px;
+        isolation: isolate;
+      }
+      .error-page::before {
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+        background-size: 34px 34px;
+        content: "";
+        mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+      }
+      .error-page::after {
+        position: absolute;
+        z-index: -1;
+        width: min(74vw, 780px);
+        height: min(74vw, 780px);
+        border: 1px solid rgba(218, 94, 66, .25);
+        border-radius: 50%;
+        box-shadow: 0 0 0 70px rgba(218, 94, 66, .025), 0 0 0 140px rgba(218, 94, 66, .018);
+        content: "";
+      }
+      .message {
+        width: min(100%, 620px);
+        border-left: 1px solid #da5e42;
+        padding: 10px 0 10px 28px;
+      }
+      .code {
+        margin: 0 0 13px;
+        color: #da5e42;
+        font-size: clamp(68px, 13vw, 126px);
+        font-weight: 500;
+        letter-spacing: -.1em;
+        line-height: .76;
+      }
+      h1 {
+        margin: 0;
+        color: #f0f1ed;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: .18em;
+      }
+      p {
+        max-width: 34em;
+        margin: 20px 0 0;
+        color: #8f9692;
+        font-size: 12px;
+        line-height: 1.8;
+      }
+      .trace {
+        margin-top: 36px;
+        color: #565e5a;
+        font-size: 10px;
+        letter-spacing: .07em;
+      }
+      @media (max-width: 520px) {
+        .error-page { padding: 24px; }
+        .message { padding-left: 20px; }
+      }
     </style>
   </head>
-  <body></body>
+  <body>
+    <main class="error-page">
+      <section class="message" aria-labelledby="error-title">
+        <p class="code" aria-hidden="true">404</p>
+        <h1 id="error-title">PAGE NOT FOUND</h1>
+        <p>The requested resource could not be located.</p>
+        <p class="trace">STATUS: NOT_FOUND · REQUEST TERMINATED</p>
+      </section>
+    </main>
+  </body>
 </html>
